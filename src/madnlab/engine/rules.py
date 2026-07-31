@@ -128,7 +128,18 @@ class RuleSet(NamedTuple):
 
     @property
     def entry_attempts(self) -> int:
-        """Rolls granted per turn while the D-1 condition holds.
+        """Entry **attempts** granted while the D-1 condition holds (D-51).
+
+        This is the attempt count, *not* the per-turn roll budget. The GM-3.3
+        free roll after a 6, and ``bonus_roll_after_quick_entry``, are added on
+        top by the game loop, and ``bonus_roll_forfeited`` (D-56) can subtract
+        the GM-3.3 grant again. D-10 tabulates the resulting maximum rolls per
+        turn as **1 / 4 / 5** for attempts of 1 / 3 / 3-with-bonus — reading
+        this property as a roll count drops the free follow-up in exactly the
+        arm D-10 exists to pin, and neither AK-2 nor AK-4 would notice.
+
+        This is also the quantity D-30's analytic gate is stated over:
+        ``p = 1 - (5/6)^attempts``.
 
         The three-attempts variant never fires under ``free_entry``: entering
         does not need a 6 there, so rolling repeatedly for one is meaningless.

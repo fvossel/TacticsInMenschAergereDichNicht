@@ -27,6 +27,7 @@ is reported so the event log can record it (§4.1) and AK-5 can count it.
 from __future__ import annotations
 
 import enum
+from collections.abc import Mapping, Sequence
 from typing import NamedTuple
 
 from madnlab.engine.geometry import (
@@ -106,14 +107,14 @@ def _ring_occupancy(board: Board, state: GameState) -> dict[int, list[int]]:
     return occupancy
 
 
-def _is_barrier(occupancy: dict[int, list[int]], field: int) -> bool:
+def _is_barrier(occupancy: Mapping[int, Sequence[int]], field: int) -> bool:
     """Two pieces on one field. Blocks passage and landing for everyone."""
     occupants = occupancy.get(field)
     return occupants is not None and len(occupants) >= 2
 
 
 def _landing(
-    occupancy: dict[int, list[int]],
+    occupancy: Mapping[int, Sequence[int]],
     field: int,
     seat: int,
     rules: RuleSet,
@@ -141,7 +142,7 @@ def _landing(
 
 def _ring_path_clear(
     board: Board,
-    occupancy: dict[int, list[int]],
+    occupancy: Mapping[int, Sequence[int]],
     seat: int,
     from_pos: int,
     steps: int,
@@ -201,36 +202,54 @@ def _candidate_moves(
     seat: int,
     roll: int,
     rules: RuleSet,
-    occupancy: dict[int, tuple[int, ...]],
+    occupancy: Mapping[int, Sequence[int]],
 ) -> list[Move]:
-    """Every move legal on its own terms, before the GM-5.1 lattice."""
+    """Every move legal on its own terms, before the GM-5.1 lattice.
+
+    ``occupancy`` is read-only here; the annotation says so rather than a
+    comment, because an in-place update inside the per-piece loop would make
+    legality depend on piece iteration order and NF-1's determinism claims are
+    made in this module.
+    """
     moves: list[Move] = []
     ring_length = board.ring_length
-    entry_emitted = False
+
+    # One move per distinct origin position, for the lowest global piece index
+    # (D-61, generalizing D-60). Two of a seat's pieces can share a position in
+    # exactly two ways: any number of them in the yard, and — under
+    # ``barriers`` — two of them on one ring field. Move generation reads only
+    # ``(pos, seat, roll, rules, occupancy)``, never the piece index, so
+    # co-located pieces produce identical moves and the second is a
+    # behavioural duplicate.
+    #
+    # The duplicates are not cosmetic. ``RANDOM`` chooses uniformly over
+    # ``legal``, so a duplicated option carries twice the weight of every
+    # other: uniform agents would break barriers at roughly twice the intended
+    # rate, which measures as a 15-16% depression of ``barrier_turns`` — an
+    # order of magnitude past D-40's 0.5 pp relevance threshold, landing
+    # directly in RQ-2's barriers main effect and RQ-4's EX-6c/6d.
+    #
+    # Skipping is unconditional rather than emit-conditional: two pieces at
+    # the same position either both produce a move or both produce none, so
+    # processing the second is redundant either way.
+    seen_positions: set[int] = set()
 
     for piece in range(PIECES_PER_SEAT):
         index = piece_index(seat, piece)
         pos = state.positions[index]
+        if pos in seen_positions:
+            continue
+        seen_positions.add(pos)
         location = board.location(pos)
 
         # -- from the yard: entry (GM-3.2 / GM-3.5 / cold_start) ------------
         if location is PieceLocation.YARD:
-            # Exactly one entry move is generated, for the lowest-index yard
-            # piece (D-60). Yard pieces are indistinguishable, so emitting one
-            # move per yard piece would put duplicates in the legal set — and
-            # since RANDOM chooses uniformly over that set, entering would be
-            # oversampled by the number of pieces still in the yard. The
-            # duplicates are not a cosmetic issue; they would bias every
-            # campaign that contains a RANDOM field.
-            if entry_emitted:
-                continue
             if rules.cold_start.requires_six_to_enter and roll != 6:
                 continue
             field = board.entry_field(seat)
             allowed, captured = _landing(occupancy, field, seat, rules)
             if allowed:
                 moves.append(Move(index, pos, 1, MoveKind.ENTER, captured))
-                entry_emitted = True
             continue
 
         # -- from the goal column: advance inside it -----------------------
@@ -240,7 +259,13 @@ def _candidate_moves(
             # D-54: a roll that would carry the piece past the last goal field
             # generates no move. The rulebook is silent; this is the project
             # choice, and it is deliberately not a bounce-back.
-            if target >= GOAL_FIELDS:
+            #
+            # The lower bound is not reachable from a d6 — ``legal_moves``
+            # rejects rolls outside 1..6 (D-62) — but it is checked anyway so
+            # that a ``GOAL`` record whose ``to_pos`` falls back onto the ring,
+            # violating the encoding every consumer relies on, cannot be
+            # constructed at all.
+            if not 0 <= target < GOAL_FIELDS:
                 continue
             if _goal_path_clear(board, state, seat, current + 1, target, rules):
                 moves.append(Move(index, pos, board.goal_pos(target), MoveKind.GOAL))
@@ -346,7 +371,22 @@ def legal_moves_with_restriction(
     The game loop uses this so the ``move`` event can record ``restriction``
     (§4.1) and the AK-5 counters can be maintained. Agents use
     :func:`legal_moves`, which drops the second element.
+
+    Domain (D-62, D-63): ``roll`` is a d6 value and ``seat`` is a seat index on
+    ``board``. Both are checked, because an out-of-domain ``seat`` would
+    otherwise read another seat's pieces through Python's negative indexing and
+    return a plausible-looking move — a silent wrong answer rather than a loud
+    failure. ``legal_moves`` is deliberately blind to *which* seats are in
+    play: the game loop skips seats outside ``seats_in_play``.
     """
+    if not 1 <= roll <= 6:
+        raise ValueError(
+            f"roll must be a d6 value in 1..6, got {roll!r} (GM-3.1; D-62)"
+        )
+    if not 0 <= seat < board.seats:
+        raise ValueError(
+            f"seat {seat!r} is out of range for a {board.seats}-seat board (D-63)"
+        )
     occupancy = _ring_occupancy(board, state)
     candidates = _candidate_moves(board, state, seat, roll, rules, occupancy)
     if not candidates:

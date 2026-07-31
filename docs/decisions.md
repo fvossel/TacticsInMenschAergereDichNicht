@@ -1534,6 +1534,112 @@ equality does, which is why the rule is "lowest index" rather than "any".
 could produce duplicate legal moves would bias a uniform-choosing agent the
 same way. The M1 engine review covers this explicitly.
 **Affects.** GM-7, §3.2 `RANDOM` and `SPREAD`, LG-3, AK-1.
+**Superseded in scope by D-61**, which generalizes the rule from yard pieces
+to any co-located pieces. D-60's tie-break and its rationale stand unchanged.
+
+### D-61 — One move per distinct origin position (generalizes D-60)
+**Status:** `pinned` · *blocker found by the M1 engine review, 2026-08-01*
+**Decision.** `legal_moves` emits at most **one move per distinct origin
+position per seat**, for the lowest global piece index — the same tie-break
+D-60 uses, so LG-3's replay event-stream equality stays well defined.
+**What D-60 missed.** D-60 fixed the yard case with a boolean guard and closed
+with "any other place where indistinguishable options could produce duplicate
+legal moves would bias a uniform-choosing agent the same way". There is
+exactly one other place: under `barriers`, two of a seat's pieces stand on one
+ring field, and since `Board.ring_field` is injective over `1..ring_length`
+they necessarily share a position. Move generation reads only
+`(pos, seat, roll, rules, occupancy)` and never the piece index, so they
+produced identical `Move` records differing only in that index — through all
+three generating branches (ring, goal entry, extra lap) and into the clearing
+and forced-capture filters.
+**Measured impact, which is why this was a blocker and not a tidy-up.**
+`RANDOM` chooses uniformly over `legal`, so the barrier-breaking option
+carried weight 2 against every other option's 1: uniform agents broke barriers
+at roughly twice the intended rate while formation stayed unbiased, i.e. a
+one-directional bias. Three independent random-play harnesses put it at
+3.1–3.4% of all decisions on the 4-seat `barriers = true` board (6.6% of
+decisions with more than one option) and **−15% to −16.4% on
+`barrier_turns`** — against D-40's 0.5 pp relevance threshold. Affected
+pre-registered cells: RQ-2's `barriers` main effect (84 EX-4 cells), RQ-4's
+confirmatory `barriers × strategy` interaction (EX-6c/6d, several at n = 400k
+with a 0.49 pp MDES), and the D-22 barrier battery. It also falsified §1.1's
+stated estimand: the barrier main effect was supposed to be a *clean* lower
+bound under barrier-blind play, and a biased bound is not that.
+**Implementation.** A `seen_positions` set skipped unconditionally at the top
+of the per-piece loop, rather than a per-branch emit guard: two pieces at the
+same position either both produce a move or both produce none, so processing
+the second is redundant either way, and the unconditional form cannot miss a
+branch. Zero cost when `barriers = false`.
+**The invariant to test, which is stronger than the rule.** Every returned
+move must lead to a **distinct successor state**, judged on the moving seat's
+own position multiset. That is checkable in every arm rather than only under
+barriers, and it guards against the next variant of this bug rather than this
+one. Verified over 8,000 decision points across 36 rule sets and both boards.
+**Affects.** GM-7, §1.1, §3.2, §6.2 barrier battery, LG-1, LG-3, AK-1, D-60.
+
+### D-62 — Domain of `roll`
+**Status:** `pinned` · *review, minor*
+**Decision.** `legal_moves` is defined on `roll ∈ 1..6` (GM-3.1, one standard
+d6) and raises a named `ValueError` outside it. Independently, the goal branch
+checks the **lower** bound of its target index, not only the upper one, so a
+`GOAL` record whose `to_pos` falls back onto the ring — violating the position
+encoding every consumer relies on — cannot be constructed at all.
+**Rationale.** A named error rather than an assert: the check is once per call
+against roughly 520 calls per game, which is not where NF-2's budget goes, and
+`-O` silently removing a domain guard from the one function GM-7 makes
+authoritative is a bad trade.
+**Affects.** GM-7, D-54, AK-1.
+
+### D-63 — Domain of `seat`, and what `legal_moves` knows about occupancy
+**Status:** `pinned` · *review, minor*
+**Decision.** `legal_moves` is defined for `0 <= seat < board.seats` and
+raises a named `ValueError` outside it. It is deliberately **blind to which
+seats are in play**: the game loop skips seats outside `seats_in_play`, as
+`initial_state` already pins.
+**Rationale.** Without the check a negative seat reads another seat's pieces
+through Python's negative indexing and returns a plausible-looking move — a
+silent wrong answer rather than a loud failure.
+**Open for M2.** Whether `seats_in_play` belongs in `GameState` is a design
+question for the game loop, not an M1 fix.
+**Affects.** GM-7.
+
+### D-64 — Domain of `Board.ring_field`, and the load-bearing modulo
+**Status:** `pinned` · *review, minor*
+**Decision.** `pos` may exceed the ring length and is reduced modulo it. The
+modulo is **required**, not defensive: `mandatory_extended`'s extra-lap path
+scan walks positions up to `ring_length + 5` and relies on them wrapping onto
+the correct lap fields.
+**Why this is worth a row.** The obvious shape of an NF-2 optimization pass is
+a precomputed per-seat lookup table indexed `1..ring_length`. That would break
+exactly the barrier path checks in the one arm carrying the forced-extra-lap
+counters, and nothing else — a failure that would look like a barrier bug in a
+capture arm. `Board.goal_entry_field` is now expressed through `ring_field` so
+the seat offset has one definition.
+**Affects.** GM-1, GM-5, NF-2.
+
+### D-65 — Semantics of `seat_pattern = spread`
+**Status:** `pinned` · *review, minor*
+**Decision.** `spread` means **maximally even spacing**, `step = seats //
+players`, requiring `players` to divide `seats`. §2.2's prose is amended to
+match; even spacing rather than a literal "every second seat" is the property
+EX-5 tests.
+**Rationale.** The two readings agree on the only spread configuration §8
+instantiates — 3 players on the 6-seat board gives (0, 2, 4), §2.2's own
+worked example — and diverge only at (6 seats, 2 players), which no measured
+cell uses. Nothing measured changes; what is closed is the possibility of the
+pattern name and the tuple written into a cell key disagreeing once configs
+outside §8 exist.
+**Affects.** §2.2, §7.1 cell keys, EX-5.
+
+### D-66 — Where AK-8b's 1-player configuration comes from
+**Status:** `pinned` · *review, minor*
+**Decision.** `occupied_seats` keeps its `players >= 2` floor — that is §2.4's
+measured-axis range and all three seat patterns are degenerate at one player.
+AK-8b's single-player analytic calibration cell builds its seat tuple by
+passing it to `initial_state` directly, which is a first-class path that never
+touches the helper. The player-count guard is split so each bound carries its
+own message and citation.
+**Affects.** §2.2, AK-8b, D-30.
 
 ---
 
@@ -1541,6 +1647,7 @@ same way. The M1 engine review covers this explicitly.
 
 | Id | Item | Blocks |
 |---|---|---|
+| NF-2 / AK-7 | **Early indication: the throughput target is missed by ~4–5×.** Two independent toy loops over the M1 engine — no logging, no `leader(t)`, no event log — measured **199 and 235 games/s** single-core at ~520 `legal_moves` calls per baseline 4-seat game, i.e. 5.0–5.5 µs/call against NF-2's implied 1.91 µs budget. This is **not** AK-7: those loops omit exactly the costs D-43c requires inside the measured loop. NF-2 pre-authorizes an optimization pass plus a ledger row as the remedy, and D-43c places AK-7 in M1, so it is run before the game loop is written against a cost model that is about to change. **Plan impact is bounded**: at the measured rate D-59's 16.4M games is ≈23 CPU-hours, ≈11 minutes on one 128-core node under D-48. Structural questions (incremental occupancy carried in `GameState` vs. rebuilt per call) are taken with the AK-7 number in hand, not before. | game loop |
 | §2.4, §2.3, §1, §6 | The specification text still carries the corrected claims (D-51, D-55: `strict` labelled "the Schmidt baseline", three attempts labelled "baseline, per Schmidt", the §2.4 preamble sentence about variants that "coincide"), and does not yet contain §6.4 (D-59) or the corrected §8 sample sizes. The ledger is authoritative until the spec is rewritten, which must happen **before** the `prereg-v1` freeze (D-41). | D-41 freeze |
 
 *Resolved 2026-07-31:*

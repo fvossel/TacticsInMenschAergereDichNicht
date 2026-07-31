@@ -88,14 +88,26 @@ class Board(NamedTuple):
         """Absolute ring field directly before ``seat``'s goal column.
 
         A piece reaches it after ``ring_length - 1`` steps, i.e. at
-        ``pos == ring_length``; the next step enters the goal column.
+        ``pos == ring_length``; the next step enters the goal column. Expressed
+        through :meth:`ring_field` so the seat offset has exactly one
+        definition (D-3's "one function, one definition" applied to geometry).
         """
-        return (seat * self.spacing - 1) % self.ring_length
+        return self.ring_field(seat, self.ring_length)
 
     def ring_field(self, seat: int, pos: int) -> int:
         """Absolute ring field of ``seat``'s piece standing at ``pos``.
 
-        ``pos`` must be a ring position (``1 <= pos <= ring_length``).
+        ``pos`` is normally a ring position (``1 <= pos <= ring_length``), but
+        the domain is deliberately wider: **``pos`` may exceed the ring length
+        and is reduced modulo it** (D-64). The modulo is load-bearing, not
+        defensive — ``mandatory_extended``'s extra-lap path scan walks
+        positions up to ``ring_length + 5`` and relies on them wrapping onto
+        the correct lap fields.
+
+        Anyone replacing this with a precomputed per-seat lookup table indexed
+        ``1..ring_length`` — the obvious shape of an NF-2 optimization pass —
+        must keep the wrap, or the barrier path checks silently break in the
+        one arm that carries the forced-extra-lap counters.
         """
         return (seat * self.spacing + pos - 1) % self.ring_length
 
@@ -147,11 +159,6 @@ def board_for(seats: int) -> Board:
     return board
 
 
-def location_of(board: Board, pos: int) -> PieceLocation:
-    """Free-function form of :meth:`Board.location`."""
-    return board.location(pos)
-
-
 # -- seat patterns (GM-2) ---------------------------------------------------
 
 
@@ -166,15 +173,29 @@ class SeatPattern(enum.StrEnum):
 def occupied_seats(seats: int, players: int, pattern: SeatPattern) -> tuple[int, ...]:
     """Seat indices occupied by ``players`` players under ``pattern``.
 
-    ``adjacent`` fills seats ``0..players-1``. ``spread`` places players every
-    ``seats // players`` seats, which is only well defined when that divides
-    evenly. ``opposite`` is defined for two players only and places them on
-    maximally distant seats.
+    ``adjacent`` fills seats ``0..players-1``. ``spread`` means **maximally
+    even spacing**, ``step = seats // players``, which requires ``players`` to
+    divide ``seats`` (D-65) — even spacing rather than a literal "every second
+    seat" is the property EX-5 tests, and the two readings agree on the only
+    spread configuration §8 instantiates, 3 players on the 6-seat board.
+    ``opposite`` is defined for two players only.
+
+    The ``players >= 2`` floor is §2.4's measured-axis range, and the three
+    patterns are degenerate at one player. AK-8b's single-player calibration
+    configuration does not go through here: it passes a seat tuple to
+    ``initial_state`` directly (D-66).
     """
-    if not 2 <= players <= seats:
+    if players > seats:
         raise ValueError(
             f"{players} players do not fit on a {seats}-seat board "
             f"(requirements §2.4 constrains players <= seats)"
+        )
+    if players < 2:
+        raise ValueError(
+            f"{players} players is below the measured range: requirements §2.4 "
+            f"defines the players axis as 2-6, and the seat patterns are "
+            f"degenerate at one player. AK-8b's 1-player calibration cell builds "
+            f"its seat tuple directly instead (D-66)"
         )
 
     if pattern is SeatPattern.ADJACENT:

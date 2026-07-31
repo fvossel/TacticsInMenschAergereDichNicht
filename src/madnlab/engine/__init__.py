@@ -3,20 +3,30 @@
 ``legal_moves`` in :mod:`madnlab.engine.moves` is the single source of truth
 for legality (GM-7): the game loop, every agent, the replay validator and the
 UI all consume that one function, and no agent re-implements any part of it.
+
+The surface deliberately carries each type together with its validating
+constructor — :class:`Board` with :func:`board_for`, :class:`GameState` with
+:func:`initial_state` — so a consumer can build both arguments
+:func:`legal_moves` needs without reaching into submodules. Names whose
+consumers do not exist yet (the game loop, the metric layer, the replay
+validator) are left in their modules until those land.
 """
 
-from madnlab.engine.geometry import POS_YARD, Board, PieceLocation, location_of
-from madnlab.engine.moves import Move, MoveKind, legal_moves
+from madnlab.engine.geometry import POS_YARD, Board, PieceLocation, board_for
+from madnlab.engine.moves import Move, MoveKind, Restriction, legal_moves
 from madnlab.engine.rules import (
+    BASELINE,
     CaptureEnforcement,
     CaptureMode,
     ColdStart,
     GameEndMode,
+    InadmissibleRuleSetError,
     RuleSet,
 )
-from madnlab.engine.state import GameState, progress_of_seat
+from madnlab.engine.state import GameState, initial_state, progress_of_seat
 
 __all__ = [
+    "BASELINE",
     "POS_YARD",
     "Board",
     "CaptureEnforcement",
@@ -24,11 +34,14 @@ __all__ = [
     "ColdStart",
     "GameEndMode",
     "GameState",
+    "InadmissibleRuleSetError",
     "Move",
     "MoveKind",
     "PieceLocation",
+    "Restriction",
     "RuleSet",
+    "board_for",
+    "initial_state",
     "legal_moves",
-    "location_of",
     "progress_of_seat",
 ]
