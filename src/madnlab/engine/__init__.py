@@ -5,7 +5,7 @@ for legality (GM-7): the game loop, every agent, the replay validator and the
 UI all consume that one function, and no agent re-implements any part of it.
 """
 
-from madnlab.engine.geometry import Board, POS_YARD, PieceLocation, location_of
+from madnlab.engine.geometry import POS_YARD, Board, PieceLocation, location_of
 from madnlab.engine.moves import Move, MoveKind, legal_moves
 from madnlab.engine.rules import (
     CaptureEnforcement,

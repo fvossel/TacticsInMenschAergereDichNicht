@@ -31,3 +31,7 @@ src = ["src", "tests"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "UP", "B", "SIM", "RUF"]
+# The docs and docstrings quote the specification, which uses en dashes for
+# section ranges and German rule text with typographic quotation marks. Those
+# are deliberate, not confusables that slipped in.
+ignore = ["RUF002", "RUF003"]

@@ -112,15 +112,15 @@ class RuleSet(NamedTuple):
     # ----------------------------------------------------------------------
 
     def validate(self) -> None:
-        """Raise :class:`InadmissibleRuleSet` if the combination is invalid."""
+        """Raise :class:`InadmissibleRuleSetError` if the combination is invalid."""
         if self.bonus_roll_after_quick_entry and not self.dreimal_wuerfeln:
-            raise InadmissibleRuleSet(
+            raise InadmissibleRuleSetError(
                 "bonus_roll_after_quick_entry requires dreimal_wuerfeln=True: the "
                 "bonus is granted for entering on the 1st or 2nd of the three "
                 "attempts, and without the variant there are no attempts (GM-4)"
             )
         if self.capture_enforcement is CaptureEnforcement.PENALIZE:
-            raise InadmissibleRuleSet(
+            raise InadmissibleRuleSetError(
                 "capture_enforcement='penalize' is out of scope for v1: it is only "
                 "meaningful with fallible agents that can overlook a capture, plus "
                 "an opponent policy for choosing the blown piece (§12)"
@@ -148,7 +148,7 @@ class RuleSet(NamedTuple):
         return not self.cold_start.requires_six_to_enter
 
 
-class InadmissibleRuleSet(ValueError):
+class InadmissibleRuleSetError(ValueError):
     """Raised for a rule combination the specification does not define."""
 
 

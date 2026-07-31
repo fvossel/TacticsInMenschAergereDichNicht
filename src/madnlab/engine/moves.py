@@ -85,30 +85,35 @@ class Move(NamedTuple):
 # -- occupancy --------------------------------------------------------------
 
 
-def _ring_occupancy(board: Board, state: GameState) -> dict[int, tuple[int, ...]]:
+def _ring_occupancy(board: Board, state: GameState) -> dict[int, list[int]]:
     """Map absolute ring field -> global indices of the pieces standing there.
 
     Only ring pieces appear. A field with two entries is a barrier, which is
     reachable only under ``barriers = True``; goal columns are strictly one
     piece per field (D-34) and are not represented here.
+
+    Values are lists appended to in ascending piece index, not rebuilt tuples:
+    this runs once per :func:`legal_moves` call over at most ``seats * 4``
+    pieces, and it is on the hot path NF-2's target has to clear.
     """
-    occupancy: dict[int, tuple[int, ...]] = {}
+    occupancy: dict[int, list[int]] = {}
     ring_length = board.ring_length
     for index, pos in enumerate(state.positions):
         if pos == POS_YARD or pos > ring_length:
             continue
         field = board.ring_field(index // PIECES_PER_SEAT, pos)
-        occupancy[field] = occupancy.get(field, ()) + (index,)
+        occupancy.setdefault(field, []).append(index)
     return occupancy
 
 
-def _is_barrier(occupancy: dict[int, tuple[int, ...]], field: int) -> bool:
+def _is_barrier(occupancy: dict[int, list[int]], field: int) -> bool:
     """Two pieces on one field. Blocks passage and landing for everyone."""
-    return len(occupancy.get(field, ())) >= 2
+    occupants = occupancy.get(field)
+    return occupants is not None and len(occupants) >= 2
 
 
 def _landing(
-    occupancy: dict[int, tuple[int, ...]],
+    occupancy: dict[int, list[int]],
     field: int,
     seat: int,
     rules: RuleSet,
@@ -123,7 +128,7 @@ def _landing(
     * one opponent piece -> allowed, captures it (GM-3.6)
     * two pieces -> a barrier; not landable and not capturable (GM-6.2/6.3)
     """
-    occupants = occupancy.get(field, ())
+    occupants = occupancy.get(field)
     if not occupants:
         return True, None
     if len(occupants) >= 2:
@@ -136,7 +141,7 @@ def _landing(
 
 def _ring_path_clear(
     board: Board,
-    occupancy: dict[int, tuple[int, ...]],
+    occupancy: dict[int, list[int]],
     seat: int,
     from_pos: int,
     steps: int,
@@ -262,13 +267,12 @@ def _candidate_moves(
 
         # Exact fit on entry (GM-3.8, verified): a roll that overshoots the
         # column does not produce a move for this piece.
-        if goal_target < GOAL_FIELDS and _ring_path_clear(
-            board, occupancy, seat, pos, ring_steps, rules
+        if (
+            goal_target < GOAL_FIELDS
+            and _ring_path_clear(board, occupancy, seat, pos, ring_steps, rules)
+            and _goal_path_clear(board, state, seat, 0, goal_target, rules)
         ):
-            if _goal_path_clear(board, state, seat, 0, goal_target, rules):
-                moves.append(
-                    Move(index, pos, board.goal_pos(goal_target), MoveKind.GOAL_ENTER)
-                )
+            moves.append(Move(index, pos, board.goal_pos(goal_target), MoveKind.GOAL_ENTER))
 
         # mandatory_extended (GM-5): continuing on the ring past the own goal
         # entry is otherwise impossible, and becomes legal exactly when it
