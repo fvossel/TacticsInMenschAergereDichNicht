@@ -1,0 +1,33 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "madnlab"
+version = "0.1.0"
+description = "A measurement engine for optional rules and movement strategies in Mensch aergere Dich nicht"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { file = "LICENSE" }
+dependencies = []
+
+[project.optional-dependencies]
+analysis = ["numpy>=1.26", "scipy>=1.11"]
+dev = ["pytest>=8.0", "ruff>=0.5"]
+
+[project.scripts]
+madnlab = "madnlab.run.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/madnlab"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "UP", "B", "SIM", "RUF"]

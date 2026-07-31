@@ -1510,6 +1510,33 @@ be qualified.
 
 ---
 
+## 9. Implementation decisions (M1)
+
+### D-60 — Exactly one entry move is generated per turn
+**Status:** `pinned` · *found by the M1 smoke tests, 2026-08-01*
+**Decision.** When a seat has pieces in the yard and entering is legal,
+`legal_moves` generates **exactly one** `ENTER` move, for the **lowest-index**
+yard piece — not one per yard piece.
+**Rationale.** Pieces in the yard are indistinguishable, so one move per yard
+piece puts behavioural duplicates in the legal set. This is not cosmetic:
+`RANDOM` chooses uniformly over `legal`, so with four pieces in the yard and
+one other legal move, entering would be chosen with probability 4/5 instead of
+1/2 — a bias proportional to how many pieces are still in the yard, present in
+every campaign containing a `RANDOM` field, and largest exactly in the opening
+and after a capture. It would also inflate `SPREAD`'s entry preference and
+distort the RQ-1 dynamics metrics through the capture-recovery path.
+**Consequence for the log.** The `move` event records which piece entered, and
+that piece is now always the lowest-index yard piece rather than an agent
+choice. Nothing downstream depends on the identity — yard pieces are
+interchangeable by construction — but the replay validator's event-stream
+equality does, which is why the rule is "lowest index" rather than "any".
+**Generalization to check.** Any other place where indistinguishable options
+could produce duplicate legal moves would bias a uniform-choosing agent the
+same way. The M1 engine review covers this explicitly.
+**Affects.** GM-7, §3.2 `RANDOM` and `SPREAD`, LG-3, AK-1.
+
+---
+
 ## Open items
 
 | Id | Item | Blocks |
