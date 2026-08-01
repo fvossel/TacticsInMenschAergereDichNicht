@@ -70,10 +70,10 @@ Game outcomes: **0 abandoned**, **0 stalemated** out of 16,430,642. Both are mea
 
 | Contrast | Estimate | 95% CI | p | Holm alpha | Verdict |
 |---|---:|---|---:|---:|---|
-| deviant win rate vs 1/k :: SPREAD | 0.0000 | [-0.0027, 0.0027] | 0.9854 | 0.05000 | not rejected |
-| deviant win rate vs 1/k :: FOCUS_FRONT | 0.0009 | [-0.0017, 0.0036] | 0.4927 | 0.01250 | not rejected |
-| deviant win rate vs 1/k :: FOCUS_REAR | 0.0004 | [-0.0022, 0.0031] | 0.7480 | 0.02500 | not rejected |
-| deviant win rate :: FOCUS_FRONT - FOCUS_REAR | 0.0005 | [-0.0022, 0.0032] | 0.7153 | 0.01667 | not rejected |
+| deviant win rate vs 1/k :: SPREAD | 0.0000 | [-0.0019, 0.0019] | 0.9794 | 0.05000 | not rejected |
+| deviant win rate vs 1/k :: FOCUS_FRONT | 0.0009 | [-0.0010, 0.0028] | 0.3316 | 0.01250 | not rejected |
+| deviant win rate vs 1/k :: FOCUS_REAR | 0.0004 | [-0.0015, 0.0023] | 0.6495 | 0.01667 | not rejected |
+| deviant win rate :: FOCUS_FRONT - FOCUS_REAR | 0.0005 | [-0.0022, 0.0032] | 0.7153 | 0.02500 | not rejected |
 
 **0 of 4 rejected** after Holm correction.
 
@@ -84,17 +84,17 @@ Game outcomes: **0 abandoned**, **0 stalemated** out of 16,430,642. Both are mea
 | Contrast | Estimate | 95% CI | p | Holm alpha | Verdict |
 |---|---:|---|---:|---:|---|
 | deviant edge shift :: capture_mode:mandatory x strategy | 0.0004 | [-0.0015, 0.0023] | 0.6985 | 0.02500 | not rejected |
-| deviant edge shift :: capture_mode:mandatory_extended x strategy | 0.0015 | [-0.0004, 0.0034] | 0.1173 | 0.00833 | not rejected |
+| deviant edge shift :: capture_mode:mandatory_extended x strategy | 0.0015 | [-0.0004, 0.0034] | 0.1173 | 0.01250 | not rejected |
 | deviant edge shift :: barriers x strategy | -0.0009 | [-0.0028, 0.0010] | 0.3318 | 0.01667 | not rejected |
-| deviant edge shift :: capture_mode:mandatory x strategy x players | 0.0018 | [-0.0001, 0.0037] | 0.0606 | 0.00625 | not rejected |
-| deviant edge shift :: capture_mode:mandatory_extended x strategy x players | 0.0017 | [-0.0002, 0.0036] | 0.0865 | 0.00714 | not rejected |
+| deviant edge shift :: capture_mode:mandatory x strategy x players | 0.0018 | [-0.0001, 0.0037] | 0.0606 | 0.00833 | not rejected |
+| deviant edge shift :: capture_mode:mandatory_extended x strategy x players | 0.0017 | [-0.0002, 0.0036] | 0.0865 | 0.01000 | not rejected |
 | deviant edge shift :: barriers x strategy x players | 0.0002 | [-0.0017, 0.0021] | 0.8606 | 0.05000 | not rejected |
-| starter win rate :: capture_mode x players | 0.3375 | [0.3356, 0.3394] | &lt;1e-300 | 0.00500 | **rejected** |
-| starter win rate :: capture_mode x players x board | 0.3374 | [0.3355, 0.3394] | &lt;1e-300 | 0.00556 | **rejected** |
-| starter win rate :: EX-5 pattern effect | 0.0018 | [-0.0008, 0.0045] | 0.1699 | 0.01250 | not rejected |
-| starter win rate :: EX-5 geometry effect | 0.0018 | [-0.0008, 0.0045] | 0.1686 | 0.01000 | not rejected |
+| rounds to first win, interaction :: capture_mode x players | -46.4 | [-46.7, -46.2] | &lt;1e-300 | 0.00500 | **rejected** |
+| rounds to first win, interaction :: capture_mode x players x board | 9.5011 | [8.8238, 10.2] | &lt;1e-300 | 0.00556 | **rejected** |
+| rounds to first win :: EX-5 pattern effect | -2.0464 | [-2.1526, -1.9523] | &lt;1e-300 | 0.00625 | **rejected** |
+| rounds to first win :: EX-5 geometry effect | -11.7 | [-11.8, -11.6] | &lt;1e-300 | 0.00714 | **rejected** |
 
-**2 of 10 rejected** after Holm correction.
+**4 of 10 rejected** after Holm correction.
 
 ### RQ-1 support criterion
 
