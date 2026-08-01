@@ -34,9 +34,20 @@ src = ["src", "tests"]
 # made. A type checker removes that error class for free.
 [tool.mypy]
 python_version = "3.13"
-files = ["src", "tests"]
+files = ["src", "tests", "benchmarks"]
 strict = true
 warn_unreachable = true
+
+# Strict typing earns its keep in the engine, where a signature that drifts out
+# of sync with its callers is invisible until it produces a wrong game. In the
+# tests the same drift is caught by running them, so requiring an annotation on
+# every scenario function would add noise without adding a check. Everything
+# else stays strict here too, including the return types of the helpers the
+# scenarios share.
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "UP", "B", "SIM", "RUF"]
