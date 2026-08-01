@@ -1879,11 +1879,119 @@ did not re-run, because nothing about the engine changed.
 
 ---
 
+### D-75 — Four specified things that were never implemented
+**Status:** `pinned` · *found 2026-08-01, after the first full campaign* ·
+*post-freeze code fix*
+
+Running the campaigns to completion surfaced a class of defect that no gate
+could catch, because in each case the thing that would have failed did not
+exist. All four were **specified**, and all four were absent.
+
+**1. Thirteen §6.2 fields.** The summary rows carried 34 fields; §6.2
+specifies `captured_by_seat`, `entry_waits_by_seat`, `barrier_turns_by_seat`,
+`forced_extra_lap_offered`/`_violations`, `winner_rank_at_50`/`_75`/`_tied`,
+`comeback` with its threshold and depth, and `final_margin`/`_norm` as well.
+No code produced any of them.
+
+*Consequence.* **RQ-1 was undecidable.** §6.4's support criterion needs 2 of 3
+from {`lead_changes_per_turn`, comeback rate, 1 − predictability skill}, and
+two of the three read `winner_rank_at_50`. Exactly one was available. The
+primary research question of the project could not be answered from the data
+the project had spent 16.4M games producing.
+
+**2. AK-9's coverage list.** `CROSS_CHECKED` was a hand-written tuple of
+thirteen field names. Any field added after it was written escaped the
+cross-check in silence — and `reference.py`'s own module docstring names
+`winner_rank_at_50` as the exact metric whose corruption AK-9 exists to catch.
+AK-9 compares two derivations of the fields it knows about; a field that does
+not exist has no two derivations, so the one check designed for this failure
+mode was structurally blind to it.
+
+**3. AK-5's second invariant.** §11 requires `capture_forcing_violations = 0`
+**and** `forced_extra_lap_violations = 0`. The second counter did not exist.
+The first is initialised to zero and **never incremented** — a violation
+raises `ValueError` in `legal.index(move)` instead of being counted — so
+AK-5's whole verdict rested on `offered > 0`. It reported PASS on every cell
+of every campaign, on half an invariant, one half of which cannot fail.
+
+**4. `log_events`.** Parsed from the config, validated, echoed into
+`campaign.json` — and never read. `run_campaign` writes only
+`summary.jsonl.gz`. §11's AK-5 per-event spot check has no data to run on,
+because the sampled logs it names are not produced.
+
+**The common shape.** Every one of these is a check that looks green because a
+part of it never ran. It is the same shape as D-74's report line and D-72's
+conflated verdict, one level deeper: there, a gate said the wrong thing about
+what it measured; here, a gate measured nothing and said it passed. A test
+suite of 118 tests, `mypy --strict` and `ruff` were all green throughout,
+because absent code is well-typed and lint-clean.
+
+**Fix.** All thirteen fields implemented and cross-derived by AK-9's walker on
+an independent route — the D-1 predicate is reimplemented there rather than
+imported, since calling the engine's own predicate would make AK-9 one
+implementation invoked twice. Verified non-trivially: over six 6-player games
+the two paths agree on 3,039 entry waits, 4,899 per-seat barrier turns, 1,653
+captures suffered and 35 extended-capture obligations. AK-9's coverage list is
+now **asserted complete** by a test, so the next field cannot repeat this.
+AK-5 checks both invariants.
+
+**Not fixed, recorded.** `log_events` still does nothing and AK-5's per-event
+spot check still has no corpus. The engine-level counters now cover the
+invariant, so this is a redundancy gap rather than an unmeasured invariant —
+but §11 asks for the second path and it is not there.
+
+**Data that existed when this was made (§14.2).** All eight campaigns had run
+under `prereg-v1` and been analysed; the gates were green and no §6.4
+hypothesis had been evaluated, because the estimators to evaluate them did not
+exist yet either. All of that data is superseded: the rows lack the thirteen
+fields, so every campaign was re-run.
+
+**Affects.** §6.2, §6.4, §11 AK-5, §14.4, D-71, D-74, `engine/loop.py`,
+`eventlog/writer.py`, `analysis/reference.py`, `analysis/aggregate.py`.
+
+---
+
+### D-76 — A two-sample contrast cannot go through the one-sample bootstrap
+**Status:** `pinned` · *2026-08-01*
+
+**Defect.** The first §6.4 estimators fed `bca_bootstrap` a concatenation of
+the two arms and split it inside the statistic. `bca_bootstrap` resamples the
+vector it is given, so every draw mixed both arms: the replicates traced the
+**permutation null**, not the sampling distribution of the contrast. A mean
+difference of exactly 2.0 came back with a 95% CI of [−0.21, 0.22].
+
+**Why it is worth a row.** Every individual number looked reasonable. The
+point estimate was right, the interval was a plausible width, and the p-value
+— computed analytically — was correctly tiny. Only the *combination* was
+absurd, and the invariant that catches it is the one nobody thinks to assert:
+**the estimate must lie inside its own interval**. It is now a parametrised
+regression test.
+
+**Fix.** `bca_two_sample` in `intervals.py`, resampling each arm
+independently.
+
+**Grouped jackknife, deliberately.** Textbook BCa jackknifes one observation
+at a time — O(n) evaluations of an O(n) statistic. At §8's confirmatory sizes
+(250k games per arm) that is ~10¹¹ operations and simply cannot be run. The
+acceleration is estimated by deleting groups of 1/100th of each arm, the
+standard delete-d construction. This is a variance-reduction device, not an
+approximation of a different quantity, and it is stated here because a reader
+checking a published interval needs to know which BCa produced it.
+
+**Affects.** §6.3 SQ-2, SQ-3, `analysis/intervals.py`, `analysis/estimands.py`.
+
+---
+
 ## Open items
 
-**None.** Both rows that stood here are resolved, and the table is empty at the
-`prereg-v1` freeze (D-73) — which is the point: a pre-registration cannot be
-frozen while an open item blocks the freeze.
+| Id | Item | Blocks |
+|---|---|---|
+| §11 AK-5 | **The per-event spot check has no corpus.** `log_events` is parsed, validated and echoed into `campaign.json`, and `run_campaign` never acts on it, so no campaign emits the sampled event logs §11's AK-5 clause names (D-75). The engine-level counters now cover both halves of the invariant, so this is a missing *second path* rather than an unmeasured invariant — the same redundancy AK-9 provides for §6.2 and AK-3 for the event stream. Closing it means sampling k games per cell into `events/` during the run and walking them in `analyse`. | nothing; recorded as a known gap in `docs/results.md` |
+
+The two rows that stood here before the freeze are resolved, and the table was
+empty at `prereg-v1` (D-73) — which was the point: a pre-registration cannot be
+frozen while an open item blocks the freeze. The row above was opened after it,
+by D-75.
 
 *Resolved 2026-08-01:*
 - **NF-2 / AK-7** — AK-7 was run. D-68 records the measurement (235–282
