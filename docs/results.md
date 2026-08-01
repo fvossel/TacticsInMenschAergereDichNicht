@@ -509,6 +509,14 @@ AK-4 is a harness and geometry gate scoped to the calibration cells (§11, D-74)
 
 Where the field is homogeneous and the seats are exchangeable, §6.3's symmetry identity fixes every seat at 1/k for any rule set, so a per-seat rate there states arithmetic rather than a measurement. These are the cells where that does not hold — an uneven seating gap, or one seat playing a different policy — and the profile is the finding. AK-4 reports these as failures and deliberately does not gate on them (D-74): the asymmetry is what EX-5 set out to measure.
 
+**The largest asymmetries, of 157 such cells.** These are **not pre-registered**: no §6.4 hypothesis asks about them, they carry no multiplicity correction, and they are reported because §14.4 requires every result to appear — not as a claim the study set out to test. Anything here worth believing needs its own pre-registered replication.
+
+- `ex5/2p/adjacent/spread` — 35.27% / 64.72% (**29.45 pp**, n = 20,000)
+- `ex2/4s2p/spread/optional` — 35.55% / 64.45% (**28.91 pp**, n = 20,000)
+- `ex3/homogeneous/4s2p/spread` — 35.77% / 64.23% (**28.46 pp**, n = 20,000)
+- `ex3/deviant/4s2p/focus_rear-vs-spread` — 37.59% / 62.41% (**24.83 pp**, n = 20,000)
+- `ex3/deviant/4s2p/spread-vs-focus_rear` — 37.85% / 62.14% (**24.29 pp**, n = 20,000)
+
 | Cell | n | per-seat win rates | spread |
 |---|---:|---|---:|
 | `ex2/4s2p/greedy_capture/mandatory` | 20,000 | 50.61% / 49.39% | 1.22 pp |
