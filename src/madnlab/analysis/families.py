@@ -20,10 +20,16 @@ from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 from typing import NamedTuple
 
-from madnlab.analysis import estimands
+from madnlab.analysis import estimands, intervals
 from madnlab.analysis.aggregate import CellSummary, load_cells
 from madnlab.analysis.estimands import Estimate
-from madnlab.analysis.multiplicity import FAMILIES, HolmResult, Hypothesis, holm
+from madnlab.analysis.multiplicity import (
+    FAMILIES,
+    FAMILIES_V2,
+    HolmResult,
+    Hypothesis,
+    holm,
+)
 
 
 class Dataset(NamedTuple):
@@ -525,3 +531,157 @@ def run_all(
         rq3(data, seed=seed, resamples=resamples),
         rq4(data, seed=seed, resamples=resamples),
     ]
+
+
+# -- §15: the seat-exposure replication, frozen separately at prereg-v2 -----
+
+#: Cells RQ-5 reads, by short name.
+RQ5_CELLS = {
+    "adjacent-spread": "ex7/2p/4s-adjacent/spread",
+    "adjacent-random": "ex7/2p/4s-adjacent/random",
+    "opposite-spread": "ex7/2p/4s-opposite/spread",
+    "opposite-random": "ex7/2p/4s-opposite/random",
+    "3p-adjacent-spread": "ex7/3p/6s-adjacent/spread",
+    "3p-spread-spread": "ex7/3p/6s-spread/spread",
+    "3p-adjacent-random": "ex7/3p/6s-adjacent/random",
+    "3p-spread-random": "ex7/3p/6s-spread/random",
+}
+
+#: §15.2's equivalence margin for the negative controls, and the magnitude
+#: threshold hypothesis 1 has to clear.
+RQ5_EQUIVALENCE_PP = 1.0
+RQ5_MAGNITUDE_PP = 5.0
+
+
+def _seat_asymmetry(cell: CellSummary, label: str) -> Estimate:
+    """p(second occupied seat) − p(first), multinomial (§15.2).
+
+    The seats are named by position, not by which one happened to win more.
+    Selecting the extreme pair out of the data and then testing it is a
+    selection the interval knows nothing about.
+    """
+    first, second = cell.occupied[0], cell.occupied[1]
+    return estimands.seat_difference(
+        cell.wins_by_seat.get(second, 0),
+        cell.wins_by_seat.get(first, 0),
+        cell.games,
+        label=label,
+    )
+
+
+def _asymmetry_difference(
+    arm: CellSummary, base: CellSummary, label: str
+) -> Estimate:
+    """Difference of two cells' seat asymmetries — separate games, so the
+    variances add."""
+    left = _seat_asymmetry(arm, "left")
+    right = _seat_asymmetry(base, "right")
+    estimate = left.estimate - right.estimate
+    z_crit = intervals.z_for(0.95)
+    se_left = (left.interval.high - left.interval.low) / (2 * z_crit)
+    se_right = (right.interval.high - right.interval.low) / (2 * z_crit)
+    se = (se_left**2 + se_right**2) ** 0.5
+    interval = intervals.Interval(
+        estimate, estimate - z_crit * se, estimate + z_crit * se, 0.95
+    )
+    p_value = estimands.two_sided_p(estimate / se) if se > 0 else 1.0
+    return Estimate(label, estimate, interval, p_value, arm.games, base.games)
+
+
+def rq5(data: Dataset) -> FamilyResult:
+    """§15's family. Eight hypotheses, Holm within the family."""
+    estimates: list[Estimate] = []
+    hypotheses: list[Hypothesis] = []
+    unavailable: list[str] = []
+    contrasts = FAMILIES_V2["RQ-5"][1]
+
+    plan: tuple[tuple[str, str, tuple[str, ...]], ...] = (
+        (contrasts[0], "single", ("adjacent-spread",)),
+        (contrasts[1], "single", ("adjacent-random",)),
+        (contrasts[2], "single", ("opposite-spread",)),
+        (contrasts[3], "single", ("opposite-random",)),
+        (contrasts[4], "diff", ("adjacent-spread", "adjacent-random")),
+        (contrasts[5], "diff", ("adjacent-spread", "opposite-spread")),
+        (contrasts[6], "diff", ("3p-adjacent-spread", "3p-spread-spread")),
+        (contrasts[7], "diff", ("3p-adjacent-random", "3p-spread-random")),
+    )
+
+    for name, kind, arms in plan:
+        cells = [data.cells.get(RQ5_CELLS[arm]) for arm in arms]
+        first = cells[0]
+        if first is None or any(c is None for c in cells):
+            unavailable.append(f"seat_asymmetry @ {name}")
+            continue
+        if kind == "single":
+            estimates.append(_seat_asymmetry(first, f"seat asymmetry :: {name}"))
+        else:
+            second = cells[1]
+            assert second is not None
+            estimates.append(
+                _asymmetry_difference(first, second, f"asymmetry shift :: {name}")
+            )
+        hypotheses.append(Hypothesis("RQ-5", "seat_asymmetry", name))
+
+    results = holm([e.p_value for e in estimates], hypotheses) if estimates else []
+    return FamilyResult("RQ-5", estimates, results, unavailable)
+
+
+class RQ5Verdict(NamedTuple):
+    """§15.2's biconditional, evaluated rather than argued."""
+
+    supported: bool
+    detail: list[str]
+
+
+def rq5_verdict(result: FamilyResult) -> RQ5Verdict:
+    """Supported iff 1, 5 and 6 reject in direction **and** 3 is equivalent.
+
+    The conjunction is what makes it a replication rather than a restatement:
+    (1) alone only repeats the observation, (6) attributes it to the seating
+    geometry, (5) shows the strategy matters, and (3) is the negative control
+    that would fail if the estimator manufactured asymmetries by itself.
+    """
+    contrasts = FAMILIES_V2["RQ-5"][1]
+    by_contrast = {
+        holm_result.hypothesis.contrast: (holm_result, estimate)
+        for holm_result, estimate in zip(result.holm, result.estimates, strict=True)
+    }
+    detail: list[str] = []
+    conditions: list[bool] = []
+
+    for index, requirement in ((0, "> 0 and > 5 pp"), (4, "> 0"), (5, "> 0")):
+        name = contrasts[index]
+        pair = by_contrast.get(name)
+        if pair is None:
+            detail.append(f"H{index + 1} ({name}): missing")
+            conditions.append(False)
+            continue
+        holm_result, estimate = pair
+        big_enough = estimate.estimate * 100 > RQ5_MAGNITUDE_PP if index == 0 else True
+        ok = holm_result.rejected and estimate.estimate > 0 and big_enough
+        conditions.append(ok)
+        detail.append(
+            f"H{index + 1} ({name}): {estimate.estimate * 100:+.3f} pp, "
+            f"Holm {'rejected' if holm_result.rejected else 'not rejected'}, "
+            f"needs {requirement} -> {'holds' if ok else 'fails'}"
+        )
+
+    name = contrasts[2]
+    pair = by_contrast.get(name)
+    if pair is None:
+        detail.append(f"H3 ({name}): missing")
+        conditions.append(False)
+    else:
+        estimate = pair[1]
+        margin = RQ5_EQUIVALENCE_PP / 100.0
+        equivalent = estimate.interval.low > -margin and estimate.interval.high < margin
+        conditions.append(equivalent)
+        detail.append(
+            f"H3 ({name}): {estimate.estimate * 100:+.3f} pp, CI "
+            f"[{estimate.interval.low * 100:+.3f}, "
+            f"{estimate.interval.high * 100:+.3f}] vs margin "
+            f"+/-{RQ5_EQUIVALENCE_PP} pp -> "
+            f"{'equivalent' if equivalent else 'not equivalent'}"
+        )
+
+    return RQ5Verdict(all(conditions), detail)

@@ -6,6 +6,7 @@
     "mode": "sample",
     "k": 100
   },
+  "prereg_version": "prereg-v1",
   "cells": [
     {
       "key": "ex2/4s2p/random/optional",

@@ -55,7 +55,7 @@ class CellConfig(NamedTuple):
     rules: dict[str, Any]
     force_full_permutations: bool | None = None
 
-    def to_spec(self, master_seed: int) -> GameSpec:
+    def to_spec(self, master_seed: int, prereg_version: str = "prereg-v1") -> GameSpec:
         return GameSpec(
             cell_key=self.key,
             seats=self.seats,
@@ -64,6 +64,7 @@ class CellConfig(NamedTuple):
             rules=build_rules(self.rules),
             agent_ids=self.agents,
             master_seed=master_seed,
+            prereg_version=prereg_version,
             counterbalanced=True,
             force_full_permutations=self.force_full_permutations,
         )
@@ -77,11 +78,15 @@ class CampaignConfig(NamedTuple):
     master_seed: int
     cells: tuple[CellConfig, ...]
     log_events: dict[str, Any]
+    #: Which pre-registration this campaign runs under (§14). Per campaign
+    #: rather than global: a later study gets its own freeze, and stamping its
+    #: tag on rows produced under the earlier one would misdate them (D-78).
+    prereg_version: str = "prereg-v1"
 
     def specs(self) -> Iterator[tuple[GameSpec, int]]:
         """Each cell's spec with its **effective** game count (D-39)."""
         for cell in self.cells:
-            spec = cell.to_spec(self.master_seed)
+            spec = cell.to_spec(self.master_seed, self.prereg_version)
             yield spec, spec.balance().effective_games(cell.games)
 
 
@@ -124,7 +129,8 @@ def _require(payload: dict[str, Any], key: str, where: str) -> Any:
 
 def parse(payload: dict[str, Any]) -> CampaignConfig:
     """Validate and resolve a campaign payload."""
-    allowed = {"name", "description", "master_seed", "cells", "log_events"}
+    allowed = {"name", "description", "master_seed", "cells", "log_events",
+               "prereg_version"}
     unknown = set(payload) - allowed
     if unknown:
         raise ConfigError(f"unknown campaign keys {sorted(unknown)}")
@@ -181,6 +187,7 @@ def parse(payload: dict[str, Any]) -> CampaignConfig:
         master_seed=_require(payload, "master_seed", "campaign"),
         cells=tuple(cells),
         log_events=payload.get("log_events", {"mode": "sample", "k": 100}),
+        prereg_version=str(payload.get("prereg_version", "prereg-v1")),
     )
 
 
@@ -196,7 +203,7 @@ def resolved_payload(config: CampaignConfig) -> dict[str, Any]:
     """The fully resolved configuration, for ``campaign.json`` (§7.2)."""
     cells = []
     for cell in config.cells:
-        spec = cell.to_spec(config.master_seed)
+        spec = cell.to_spec(config.master_seed, config.prereg_version)
         balance = spec.balance()
         cells.append(
             {
@@ -221,6 +228,7 @@ def resolved_payload(config: CampaignConfig) -> dict[str, Any]:
         "description": config.description,
         "master_seed": config.master_seed,
         "log_events": config.log_events,
+        "prereg_version": config.prereg_version,
         "cells": cells,
     }
 

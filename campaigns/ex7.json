@@ -1,0 +1,184 @@
+{
+  "name": "EX7",
+  "description": "RQ-5 seat exposure (prereg-v2)",
+  "master_seed": 20260901,
+  "log_events": {
+    "mode": "sample",
+    "k": 100
+  },
+  "prereg_version": "prereg-v2",
+  "cells": [
+    {
+      "key": "ex7/2p/4s-adjacent/random",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 200000,
+      "rules": {}
+    },
+    {
+      "key": "ex7/2p/4s-adjacent/spread",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "SPREAD",
+        "SPREAD"
+      ],
+      "games": 200000,
+      "rules": {}
+    },
+    {
+      "key": "ex7/2p/4s-adjacent/focus_front",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_FRONT",
+        "FOCUS_FRONT"
+      ],
+      "games": 200000,
+      "rules": {}
+    },
+    {
+      "key": "ex7/2p/4s-adjacent/focus_rear",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_REAR",
+        "FOCUS_REAR"
+      ],
+      "games": 200000,
+      "rules": {}
+    },
+    {
+      "key": "ex7/2p/4s-adjacent/greedy_capture",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "GREEDY_CAPTURE",
+        "GREEDY_CAPTURE"
+      ],
+      "games": 200000,
+      "rules": {}
+    },
+    {
+      "key": "ex7/2p/4s-opposite/random",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "opposite",
+      "agents": [
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 200000,
+      "rules": {}
+    },
+    {
+      "key": "ex7/2p/4s-opposite/spread",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "opposite",
+      "agents": [
+        "SPREAD",
+        "SPREAD"
+      ],
+      "games": 200000,
+      "rules": {}
+    },
+    {
+      "key": "ex7/2p/4s-opposite/focus_front",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "opposite",
+      "agents": [
+        "FOCUS_FRONT",
+        "FOCUS_FRONT"
+      ],
+      "games": 200000,
+      "rules": {}
+    },
+    {
+      "key": "ex7/2p/4s-opposite/focus_rear",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "opposite",
+      "agents": [
+        "FOCUS_REAR",
+        "FOCUS_REAR"
+      ],
+      "games": 200000,
+      "rules": {}
+    },
+    {
+      "key": "ex7/2p/4s-opposite/greedy_capture",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "opposite",
+      "agents": [
+        "GREEDY_CAPTURE",
+        "GREEDY_CAPTURE"
+      ],
+      "games": 200000,
+      "rules": {}
+    },
+    {
+      "key": "ex7/3p/6s-adjacent/random",
+      "seats": 6,
+      "players": 3,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 200000,
+      "rules": {}
+    },
+    {
+      "key": "ex7/3p/6s-adjacent/spread",
+      "seats": 6,
+      "players": 3,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "SPREAD",
+        "SPREAD",
+        "SPREAD"
+      ],
+      "games": 200000,
+      "rules": {}
+    },
+    {
+      "key": "ex7/3p/6s-spread/random",
+      "seats": 6,
+      "players": 3,
+      "seat_pattern": "spread",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 200000,
+      "rules": {}
+    },
+    {
+      "key": "ex7/3p/6s-spread/spread",
+      "seats": 6,
+      "players": 3,
+      "seat_pattern": "spread",
+      "agents": [
+        "SPREAD",
+        "SPREAD",
+        "SPREAD"
+      ],
+      "games": 200000,
+      "rules": {}
+    }
+  ]
+}

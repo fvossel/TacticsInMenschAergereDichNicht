@@ -6,6 +6,7 @@
     "mode": "sample",
     "k": 100
   },
+  "prereg_version": "prereg-v1",
   "cells": [
     {
       "key": "ex4/4s4p/random/baseline",

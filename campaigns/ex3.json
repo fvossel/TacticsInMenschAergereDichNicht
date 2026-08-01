@@ -6,6 +6,7 @@
     "mode": "sample",
     "k": 100
   },
+  "prereg_version": "prereg-v1",
   "cells": [
     {
       "key": "ex3/homogeneous/4s2p/random",

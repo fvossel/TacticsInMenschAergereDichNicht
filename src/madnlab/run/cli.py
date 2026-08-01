@@ -226,6 +226,25 @@ def build_report(
     for line in verdict.detail:
         print(f"  {line}")
 
+    # §15's family runs only when its campaign is present. It is frozen at a
+    # different tag and reported in its own section, never merged into the
+    # prereg-v1 families or their Holm correction (D-78).
+    replication = families.rq5(data)
+    replication_verdict = None
+    if replication.estimates:
+        replication_verdict = families.rq5_verdict(replication)
+        rejected = sum(1 for r in replication.holm if r.rejected)
+        print(
+            f"  RQ-5: {len(replication.estimates)} tests, {rejected} rejected "
+            f"(prereg-v2)"
+        )
+        print(
+            f"\nRQ-5: "
+            f"{'SUPPORTED' if replication_verdict.supported else 'NOT SUPPORTED'}"
+        )
+        for line in replication_verdict.detail:
+            print(f"  {line}")
+
     # A cell is confirmatory when a §6.4 contrast reads it. Derived from the
     # sample sizes §8 assigned rather than re-listed here, so the label cannot
     # drift from the plan that produced it.
@@ -236,6 +255,8 @@ def build_report(
         data,
         results,
         verdict,
+        replication=replication if replication.estimates else None,
+        replication_verdict=replication_verdict,
         confirmatory=confirmatory,
         provenance={
             "prereg_version": PREREG_VERSION,

@@ -58,8 +58,12 @@ def _phi(z: float) -> float:
     return 0.5 * (1.0 + math.erf(z / math.sqrt(2.0)))
 
 
-def _two_sided_p(z: float) -> float:
+def two_sided_p(z: float) -> float:
+    """Two-sided normal tail probability. Public because §15's family needs it."""
     return 2.0 * (1.0 - _phi(abs(z)))
+
+
+_two_sided_p = two_sided_p
 
 
 def mean(values: Sequence[float]) -> float:

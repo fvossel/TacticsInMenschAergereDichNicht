@@ -802,3 +802,84 @@ AK-5 → **M4** UI + AK-6 → **M5** full experiment plan + `docs/results.md`.
    every campaign cell, significant or not, with its confirmatory/descriptive
    label attached. This, together with the freeze, is what prevents
    cherry-picking — not the size of the multiplicity correction.
+
+---
+
+## 15. EX-7 — the seat-exposure replication (pre-registration v2)
+
+**This is a separate pre-registration, frozen at the git tag `prereg-v2`, and
+it is not part of `prereg-v1`.** The effect it tests was *discovered in* the
+`prereg-v1` data (§14.4's descriptive section: two adjacent SPREAD players won
+35.3% against 64.7%). Adding a hypothesis to a frozen set after seeing the
+data that suggested it, and then testing it on that same data, confirms
+nothing — the data cannot be both the source of a hypothesis and its evidence.
+EX-7 therefore runs on **fresh master seeds**, and every EX-7 row records
+`prereg_version = prereg-v2` (D-78).
+
+### 15.1 The mechanism, stated before the data
+
+Entry fields are `spacing` apart, so an occupancy pattern fixes the cyclic
+gaps between them. A piece is exposed to an opponent over the stretch of ring
+it occupies *downstream* of that opponent's entry field, because that is where
+the opponent's freshly entering pieces move into it.
+
+| Cell | occupied | entry fields | cyclic gaps |
+|---|---|---|---|
+| 4 seats, 2 players, `adjacent` | 0, 1 | 0, 10 | 10, 30 |
+| 4 seats, 2 players, `opposite` | 0, 2 | 0, 20 | 20, 20 |
+| 6 seats, 3 players, `adjacent` | 0, 1, 2 | 0, 8, 16 | 8, 8, 32 |
+| 6 seats, 3 players, `spread` | 0, 2, 4 | 0, 16, 32 | 16, 16, 16 |
+
+Under `adjacent` at two players, a seat-0 piece spends 30 of its 40 ring steps
+downstream of seat 1's entry; a seat-1 piece spends 10 of 40 downstream of
+seat 0's. **Prediction: seat 1 wins more.** Under `opposite` the gaps are
+equal and the prediction is no asymmetry. The prediction is derived from the
+geometry, not fitted to the observation.
+
+### 15.2 Confirmatory hypotheses (family RQ-5)
+
+Estimand: `seat_asymmetry` = p(second occupied seat) − p(first occupied seat)
+within one cell, using the multinomial difference variance (§6.3 SQ-6). Holm
+within the family at alpha = 0.05. **8 hypotheses.**
+
+The two seats are named **by position, in advance** — the first and second
+entries of the occupied list — never as the observed maximum and minimum.
+Picking the extreme pair out of the data and then testing it is a selection
+the interval does not know about, and at three seats it inflates the
+rejection rate by roughly a factor of three. For the three-player cells the
+geometry gives the same prediction as at two: seat 0 carries the longest
+downstream exposure and is predicted lowest, seat 1 highest.
+
+| # | Contrast | Pre-registered prediction |
+|---|---|---|
+| 1 | `4s2p adjacent`, homogeneous SPREAD | asymmetry **> 0** and **> 5 pp** |
+| 2 | `4s2p adjacent`, homogeneous RANDOM | asymmetry **> 0** |
+| 3 | `4s2p opposite`, homogeneous SPREAD | **equivalent to 0** within ±1 pp |
+| 4 | `4s2p opposite`, homogeneous RANDOM | **equivalent to 0** within ±1 pp |
+| 5 | SPREAD − RANDOM asymmetry, `adjacent` | **> 0** (the strategy amplifies it) |
+| 6 | `adjacent` − `opposite` asymmetry, SPREAD | **> 0** (the geometry causes it) |
+| 7 | `6s3p adjacent` vs `6s3p spread`, SPREAD | adjacent asymmetry **larger** |
+| 8 | `6s3p adjacent` vs `6s3p spread`, RANDOM | adjacent asymmetry **larger** |
+
+**RQ-5 support criterion (decidable biconditional).** RQ-5 is **supported iff**
+hypotheses **1, 5 and 6** are all Holm-rejected in the predicted direction
+**and** hypothesis **3** passes its equivalence test. Any other outcome is
+reported as not supported, with all values published either way.
+
+Rationale for the conjunction: (1) alone would only restate the observation;
+(6) is what attributes it to the seating geometry rather than to something
+about SPREAD; (5) is what shows the strategy matters; and (3) is the negative
+control that would fail if the estimator simply manufactured asymmetries.
+
+### 15.3 Arms and sample size
+
+14 cells at n = 200,000: seating pattern {`adjacent`, `opposite`} × five
+homogeneous fields at 2 players on the 4-seat board (10 cells), plus
+{`6s-adjacent`, `6s-spread`} × {RANDOM, SPREAD} at 3 players (4 cells).
+**2.8M games.**
+
+At n = 200,000 and two players the multinomial half-width of a seat difference
+is 0.44 pp, which resolves both the 5 pp threshold of hypothesis 1 and the
+±1 pp equivalence margin of hypothesis 3. The three non-headline fields
+(FOCUS_FRONT, FOCUS_REAR, GREEDY_CAPTURE) carry no confirmatory hypothesis and
+are descriptive: they say whether the effect is specific to SPREAD.

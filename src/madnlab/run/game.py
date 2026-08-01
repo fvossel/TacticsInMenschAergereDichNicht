@@ -47,6 +47,10 @@ class GameSpec(NamedTuple):
     counterbalanced: bool = True
     #: Override D-39's permutation trigger. ``None`` uses the rule.
     force_full_permutations: bool | None = None
+    #: The pre-registration this cell runs under (§14). Carried on the spec so
+    #: a second study can be frozen separately without restamping the first
+    #: study's rows (D-78).
+    prereg_version: str = PREREG_VERSION
 
     def occupied(self) -> tuple[int, ...]:
         return occupied_seats(self.seats, self.players, self.seat_pattern)
@@ -83,7 +87,7 @@ def build_header(
     return LogHeader(
         schema_version=SCHEMA_VERSION,
         engine_version=ENGINE_VERSION,
-        prereg_version=PREREG_VERSION,
+        prereg_version=spec.prereg_version,
         cell_key=spec.cell_key,
         game_index=game_index,
         master_seed=spec.master_seed,
@@ -152,7 +156,7 @@ def play_indexed_game(
         cell_key=spec.cell_key,
         game_index=game_index,
         game_seed=seed,
-        prereg_version=PREREG_VERSION,
+        prereg_version=spec.prereg_version,
         engine_version=ENGINE_VERSION,
         seats=spec.seats,
         players=spec.players,

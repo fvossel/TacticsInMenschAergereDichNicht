@@ -24,7 +24,12 @@ from madnlab.analysis.aggregate import (
     starting_player_advantage,
 )
 from madnlab.analysis.estimands import Estimate
-from madnlab.analysis.families import Dataset, FamilyResult, RQ1Verdict
+from madnlab.analysis.families import (
+    Dataset,
+    FamilyResult,
+    RQ1Verdict,
+    RQ5Verdict,
+)
 
 #: The §6.2 battery, in report order. Keys are ``CellSummary.metric_means``.
 BATTERY = (
@@ -166,6 +171,53 @@ def rq1_section(verdict: RQ1Verdict) -> list[str]:
     return lines
 
 
+def replication_section(
+    result: FamilyResult, verdict: RQ5Verdict
+) -> list[str]:
+    """§15's family, reported under its own freeze and its own correction.
+
+    Kept in its own section, and out of §6.4's Holm families, because it is a
+    different pre-registration: `prereg-v2`, on data generated from a fresh
+    master seed after the hypothesis was written down. Merging it into the
+    earlier families would put a hypothesis formed *after* the prereg-v1 data
+    inside prereg-v1's error control, which is the thing a second freeze
+    exists to avoid.
+    """
+    lines = [
+        "## 2b. Replication: seat exposure (pre-registration v2)",
+        "",
+        "The largest effect in §6 was never a §6.4 hypothesis: it was found in "
+        "the descriptive tables. §15 states it as a mechanism derived from the "
+        "board geometry — a piece is exposed to an opponent over the stretch "
+        "of ring it occupies downstream of that opponent's entry field, and "
+        "`adjacent` seating makes those stretches unequal while `opposite` "
+        "does not — freezes it at `prereg-v2`, and tests it on **fresh master "
+        "seeds**. Data that suggests a hypothesis cannot also be its evidence.",
+        "",
+    ]
+    lines.extend(family_section(result))
+    lines.extend(
+        [
+            "### RQ-5 support criterion",
+            "",
+            "§15.2: supported **iff** hypotheses 1, 5 and 6 are Holm-rejected "
+            "in the predicted direction **and** hypothesis 3 — the `opposite` "
+            "negative control — is equivalent to zero within ±1 pp.",
+            "",
+        ]
+    )
+    lines.extend(f"- {item}" for item in verdict.detail)
+    lines.extend(
+        [
+            "",
+            f"## RQ-5 is "
+            f"{'**SUPPORTED**' if verdict.supported else '**NOT SUPPORTED**'}",
+            "",
+        ]
+    )
+    return lines
+
+
 def battery_table(cells: dict[str, CellSummary], confirmatory: set[str]) -> list[str]:
     """§14.4's all-results table: every metric, every cell, no selection."""
     header = "| Cell | label | n | " + " | ".join(name for _, name in BATTERY) + " |"
@@ -282,6 +334,8 @@ def render(
     families: Sequence[FamilyResult],
     verdict: RQ1Verdict,
     *,
+    replication: FamilyResult | None = None,
+    replication_verdict: RQ5Verdict | None = None,
     confirmatory: set[str],
     provenance: dict[str, Any],
 ) -> str:
@@ -343,6 +397,9 @@ def render(
         ]
     )
     lines.extend(gates_table(data.cells, data.agents))
+    if replication is not None and replication_verdict is not None:
+        lines.extend(replication_section(replication, replication_verdict))
+
     lines.extend(
         [
             "",
