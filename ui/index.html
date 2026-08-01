@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MadnLab — replay viewer</title>
+  </head>
+  <body>
+    <header>
+      <h1>MadnLab replay viewer<small>an analysis instrument, not a play interface (UI-1)</small></h1>
+    </header>
+
+    <main>
+      <div>
+        <section class="panel">
+          <div id="drop">
+            Drop an event log (<code>.jsonl</code>) or a <code>campaign.json</code> here, or
+            <input type="file" id="file" accept=".jsonl,.json" />
+          </div>
+          <p id="status">No log loaded.</p>
+        </section>
+
+        <section class="panel" id="viewer" hidden>
+          <div id="board-host"></div>
+          <div class="controls">
+            <button id="first">|&lt;</button>
+            <button id="prev">&lt;</button>
+            <button id="play">Play</button>
+            <button id="next">&gt;</button>
+            <button id="last">&gt;|</button>
+            <input type="range" id="scrubber" min="0" max="0" value="0" />
+            <span id="position">0 / 0</span>
+          </div>
+          <div class="controls" style="margin-top:8px">
+            <label for="speed">speed</label>
+            <input type="range" id="speed" min="1" max="60" value="8" style="max-width:140px" />
+            <span id="speed-label">8/s</span>
+            <label for="filter">filter</label>
+            <select id="filter">
+              <option value="all">all events</option>
+              <option value="moves">moves</option>
+              <option value="captures">captures</option>
+              <option value="entries">entries</option>
+              <option value="barriers">barrier events</option>
+              <option value="passes">passes</option>
+            </select>
+          </div>
+        </section>
+
+        <section class="panel" id="aggregate" hidden>
+          <h2 id="aggregate-title">Aggregate</h2>
+          <table>
+            <thead><tr><th>cell</th><th>board</th><th>agents</th><th class="num">games</th><th class="num">block</th><th>flags</th></tr></thead>
+            <tbody id="aggregate-body"></tbody>
+          </table>
+        </section>
+      </div>
+
+      <div>
+        <section class="panel">
+          <h2>Current roll &amp; offered legal moves</h2>
+          <p id="roll">not started</p>
+          <div id="offered">—</div>
+        </section>
+        <section class="panel"><h2>Seats</h2><div id="seats"></div></section>
+        <section class="panel"><h2>Running metrics (§6.2)</h2><div id="metrics"></div></section>
+        <section class="panel"><h2>Events</h2><div id="events"></div></section>
+        <section class="panel"><h2>Resolved configuration &amp; seeds</h2><div id="meta"></div></section>
+      </div>
+    </main>
+
+    <footer>
+      Results are statements about the defined agent policies, not about human play (§1.1).
+    </footer>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

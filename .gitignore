@@ -181,3 +181,5 @@ cython_debug/
 .cursorindexingignore
 # campaign outputs -- regenerated from the master seed (NF-6)
 .runs/
+node_modules/
+ui/dist/
