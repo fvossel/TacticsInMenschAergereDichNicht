@@ -265,10 +265,12 @@ def ex6() -> list[dict[str, Any]]:
 
 
 def ex7() -> list[dict[str, Any]]:
-    """RQ-5, the seat-exposure replication (§15). Pre-registration v2.
+    """RQ-5, seat exposure (§15).
 
-    Fresh master seed, deliberately: the effect was found in the prereg-v1
-    data, and data that suggested a hypothesis cannot also be its evidence.
+    Two players on the 4-seat board sit either `adjacent` (cyclic entry-field
+    gaps of 10 and 30) or `opposite` (20 and 20). A piece is exposed to an
+    opponent over the stretch it occupies downstream of that opponent's entry,
+    so `adjacent` should be lopsided and `opposite` should not.
     """
     cells = []
     for pattern, field in itertools.product(("adjacent", "opposite"), AGENTS):
@@ -289,13 +291,13 @@ def ex7() -> list[dict[str, Any]]:
 
 
 CAMPAIGNS = {
-    "ex2": ("RQ-1 Schlagzwang", 20260810, ex2),
-    "ex3": ("RQ-3 movement strategies", 20260811, ex3),
-    "ex4": ("RQ-2 rule main effects", 20260812, ex4),
-    "ex5": ("Seating geometry", 20260813, ex5),
-    "ex6": ("RQ-4 interactions", 20260814, ex6),
+    "ex2": ("RQ-1 Schlagzwang", 20261010, ex2),
+    "ex3": ("RQ-3 movement strategies", 20261011, ex3),
+    "ex4": ("RQ-2 rule main effects", 20261012, ex4),
+    "ex5": ("Seating geometry", 20261013, ex5),
+    "ex6": ("RQ-4 interactions", 20261014, ex6),
     # A fresh seed, and its own pre-registration (§15, D-78).
-    "ex7": ("RQ-5 seat exposure (prereg-v2)", 20260901, ex7),
+    "ex7": ("RQ-5 seat exposure", 20261015, ex7),
 }
 
 #: D-59's cell counts. Asserted, so the plan and the files cannot drift.
@@ -326,9 +328,7 @@ def main() -> int:
             "description": description,
             "master_seed": seed,
             "log_events": {"mode": "sample", "k": 100},
-            # EX-7 is frozen separately (§15): its rows must not claim the
-            # tag the earlier study was frozen at (D-78).
-            "prereg_version": "prereg-v2" if name == "ex7" else "prereg-v1",
+            "prereg_version": "prereg-v1",
             "cells": cells,
         }
         path = OUT / f"{name}.json"

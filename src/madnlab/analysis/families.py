@@ -23,13 +23,7 @@ from typing import NamedTuple
 from madnlab.analysis import estimands, intervals
 from madnlab.analysis.aggregate import CellSummary, load_cells
 from madnlab.analysis.estimands import Estimate
-from madnlab.analysis.multiplicity import (
-    FAMILIES,
-    FAMILIES_V2,
-    HolmResult,
-    Hypothesis,
-    holm,
-)
+from madnlab.analysis.multiplicity import FAMILIES, HolmResult, Hypothesis, holm
 
 
 class Dataset(NamedTuple):
@@ -530,10 +524,11 @@ def run_all(
         rq2(data, seed=seed, resamples=resamples, workers=workers),
         rq3(data, seed=seed, resamples=resamples),
         rq4(data, seed=seed, resamples=resamples),
+        rq5(data),
     ]
 
 
-# -- §15: the seat-exposure replication, frozen separately at prereg-v2 -----
+# -- §15: seat exposure ------------------------------------------------------
 
 #: Cells RQ-5 reads, by short name.
 RQ5_CELLS = {
@@ -588,12 +583,18 @@ def _asymmetry_difference(
     return Estimate(label, estimate, interval, p_value, arm.games, base.games)
 
 
-def rq5(data: Dataset) -> FamilyResult:
-    """§15's family. Eight hypotheses, Holm within the family."""
+def rq5(data: Dataset, *, seed: int = 0, resamples: int = 0) -> FamilyResult:
+    """§15's family: does seating position decide the game? Eight hypotheses.
+
+    ``seed`` and ``resamples`` are accepted and unused — every contrast here is
+    a proportion with a closed-form variance, so nothing is bootstrapped. They
+    keep the signature uniform with the other families.
+    """
+    del seed, resamples
     estimates: list[Estimate] = []
     hypotheses: list[Hypothesis] = []
     unavailable: list[str] = []
-    contrasts = FAMILIES_V2["RQ-5"][1]
+    contrasts = FAMILIES["RQ-5"][1]
 
     plan: tuple[tuple[str, str, tuple[str, ...]], ...] = (
         (contrasts[0], "single", ("adjacent-spread",)),
@@ -636,12 +637,12 @@ class RQ5Verdict(NamedTuple):
 def rq5_verdict(result: FamilyResult) -> RQ5Verdict:
     """Supported iff 1, 5 and 6 reject in direction **and** 3 is equivalent.
 
-    The conjunction is what makes it a replication rather than a restatement:
-    (1) alone only repeats the observation, (6) attributes it to the seating
-    geometry, (5) shows the strategy matters, and (3) is the negative control
-    that would fail if the estimator manufactured asymmetries by itself.
+    The conjunction is what makes it an explanation rather than an
+    observation: (6) attributes the effect to the seating geometry, (5) shows
+    the strategy matters, and (3) is the negative control — `opposite` seating
+    has equal gaps and must show nothing.
     """
-    contrasts = FAMILIES_V2["RQ-5"][1]
+    contrasts = FAMILIES["RQ-5"][1]
     by_contrast = {
         holm_result.hypothesis.contrast: (holm_result, estimate)
         for holm_result, estimate in zip(result.holm, result.estimates, strict=True)

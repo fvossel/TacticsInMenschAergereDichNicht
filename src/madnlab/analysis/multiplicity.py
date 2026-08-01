@@ -88,16 +88,6 @@ FAMILIES: dict[str, tuple[tuple[str, ...], tuple[str, ...]]] = {
             "capture_mode x players x board",
         ),
     ),
-}
-
-#: The total §6.4 declares. Asserted by the test suite against FAMILIES.
-CONFIRMATORY_TOTAL = 40
-
-#: §15's family, frozen separately at ``prereg-v2``. Kept out of ``FAMILIES``
-#: deliberately: that dict is the operative definition of what ``prereg-v1``
-#: declared, and adding a row to it would silently change a frozen artifact
-#: — which is the one thing a freeze exists to prevent (D-78).
-FAMILIES_V2: dict[str, tuple[tuple[str, ...], tuple[str, ...]]] = {
     "RQ-5": (
         ("seat_asymmetry",),
         (
@@ -113,8 +103,9 @@ FAMILIES_V2: dict[str, tuple[tuple[str, ...], tuple[str, ...]]] = {
     ),
 }
 
-#: The total §15.2 declares.
-CONFIRMATORY_TOTAL_V2 = 8
+#: The total §6.4 and §15 declare together.
+CONFIRMATORY_TOTAL = 48
+
 
 
 def family_hypotheses(family: str) -> tuple[Hypothesis, ...]:

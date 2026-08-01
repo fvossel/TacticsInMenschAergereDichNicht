@@ -1,7 +1,7 @@
 {
   "name": "EX5",
   "description": "Seating geometry",
-  "master_seed": 20260813,
+  "master_seed": 20261013,
   "log_events": {
     "mode": "sample",
     "k": 100

@@ -1,7 +1,7 @@
 {
   "name": "EX2",
   "description": "RQ-1 Schlagzwang",
-  "master_seed": 20260810,
+  "master_seed": 20261010,
   "log_events": {
     "mode": "sample",
     "k": 100

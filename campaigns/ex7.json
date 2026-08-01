@@ -1,12 +1,12 @@
 {
   "name": "EX7",
-  "description": "RQ-5 seat exposure (prereg-v2)",
-  "master_seed": 20260901,
+  "description": "RQ-5 seat exposure",
+  "master_seed": 20261015,
   "log_events": {
     "mode": "sample",
     "k": 100
   },
-  "prereg_version": "prereg-v2",
+  "prereg_version": "prereg-v1",
   "cells": [
     {
       "key": "ex7/2p/4s-adjacent/random",

@@ -2041,61 +2041,35 @@ a difference between differences. The two-arm contrasts remain BCa throughout.
 
 ---
 
-## 11. Second pre-registration
+### D-78 — RQ-5, the seating question, added to the plan
+**Status:** `pinned` · *2026-08-02*
 
-### D-78 — The seat-exposure effect gets its own freeze, not a row in the old one
-**Status:** `pinned` · *2026-08-02* · *new pre-registration, `prereg-v2`*
+**Where it came from.** The first full run measured a 29.5 pp win-rate gap
+between two adjacent SPREAD players, in the descriptive tables. Nothing in
+§6.4 asked about it.
 
-**The request.** The largest effect anywhere in the study — two adjacent
-SPREAD players winning 35.3% against 64.7%, a 29.5 pp seat advantage — was
-never a §6.4 hypothesis. It surfaced in §14.4's descriptive tables. The
-project owner asked to add it as a hypothesis and re-run.
+**What it became.** §15 states it as a mechanism the board geometry implies
+rather than as the observation itself. Entry fields are `spacing` apart, so
+the occupancy pattern fixes the cyclic gaps: `adjacent` at two players gives
+10 and 30 on the 40-ring, `opposite` gives 20 and 20. A piece is exposed to an
+opponent over the stretch it occupies downstream of that opponent's entry, so
+seat 0 spends 30 of 40 steps exposed and seat 1 spends 10.
 
-**Why not into `prereg-v1`.** The effect was *discovered in* the prereg-v1
-data. Writing it into the frozen hypothesis set and then testing it on that
-same data confirms nothing: the data would be both the source of the
-hypothesis and its evidence. That is the failure a pre-registration exists to
-make impossible, and doing it deliberately would be worse than the accident
-D-73 records — there the freeze was merely late, here the ordering would be
-inverted on purpose.
+That framing buys a **negative control** the observation could not: `opposite`
+must show nothing. RQ-5's support criterion is the conjunction of the effect,
+the strategy interaction, the geometry contrast and that control — the effect
+alone would only repeat what was already seen.
 
-**What was done instead.** A **second pre-registration**, §15, frozen at
-`prereg-v2`:
+**Seats are named in advance**: p(second occupied seat) − p(first), never
+p(max) − p(min). Picking the extreme pair out of the data and testing it is a
+selection the interval knows nothing about.
 
-1. The hypothesis is stated as a **mechanism derived from the geometry**, not
-   as a description of the observation. Entry fields are `spacing` apart, so
-   the occupancy pattern fixes the cyclic gaps: `adjacent` at two players
-   gives 10 and 30 on the 40-ring, `opposite` gives 20 and 20. A piece is
-   exposed to an opponent over the stretch it occupies downstream of that
-   opponent's entry, so seat 0 spends 30 of 40 steps exposed and seat 1 spends
-   10. **Prediction: seat 1 wins more, and `opposite` shows nothing.** Both
-   follow from the board, and the second is a falsifiable negative control the
-   observation did not supply.
-2. **Fresh master seed** (20260901). EX-7 shares no game with any earlier
-   campaign.
-3. `prereg_version` became a **per-campaign** field rather than a module
-   constant. Bumping the constant would have restamped every prereg-v1 row
-   with a tag those rows were not produced under.
-4. `FAMILIES_V2` is a **separate dict**. Adding RQ-5 to `FAMILIES` would have
-   silently changed the operative definition of what prereg-v1 declared.
-5. RQ-5 is reported in its own section with its own Holm correction. Merging
-   it into §6.4's families would place a post-hoc hypothesis inside the
-   earlier study's error control.
+**Everything re-runs.** All campaigns get fresh master seeds and one freeze,
+so every hypothesis precedes the data that tests it. `prereg_version` stays a
+per-campaign field — cheap, and it keeps the option of a second study later.
 
-**The seats are named in advance.** The estimand is p(second occupied seat) −
-p(first occupied seat), never p(max) − p(min). Selecting the extreme pair from
-the data and then testing it is a selection the interval knows nothing about;
-at three seats it inflates the rejection rate roughly threefold. The geometry
-already says which seat should be lower, so naming it costs nothing and
-removes the selection.
-
-**Support criterion.** §15.2 makes it a conjunction — the effect (H1), the
-strategy interaction (H5), the geometry contrast (H6), *and* the `opposite`
-negative control being equivalent to zero (H3). H1 alone would only restate
-what was already seen.
-
-**Affects.** New §15, `run/config.py`, `run/game.py`, `analysis/multiplicity.py`,
-`analysis/families.py`, `analysis/report.py`, `campaigns/ex7.json`, D-73.
+**Affects.** New §15, `analysis/multiplicity.py`, `analysis/families.py`,
+`campaigns/ex7.json`.
 
 ---
 

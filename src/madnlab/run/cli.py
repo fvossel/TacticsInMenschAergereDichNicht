@@ -209,6 +209,7 @@ def build_report(
         ("RQ-2", families.rq2),
         ("RQ-3", families.rq3),
         ("RQ-4", families.rq4),
+        ("RQ-5", families.rq5),
     ):
         family_started = time.perf_counter()
         kwargs = {"workers": workers} if name == "RQ-2" else {}
@@ -226,22 +227,12 @@ def build_report(
     for line in verdict.detail:
         print(f"  {line}")
 
-    # §15's family runs only when its campaign is present. It is frozen at a
-    # different tag and reported in its own section, never merged into the
-    # prereg-v1 families or their Holm correction (D-78).
-    replication = families.rq5(data)
-    replication_verdict = None
-    if replication.estimates:
-        replication_verdict = families.rq5_verdict(replication)
-        rejected = sum(1 for r in replication.holm if r.rejected)
-        print(
-            f"  RQ-5: {len(replication.estimates)} tests, {rejected} rejected "
-            f"(prereg-v2)"
-        )
-        print(
-            f"\nRQ-5: "
-            f"{'SUPPORTED' if replication_verdict.supported else 'NOT SUPPORTED'}"
-        )
+    replication_verdict = (
+        families.rq5_verdict(results[4]) if results[4].estimates else None
+    )
+    if replication_verdict is not None:
+        supported = "SUPPORTED" if replication_verdict.supported else "NOT SUPPORTED"
+        print(f"\nRQ-5: {supported}")
         for line in replication_verdict.detail:
             print(f"  {line}")
 
@@ -255,7 +246,6 @@ def build_report(
         data,
         results,
         verdict,
-        replication=replication if replication.estimates else None,
         replication_verdict=replication_verdict,
         confirmatory=confirmatory,
         provenance={

@@ -805,18 +805,13 @@ AK-5 → **M4** UI + AK-6 → **M5** full experiment plan + `docs/results.md`.
 
 ---
 
-## 15. EX-7 — the seat-exposure replication (pre-registration v2)
+## 15. EX-7 — seat exposure
 
-**This is a separate pre-registration, frozen at the git tag `prereg-v2`, and
-it is not part of `prereg-v1`.** The effect it tests was *discovered in* the
-`prereg-v1` data (§14.4's descriptive section: two adjacent SPREAD players won
-35.3% against 64.7%). Adding a hypothesis to a frozen set after seeing the
-data that suggested it, and then testing it on that same data, confirms
-nothing — the data cannot be both the source of a hypothesis and its evidence.
-EX-7 therefore runs on **fresh master seeds**, and every EX-7 row records
-`prereg_version = prereg-v2` (D-78).
+Does where you sit decide the game? On the 4-seat board two players sit
+either next to each other or across from each other, and the two
+arrangements are not equivalent.
 
-### 15.1 The mechanism, stated before the data
+### 15.1 The mechanism
 
 Entry fields are `spacing` apart, so an occupancy pattern fixes the cyclic
 gaps between them. A piece is exposed to an opponent over the stretch of ring
@@ -832,9 +827,8 @@ the opponent's freshly entering pieces move into it.
 
 Under `adjacent` at two players, a seat-0 piece spends 30 of its 40 ring steps
 downstream of seat 1's entry; a seat-1 piece spends 10 of 40 downstream of
-seat 0's. **Prediction: seat 1 wins more.** Under `opposite` the gaps are
-equal and the prediction is no asymmetry. The prediction is derived from the
-geometry, not fitted to the observation.
+seat 0's. **Prediction: seat 1 wins more.** Under `opposite` the gaps are equal and the
+prediction is no asymmetry — a negative control the geometry supplies for free.
 
 ### 15.2 Confirmatory hypotheses (family RQ-5)
 

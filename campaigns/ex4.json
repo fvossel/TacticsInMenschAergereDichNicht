@@ -1,7 +1,7 @@
 {
   "name": "EX4",
   "description": "RQ-2 rule main effects",
-  "master_seed": 20260812,
+  "master_seed": 20261012,
   "log_events": {
     "mode": "sample",
     "k": 100
