@@ -203,6 +203,35 @@ def gates_table(cells: dict[str, CellSummary], agents: dict[str, tuple[str, ...]
     return lines
 
 
+def seat_profile_table(
+    cells: dict[str, CellSummary], agents: dict[str, tuple[str, ...]]
+) -> list[str]:
+    """Per-seat win rates for the cells where they carry information.
+
+    §6.3's symmetry identity fixes every seat at 1/k wherever the field is
+    homogeneous *and* the seats are exchangeable, so a per-seat rate there is
+    a statement about arithmetic. Where exchangeability fails — an uneven
+    seating gap, or one seat playing a different policy — the profile is the
+    measurement, and it is the one AK-4 is deliberately not allowed to gate on
+    (D-74). This table is exactly those cells.
+    """
+    lines = [
+        "| Cell | n | per-seat win rates | spread |",
+        "|---|---:|---|---:|",
+    ]
+    for key in sorted(cells):
+        cell = cells[key]
+        if seats_exchangeable(cell.occupied, cell.seats, agents.get(key, ())):
+            continue
+        rates = [cell.wins_by_seat.get(seat, 0) / cell.games for seat in cell.occupied]
+        profile = " / ".join(f"{rate * 100:.2f}%" for rate in rates)
+        lines.append(
+            f"| `{key}` | {cell.games:,} | {profile} | "
+            f"{(max(rates) - min(rates)) * 100:.2f} pp |"
+        )
+    return lines
+
+
 def seat_advantage_table(cells: dict[str, CellSummary], keys: Sequence[str]) -> list[str]:
     lines = ["| Cell | offset | win rate | 95% CI |", "|---|---:|---:|---|"]
     for key in keys:
@@ -250,10 +279,10 @@ def render(
         "## 1. Reading this document",
         "",
         "Sections 2 and 3 are **confirmatory**: 40 hypotheses fixed in §6.4 "
-        "before any campaign ran, Holm-corrected within each family. Section 5 "
-        "is **descriptive** — computed, published, and explicitly not "
+        "before any campaign ran, Holm-corrected within each family. "
+        "Sections 4 to 6 are **descriptive** — computed, published, and explicitly not "
         "error-controlled. §14.4 requires every §6.2 metric of every cell to "
-        "appear whether or not anything depends on it, which is why section 5 "
+        "appear whether or not anything depends on it, which is why section 6 "
         "is long and unselective.",
         "",
         f"Game outcomes: **{abandoned:,} abandoned**, **{stalemated:,} "
@@ -286,7 +315,24 @@ def render(
     lines.extend(
         [
             "",
-            "## 4. Starting-player advantage",
+            "## 4. Seat profiles where seats are not exchangeable",
+            "",
+            "Where the field is homogeneous and the seats are exchangeable, "
+            "§6.3's symmetry identity fixes every seat at 1/k for any rule "
+            "set, so a per-seat rate there states arithmetic rather than a "
+            "measurement. These are the cells where that does not hold — an "
+            "uneven seating gap, or one seat playing a different policy — and "
+            "the profile is the finding. AK-4 reports these as failures and "
+            "deliberately does not gate on them (D-74): the asymmetry is what "
+            "EX-5 set out to measure.",
+            "",
+        ]
+    )
+    lines.extend(seat_profile_table(data.cells, data.agents))
+    lines.extend(
+        [
+            "",
+            "## 5. Starting-player advantage",
             "",
             "D-25's estimand, on the two calibration cells.",
             "",
@@ -300,7 +346,7 @@ def render(
     lines.extend(
         [
             "",
-            "## 5. Full metric battery (descriptive)",
+            "## 6. Full metric battery (descriptive)",
             "",
             "Every §6.2 metric for every cell, per §14.4. Per-seat fields are "
             "summed to a game total, which is the k-comparable form; the "
