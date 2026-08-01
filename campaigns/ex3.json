@@ -1,0 +1,891 @@
+{
+  "name": "EX3",
+  "description": "RQ-3 movement strategies",
+  "master_seed": 20260811,
+  "log_events": {
+    "mode": "sample",
+    "k": 100
+  },
+  "cells": [
+    {
+      "key": "ex3/homogeneous/4s2p/random",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/homogeneous/4s3p/random",
+      "seats": 4,
+      "players": 3,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/homogeneous/4s4p/random",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/homogeneous/6s6p/random",
+      "seats": 6,
+      "players": 6,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/homogeneous/4s2p/spread",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "SPREAD",
+        "SPREAD"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/homogeneous/4s3p/spread",
+      "seats": 4,
+      "players": 3,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "SPREAD",
+        "SPREAD",
+        "SPREAD"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/homogeneous/4s4p/spread",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "SPREAD",
+        "SPREAD",
+        "SPREAD",
+        "SPREAD"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/homogeneous/6s6p/spread",
+      "seats": 6,
+      "players": 6,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "SPREAD",
+        "SPREAD",
+        "SPREAD",
+        "SPREAD",
+        "SPREAD",
+        "SPREAD"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/homogeneous/4s2p/focus_front",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_FRONT",
+        "FOCUS_FRONT"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/homogeneous/4s3p/focus_front",
+      "seats": 4,
+      "players": 3,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_FRONT",
+        "FOCUS_FRONT",
+        "FOCUS_FRONT"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/homogeneous/4s4p/focus_front",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_FRONT",
+        "FOCUS_FRONT",
+        "FOCUS_FRONT",
+        "FOCUS_FRONT"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/homogeneous/6s6p/focus_front",
+      "seats": 6,
+      "players": 6,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_FRONT",
+        "FOCUS_FRONT",
+        "FOCUS_FRONT",
+        "FOCUS_FRONT",
+        "FOCUS_FRONT",
+        "FOCUS_FRONT"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/homogeneous/4s2p/focus_rear",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_REAR",
+        "FOCUS_REAR"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/homogeneous/4s3p/focus_rear",
+      "seats": 4,
+      "players": 3,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_REAR",
+        "FOCUS_REAR",
+        "FOCUS_REAR"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/homogeneous/4s4p/focus_rear",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_REAR",
+        "FOCUS_REAR",
+        "FOCUS_REAR",
+        "FOCUS_REAR"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/homogeneous/6s6p/focus_rear",
+      "seats": 6,
+      "players": 6,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_REAR",
+        "FOCUS_REAR",
+        "FOCUS_REAR",
+        "FOCUS_REAR",
+        "FOCUS_REAR",
+        "FOCUS_REAR"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/deviant/4s2p/random-vs-spread",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "SPREAD"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/deviant/4s3p/random-vs-spread",
+      "seats": 4,
+      "players": 3,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "SPREAD",
+        "SPREAD"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/deviant/4s4p/random-vs-spread",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "SPREAD",
+        "SPREAD",
+        "SPREAD"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/deviant/6s6p/random-vs-spread",
+      "seats": 6,
+      "players": 6,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "SPREAD",
+        "SPREAD",
+        "SPREAD",
+        "SPREAD",
+        "SPREAD"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/deviant/4s2p/random-vs-focus_front",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "FOCUS_FRONT"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/deviant/4s3p/random-vs-focus_front",
+      "seats": 4,
+      "players": 3,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "FOCUS_FRONT",
+        "FOCUS_FRONT"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/deviant/4s4p/random-vs-focus_front",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "FOCUS_FRONT",
+        "FOCUS_FRONT",
+        "FOCUS_FRONT"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/deviant/6s6p/random-vs-focus_front",
+      "seats": 6,
+      "players": 6,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "FOCUS_FRONT",
+        "FOCUS_FRONT",
+        "FOCUS_FRONT",
+        "FOCUS_FRONT",
+        "FOCUS_FRONT"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/deviant/4s2p/random-vs-focus_rear",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "FOCUS_REAR"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/deviant/4s3p/random-vs-focus_rear",
+      "seats": 4,
+      "players": 3,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "FOCUS_REAR",
+        "FOCUS_REAR"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/deviant/4s4p/random-vs-focus_rear",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "FOCUS_REAR",
+        "FOCUS_REAR",
+        "FOCUS_REAR"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/deviant/6s6p/random-vs-focus_rear",
+      "seats": 6,
+      "players": 6,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "FOCUS_REAR",
+        "FOCUS_REAR",
+        "FOCUS_REAR",
+        "FOCUS_REAR",
+        "FOCUS_REAR"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/deviant/4s2p/spread-vs-random",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "SPREAD",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/deviant/4s3p/spread-vs-random",
+      "seats": 4,
+      "players": 3,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "SPREAD",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/deviant/4s4p/spread-vs-random",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "SPREAD",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 200000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/deviant/6s6p/spread-vs-random",
+      "seats": 6,
+      "players": 6,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "SPREAD",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/deviant/4s2p/spread-vs-focus_front",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "SPREAD",
+        "FOCUS_FRONT"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/deviant/4s3p/spread-vs-focus_front",
+      "seats": 4,
+      "players": 3,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "SPREAD",
+        "FOCUS_FRONT",
+        "FOCUS_FRONT"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/deviant/4s4p/spread-vs-focus_front",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "SPREAD",
+        "FOCUS_FRONT",
+        "FOCUS_FRONT",
+        "FOCUS_FRONT"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/deviant/6s6p/spread-vs-focus_front",
+      "seats": 6,
+      "players": 6,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "SPREAD",
+        "FOCUS_FRONT",
+        "FOCUS_FRONT",
+        "FOCUS_FRONT",
+        "FOCUS_FRONT",
+        "FOCUS_FRONT"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/deviant/4s2p/spread-vs-focus_rear",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "SPREAD",
+        "FOCUS_REAR"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/deviant/4s3p/spread-vs-focus_rear",
+      "seats": 4,
+      "players": 3,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "SPREAD",
+        "FOCUS_REAR",
+        "FOCUS_REAR"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/deviant/4s4p/spread-vs-focus_rear",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "SPREAD",
+        "FOCUS_REAR",
+        "FOCUS_REAR",
+        "FOCUS_REAR"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/deviant/6s6p/spread-vs-focus_rear",
+      "seats": 6,
+      "players": 6,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "SPREAD",
+        "FOCUS_REAR",
+        "FOCUS_REAR",
+        "FOCUS_REAR",
+        "FOCUS_REAR",
+        "FOCUS_REAR"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/deviant/4s2p/focus_front-vs-random",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_FRONT",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/deviant/4s3p/focus_front-vs-random",
+      "seats": 4,
+      "players": 3,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_FRONT",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/deviant/4s4p/focus_front-vs-random",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_FRONT",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 200000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/deviant/6s6p/focus_front-vs-random",
+      "seats": 6,
+      "players": 6,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_FRONT",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/deviant/4s2p/focus_front-vs-spread",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_FRONT",
+        "SPREAD"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/deviant/4s3p/focus_front-vs-spread",
+      "seats": 4,
+      "players": 3,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_FRONT",
+        "SPREAD",
+        "SPREAD"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/deviant/4s4p/focus_front-vs-spread",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_FRONT",
+        "SPREAD",
+        "SPREAD",
+        "SPREAD"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/deviant/6s6p/focus_front-vs-spread",
+      "seats": 6,
+      "players": 6,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_FRONT",
+        "SPREAD",
+        "SPREAD",
+        "SPREAD",
+        "SPREAD",
+        "SPREAD"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/deviant/4s2p/focus_front-vs-focus_rear",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_FRONT",
+        "FOCUS_REAR"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/deviant/4s3p/focus_front-vs-focus_rear",
+      "seats": 4,
+      "players": 3,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_FRONT",
+        "FOCUS_REAR",
+        "FOCUS_REAR"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/deviant/4s4p/focus_front-vs-focus_rear",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_FRONT",
+        "FOCUS_REAR",
+        "FOCUS_REAR",
+        "FOCUS_REAR"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/deviant/6s6p/focus_front-vs-focus_rear",
+      "seats": 6,
+      "players": 6,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_FRONT",
+        "FOCUS_REAR",
+        "FOCUS_REAR",
+        "FOCUS_REAR",
+        "FOCUS_REAR",
+        "FOCUS_REAR"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/deviant/4s2p/focus_rear-vs-random",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_REAR",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/deviant/4s3p/focus_rear-vs-random",
+      "seats": 4,
+      "players": 3,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_REAR",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/deviant/4s4p/focus_rear-vs-random",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_REAR",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 200000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/deviant/6s6p/focus_rear-vs-random",
+      "seats": 6,
+      "players": 6,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_REAR",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/deviant/4s2p/focus_rear-vs-spread",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_REAR",
+        "SPREAD"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/deviant/4s3p/focus_rear-vs-spread",
+      "seats": 4,
+      "players": 3,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_REAR",
+        "SPREAD",
+        "SPREAD"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/deviant/4s4p/focus_rear-vs-spread",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_REAR",
+        "SPREAD",
+        "SPREAD",
+        "SPREAD"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/deviant/6s6p/focus_rear-vs-spread",
+      "seats": 6,
+      "players": 6,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_REAR",
+        "SPREAD",
+        "SPREAD",
+        "SPREAD",
+        "SPREAD",
+        "SPREAD"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/deviant/4s2p/focus_rear-vs-focus_front",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_REAR",
+        "FOCUS_FRONT"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/deviant/4s3p/focus_rear-vs-focus_front",
+      "seats": 4,
+      "players": 3,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_REAR",
+        "FOCUS_FRONT",
+        "FOCUS_FRONT"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/deviant/4s4p/focus_rear-vs-focus_front",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_REAR",
+        "FOCUS_FRONT",
+        "FOCUS_FRONT",
+        "FOCUS_FRONT"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex3/deviant/6s6p/focus_rear-vs-focus_front",
+      "seats": 6,
+      "players": 6,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_REAR",
+        "FOCUS_FRONT",
+        "FOCUS_FRONT",
+        "FOCUS_FRONT",
+        "FOCUS_FRONT",
+        "FOCUS_FRONT"
+      ],
+      "games": 20000,
+      "rules": {}
+    }
+  ]
+}

@@ -23,10 +23,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 
-from madnlab.eventlog.replay import validate  # noqa: E402
-from madnlab.eventlog.writer import write_log  # noqa: E402
 from madnlab.engine.geometry import SeatPattern  # noqa: E402
 from madnlab.engine.rules import CaptureMode, RuleSet  # noqa: E402
+from madnlab.eventlog.replay import validate  # noqa: E402
+from madnlab.eventlog.writer import write_log  # noqa: E402
 from madnlab.run.game import GameSpec, play_indexed_game  # noqa: E402
 
 GOLDEN = {
@@ -84,7 +84,8 @@ CHECKER = """
 
     // Stepping back to the start must restore the opening position exactly.
     document.getElementById("first").click();
-    check(label + ": rewinds to the opening position", window.madnlabState().positions, golden.opening);
+    const rewound = window.madnlabState().positions;
+    check(label + ": rewinds to the opening position", rewound, golden.opening);
 
     // The board renders as SVG for this geometry.
     document.getElementById("last").click();

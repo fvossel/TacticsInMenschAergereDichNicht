@@ -1,0 +1,137 @@
+{
+  "name": "EX5",
+  "description": "Seating geometry",
+  "master_seed": 20260813,
+  "log_events": {
+    "mode": "sample",
+    "k": 100
+  },
+  "cells": [
+    {
+      "key": "ex5/3p/4s-adjacent/random",
+      "seats": 4,
+      "players": 3,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 250000,
+      "rules": {}
+    },
+    {
+      "key": "ex5/3p/4s-adjacent/spread",
+      "seats": 4,
+      "players": 3,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "SPREAD",
+        "SPREAD",
+        "SPREAD"
+      ],
+      "games": 250000,
+      "rules": {}
+    },
+    {
+      "key": "ex5/3p/6s-spread/random",
+      "seats": 6,
+      "players": 3,
+      "seat_pattern": "spread",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 250000,
+      "rules": {}
+    },
+    {
+      "key": "ex5/3p/6s-spread/spread",
+      "seats": 6,
+      "players": 3,
+      "seat_pattern": "spread",
+      "agents": [
+        "SPREAD",
+        "SPREAD",
+        "SPREAD"
+      ],
+      "games": 250000,
+      "rules": {}
+    },
+    {
+      "key": "ex5/3p/6s-adjacent/random",
+      "seats": 6,
+      "players": 3,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 250000,
+      "rules": {}
+    },
+    {
+      "key": "ex5/3p/6s-adjacent/spread",
+      "seats": 6,
+      "players": 3,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "SPREAD",
+        "SPREAD",
+        "SPREAD"
+      ],
+      "games": 250000,
+      "rules": {}
+    },
+    {
+      "key": "ex5/2p/adjacent/random",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex5/2p/adjacent/spread",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "SPREAD",
+        "SPREAD"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex5/2p/opposite/random",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "opposite",
+      "agents": [
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex5/2p/opposite/spread",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "opposite",
+      "agents": [
+        "SPREAD",
+        "SPREAD"
+      ],
+      "games": 20000,
+      "rules": {}
+    }
+  ]
+}

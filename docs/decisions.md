@@ -20,9 +20,12 @@ defaults §9 proposes. D-8…D-47 come from the specification review
 are cited per row. Four rows (D-9, D-10, D-44, D-46) were decided by the
 project owner against a presented alternative and are marked accordingly.
 
-**Not yet verified.** No row in this file has been checked against the
-official Schmidt Spiele rulebook. Rows whose justification rests on the
-rulebook carry `pinned-unverified`. §9 requires that check before EX-1 runs.
+**Rulebook verification.** Complete as of 2026-07-31, before the `prereg-v1`
+freeze (D-73). Nine rows carry `verified-official` with the German source text
+quoted and the edition cited; the rows resting on questions the rulebook is
+demonstrably silent on carry `project-choice`. No row carries
+`pinned-unverified` any more — the status stays in the vocabulary above
+because rows added after the freeze may need it again.
 
 ---
 
@@ -1768,12 +1771,80 @@ is distinguished, and is worth keeping: a large non-calibration cell that
 
 ---
 
+## 10. Pre-registration freeze
+
+### D-73 — The `prereg-v1` freeze, and the data discarded to make it honest
+**Status:** `pinned` · *amendment under §14.2* · *2026-08-01*
+
+**Defect.** §14.1 requires the tag `prereg-v1` to exist **before EX-1 runs**.
+It did not. `PREREG_VERSION` in `run/game.py` was the placeholder `"unfrozen"`,
+and it stayed that way through M3 and M5: EX-1, EX-1b and the AK-5 smoke
+campaign ran under it, and five HPC campaigns were submitted under it.
+Separately, `campaigns/ex2..ex6.json` — the §8 plan the runs were executing —
+were untracked, so a tag created at that moment would not even have covered
+the plan under test.
+
+**What §14.2 requires stated: the data that existed when this amendment was
+made.** At the moment of the freeze there existed
+- `campaigns/results/ex1-*`, `ex1b-*` and `ak5-*`: 800,002 games of
+  calibration plus the AK-5 smoke cell, all stamped `unfrozen`;
+- one completed HPC campaign, EX-5 (1,580,012 rows), and four partial ones
+  (EX-2, EX-3, EX-4, EX-6) cancelled ~10 minutes in, likewise `unfrozen`.
+
+**No confirmatory result had been read.** Nothing beyond AK-4/AK-5 gate
+verdicts and throughput lines had been computed from any of it, and no §6.4
+hypothesis had been evaluated. The freeze therefore still precedes the
+analysis, which is the property pre-registration actually protects.
+
+**Decision.** The tag is created now, at the commit that carries the §8 plan
+and the corrected constant, and **every campaign is re-run under it**. The
+`unfrozen` data is discarded rather than relabelled. Runs are deterministic
+from the master seed (NF-6), so regeneration costs wall-clock and nothing
+else — which is exactly why relabelling would have been the worse trade: it
+saves an hour and buys a provenance claim that no longer matches the bytes.
+
+**Why not simply document the deviation.** That was the cheaper option and it
+is defensible — the substance was intact. It was rejected because §14's whole
+function is to make "the plan predates the data" checkable by someone who does
+not trust the authors, and a `prereg_version` field reading `unfrozen` on
+every row of the published dataset defeats that for the sake of one hour of
+cluster time.
+
+**Consequence for the record.** This row is the permanent trace of the
+deviation: the published dataset carries `prereg-v1` throughout, and the fact
+that an earlier `unfrozen` generation existed and was discarded is recorded
+here rather than being invisible.
+
+**Affects.** §14, D-41, `run/game.py`, every campaign, `docs/results.md`.
+
+---
+
 ## Open items
+
+**None.** Both rows that stood here are resolved, and the table is empty at the
+`prereg-v1` freeze (D-73) — which is the point: a pre-registration cannot be
+frozen while an open item blocks the freeze.
+
+*Resolved 2026-08-01:*
+- **NF-2 / AK-7** — AK-7 was run. D-68 records the measurement (235–282
+  games/s baseline, 32–34 worst case), restates NF-2 per turn because the
+  per-game figure meant a different budget in every cell, and lifts the
+  blocking clause. The HPC runs since then measured 2,700–9,000 games/s on 48
+  workers, well inside the plan.
+- **§2.4, §2.3, §1, §6** — the specification was rewritten as version 2 before
+  the freeze. `cold_start = one_piece_out` is now labelled the official setup
+  (§2.4), the three-attempts rule is a variant (D-51), §6.4 carries the 40
+  confirmatory hypotheses, and §8 carries the re-derived sample sizes.
+
+<details>
+<summary>The two rows as they stood</summary>
 
 | Id | Item | Blocks |
 |---|---|---|
 | NF-2 / AK-7 | **Early indication: the throughput target is missed by ~4–5×.** Two independent toy loops over the M1 engine — no logging, no `leader(t)`, no event log — measured **199 and 235 games/s** single-core at ~520 `legal_moves` calls per baseline 4-seat game, i.e. 5.0–5.5 µs/call against NF-2's implied 1.91 µs budget. This is **not** AK-7: those loops omit exactly the costs D-43c requires inside the measured loop. NF-2 pre-authorizes an optimization pass plus a ledger row as the remedy, and D-43c places AK-7 in M1, so it is run before the game loop is written against a cost model that is about to change. **Plan impact is bounded**: at the measured rate D-59's 16.4M games is ≈23 CPU-hours, ≈11 minutes on one 128-core node under D-48. Structural questions (incremental occupancy carried in `GameState` vs. rebuilt per call) are taken with the AK-7 number in hand, not before. | game loop |
 | §2.4, §2.3, §1, §6 | The specification text still carries the corrected claims (D-51, D-55: `strict` labelled "the Schmidt baseline", three attempts labelled "baseline, per Schmidt", the §2.4 preamble sentence about variants that "coincide"), and does not yet contain §6.4 (D-59) or the corrected §8 sample sizes. The ledger is authoritative until the spec is rewritten, which must happen **before** the `prereg-v1` freeze (D-41). | D-41 freeze |
+
+</details>
 
 *Resolved 2026-07-31:*
 - D-14 settled by D-59: confirmatory sets defined per research question, all n
@@ -1799,9 +1870,12 @@ Index of all official Spielanleitungen: `schmidtspiele.de/spielanleitungen.html`
 **Correction (2026-07-31).** An earlier version of this table listed
 "D-1…D-7, D-34" as awaiting rulebook verification. That over-claimed: only
 **D-1** (scope of the three-attempts condition) and **D-2** (clearing priority
-vs. entering on a 6) carry `pinned-unverified`, plus the baseline clause
-**GM-3.8** (jumping over own pieces inside the goal column), which §2.3
-asserts without a citation. D-3 to D-7 and D-34 concern points on which the
-rulebook is silent or which are pure implementation choices, and fall under
-§9's own clause "where the rulebook is silent, by an explicit documented
-choice". They are `pinned`, not pending.
+vs. entering on a 6) were pending, plus the baseline clause **GM-3.8**
+(jumping over own pieces inside the goal column), which §2.3 asserts without
+a citation. D-3 to D-7 and D-34 concern points on which the rulebook is silent
+or which are pure implementation choices, and fall under §9's own clause
+"where the rulebook is silent, by an explicit documented choice". They are
+`pinned`, not pending.
+
+All three pending items were then verified against the editions above and
+carry `verified-official`, which is the state frozen at `prereg-v1` (D-73).

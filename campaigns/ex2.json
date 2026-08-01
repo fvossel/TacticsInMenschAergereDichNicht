@@ -1,0 +1,554 @@
+{
+  "name": "EX2",
+  "description": "RQ-1 Schlagzwang",
+  "master_seed": 20260810,
+  "log_events": {
+    "mode": "sample",
+    "k": 100
+  },
+  "cells": [
+    {
+      "key": "ex2/4s2p/random/optional",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex2/4s2p/spread/optional",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "SPREAD",
+        "SPREAD"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex2/4s2p/greedy_capture/optional",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "GREEDY_CAPTURE",
+        "GREEDY_CAPTURE"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex2/4s3p/random/optional",
+      "seats": 4,
+      "players": 3,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex2/4s3p/spread/optional",
+      "seats": 4,
+      "players": 3,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "SPREAD",
+        "SPREAD",
+        "SPREAD"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex2/4s3p/greedy_capture/optional",
+      "seats": 4,
+      "players": 3,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "GREEDY_CAPTURE",
+        "GREEDY_CAPTURE",
+        "GREEDY_CAPTURE"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex2/4s4p/random/optional",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 250000,
+      "rules": {}
+    },
+    {
+      "key": "ex2/4s4p/spread/optional",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "SPREAD",
+        "SPREAD",
+        "SPREAD",
+        "SPREAD"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex2/4s4p/greedy_capture/optional",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "GREEDY_CAPTURE",
+        "GREEDY_CAPTURE",
+        "GREEDY_CAPTURE",
+        "GREEDY_CAPTURE"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex2/6s6p/random/optional",
+      "seats": 6,
+      "players": 6,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex2/6s6p/spread/optional",
+      "seats": 6,
+      "players": 6,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "SPREAD",
+        "SPREAD",
+        "SPREAD",
+        "SPREAD",
+        "SPREAD",
+        "SPREAD"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex2/6s6p/greedy_capture/optional",
+      "seats": 6,
+      "players": 6,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "GREEDY_CAPTURE",
+        "GREEDY_CAPTURE",
+        "GREEDY_CAPTURE",
+        "GREEDY_CAPTURE",
+        "GREEDY_CAPTURE",
+        "GREEDY_CAPTURE"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex2/4s2p/random/mandatory",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "capture_mode": "mandatory"
+      }
+    },
+    {
+      "key": "ex2/4s2p/spread/mandatory",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "SPREAD",
+        "SPREAD"
+      ],
+      "games": 20000,
+      "rules": {
+        "capture_mode": "mandatory"
+      }
+    },
+    {
+      "key": "ex2/4s2p/greedy_capture/mandatory",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "GREEDY_CAPTURE",
+        "GREEDY_CAPTURE"
+      ],
+      "games": 20000,
+      "rules": {
+        "capture_mode": "mandatory"
+      }
+    },
+    {
+      "key": "ex2/4s3p/random/mandatory",
+      "seats": 4,
+      "players": 3,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "capture_mode": "mandatory"
+      }
+    },
+    {
+      "key": "ex2/4s3p/spread/mandatory",
+      "seats": 4,
+      "players": 3,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "SPREAD",
+        "SPREAD",
+        "SPREAD"
+      ],
+      "games": 20000,
+      "rules": {
+        "capture_mode": "mandatory"
+      }
+    },
+    {
+      "key": "ex2/4s3p/greedy_capture/mandatory",
+      "seats": 4,
+      "players": 3,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "GREEDY_CAPTURE",
+        "GREEDY_CAPTURE",
+        "GREEDY_CAPTURE"
+      ],
+      "games": 20000,
+      "rules": {
+        "capture_mode": "mandatory"
+      }
+    },
+    {
+      "key": "ex2/4s4p/random/mandatory",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 250000,
+      "rules": {
+        "capture_mode": "mandatory"
+      }
+    },
+    {
+      "key": "ex2/4s4p/spread/mandatory",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "SPREAD",
+        "SPREAD",
+        "SPREAD",
+        "SPREAD"
+      ],
+      "games": 20000,
+      "rules": {
+        "capture_mode": "mandatory"
+      }
+    },
+    {
+      "key": "ex2/4s4p/greedy_capture/mandatory",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "GREEDY_CAPTURE",
+        "GREEDY_CAPTURE",
+        "GREEDY_CAPTURE",
+        "GREEDY_CAPTURE"
+      ],
+      "games": 20000,
+      "rules": {
+        "capture_mode": "mandatory"
+      }
+    },
+    {
+      "key": "ex2/6s6p/random/mandatory",
+      "seats": 6,
+      "players": 6,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "capture_mode": "mandatory"
+      }
+    },
+    {
+      "key": "ex2/6s6p/spread/mandatory",
+      "seats": 6,
+      "players": 6,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "SPREAD",
+        "SPREAD",
+        "SPREAD",
+        "SPREAD",
+        "SPREAD",
+        "SPREAD"
+      ],
+      "games": 20000,
+      "rules": {
+        "capture_mode": "mandatory"
+      }
+    },
+    {
+      "key": "ex2/6s6p/greedy_capture/mandatory",
+      "seats": 6,
+      "players": 6,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "GREEDY_CAPTURE",
+        "GREEDY_CAPTURE",
+        "GREEDY_CAPTURE",
+        "GREEDY_CAPTURE",
+        "GREEDY_CAPTURE",
+        "GREEDY_CAPTURE"
+      ],
+      "games": 20000,
+      "rules": {
+        "capture_mode": "mandatory"
+      }
+    },
+    {
+      "key": "ex2/4s2p/random/mandatory_extended",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "capture_mode": "mandatory_extended"
+      }
+    },
+    {
+      "key": "ex2/4s2p/spread/mandatory_extended",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "SPREAD",
+        "SPREAD"
+      ],
+      "games": 20000,
+      "rules": {
+        "capture_mode": "mandatory_extended"
+      }
+    },
+    {
+      "key": "ex2/4s2p/greedy_capture/mandatory_extended",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "GREEDY_CAPTURE",
+        "GREEDY_CAPTURE"
+      ],
+      "games": 20000,
+      "rules": {
+        "capture_mode": "mandatory_extended"
+      }
+    },
+    {
+      "key": "ex2/4s3p/random/mandatory_extended",
+      "seats": 4,
+      "players": 3,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "capture_mode": "mandatory_extended"
+      }
+    },
+    {
+      "key": "ex2/4s3p/spread/mandatory_extended",
+      "seats": 4,
+      "players": 3,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "SPREAD",
+        "SPREAD",
+        "SPREAD"
+      ],
+      "games": 20000,
+      "rules": {
+        "capture_mode": "mandatory_extended"
+      }
+    },
+    {
+      "key": "ex2/4s3p/greedy_capture/mandatory_extended",
+      "seats": 4,
+      "players": 3,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "GREEDY_CAPTURE",
+        "GREEDY_CAPTURE",
+        "GREEDY_CAPTURE"
+      ],
+      "games": 20000,
+      "rules": {
+        "capture_mode": "mandatory_extended"
+      }
+    },
+    {
+      "key": "ex2/4s4p/random/mandatory_extended",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 250000,
+      "rules": {
+        "capture_mode": "mandatory_extended"
+      }
+    },
+    {
+      "key": "ex2/4s4p/spread/mandatory_extended",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "SPREAD",
+        "SPREAD",
+        "SPREAD",
+        "SPREAD"
+      ],
+      "games": 20000,
+      "rules": {
+        "capture_mode": "mandatory_extended"
+      }
+    },
+    {
+      "key": "ex2/4s4p/greedy_capture/mandatory_extended",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "GREEDY_CAPTURE",
+        "GREEDY_CAPTURE",
+        "GREEDY_CAPTURE",
+        "GREEDY_CAPTURE"
+      ],
+      "games": 20000,
+      "rules": {
+        "capture_mode": "mandatory_extended"
+      }
+    },
+    {
+      "key": "ex2/6s6p/random/mandatory_extended",
+      "seats": 6,
+      "players": 6,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "capture_mode": "mandatory_extended"
+      }
+    },
+    {
+      "key": "ex2/6s6p/spread/mandatory_extended",
+      "seats": 6,
+      "players": 6,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "SPREAD",
+        "SPREAD",
+        "SPREAD",
+        "SPREAD",
+        "SPREAD",
+        "SPREAD"
+      ],
+      "games": 20000,
+      "rules": {
+        "capture_mode": "mandatory_extended"
+      }
+    },
+    {
+      "key": "ex2/6s6p/greedy_capture/mandatory_extended",
+      "seats": 6,
+      "players": 6,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "GREEDY_CAPTURE",
+        "GREEDY_CAPTURE",
+        "GREEDY_CAPTURE",
+        "GREEDY_CAPTURE",
+        "GREEDY_CAPTURE",
+        "GREEDY_CAPTURE"
+      ],
+      "games": 20000,
+      "rules": {
+        "capture_mode": "mandatory_extended"
+      }
+    }
+  ]
+}

@@ -780,9 +780,19 @@ AK-5 → **M4** UI + AK-6 → **M5** full experiment plan + `docs/results.md`.
 
 ## 14. Pre-registration status
 
-1. **Freeze.** The frozen specification is the git tag `prereg-v1`, created
-   before EX-1 runs. Every campaign config and every summary row records the
-   `prereg_version` it ran under.
+1. **Freeze.** The frozen specification is the git tag `prereg-v1`. Every
+   campaign config and every summary row records the `prereg_version` it ran
+   under, and every published row reads `prereg-v1`.
+
+   *Amendment (2026-08-01, D-73).* This clause read "created before EX-1
+   runs", and that is not what happened: the tag was created after EX-1,
+   EX-1b and the AK-5 smoke campaign had run and after the five main
+   campaigns had been submitted, all under the placeholder `unfrozen`. All of
+   that data was **discarded and regenerated** under the tag rather than
+   relabelled — runs are deterministic from the master seed (NF-6), so
+   regeneration costs wall-clock only. No §6.4 hypothesis had been evaluated
+   at any point before the freeze, so the freeze still precedes the analysis.
+   D-73 carries the full record.
 2. **Amendments.** Any change to §6 or §8 after the freeze is an amendment with
    its own ledger row stating what data already existed when it was made.
 3. **Confirmatory / exploratory.** EX-1 through EX-6 are all confirmatory: no

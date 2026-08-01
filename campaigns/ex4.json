@@ -1,0 +1,3134 @@
+{
+  "name": "EX4",
+  "description": "RQ-2 rule main effects",
+  "master_seed": 20260812,
+  "log_events": {
+    "mode": "sample",
+    "k": 100
+  },
+  "cells": [
+    {
+      "key": "ex4/4s4p/random/baseline",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {}
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/capture_mode=mandatory",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "capture_mode": "mandatory"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-capture_mode=mandatory",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "capture_mode": "mandatory",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/capture_mode=mandatory_extended",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "capture_mode": "mandatory_extended"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-capture_mode=mandatory_extended",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "capture_mode": "mandatory_extended",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "goal_no_jump": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "goal_no_jump": true,
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/capture_mode=mandatory-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "goal_no_jump": true,
+        "capture_mode": "mandatory"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-capture_mode=mandatory-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "goal_no_jump": true,
+        "capture_mode": "mandatory",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/capture_mode=mandatory_extended-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "goal_no_jump": true,
+        "capture_mode": "mandatory_extended"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-capture_mode=mandatory_extended-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "goal_no_jump": true,
+        "capture_mode": "mandatory_extended",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/bonus_roll_forfeited=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "bonus_roll_forfeited": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-bonus_roll_forfeited=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "bonus_roll_forfeited": true,
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/bonus_roll_forfeited=True-capture_mode=mandatory",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "bonus_roll_forfeited": true,
+        "capture_mode": "mandatory"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-bonus_roll_forfeited=True-capture_mode=mandatory",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "bonus_roll_forfeited": true,
+        "capture_mode": "mandatory",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/bonus_roll_forfeited=True-capture_mode=mandatory_extended",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "bonus_roll_forfeited": true,
+        "capture_mode": "mandatory_extended"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-bonus_roll_forfeited=True-capture_mode=mandatory_extended",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "bonus_roll_forfeited": true,
+        "capture_mode": "mandatory_extended",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/bonus_roll_forfeited=True-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "bonus_roll_forfeited": true,
+        "goal_no_jump": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-bonus_roll_forfeited=True-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "bonus_roll_forfeited": true,
+        "goal_no_jump": true,
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/bonus_roll_forfeited=True-capture_mode=mandatory-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "bonus_roll_forfeited": true,
+        "goal_no_jump": true,
+        "capture_mode": "mandatory"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-bonus_roll_forfeited=True-capture_mode=mandatory-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "bonus_roll_forfeited": true,
+        "goal_no_jump": true,
+        "capture_mode": "mandatory",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/bonus_roll_forfeited=True-capture_mode=mandatory_extended-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "bonus_roll_forfeited": true,
+        "goal_no_jump": true,
+        "capture_mode": "mandatory_extended"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-bonus_roll_forfeited=True-capture_mode=mandatory_extended-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "bonus_roll_forfeited": true,
+        "goal_no_jump": true,
+        "capture_mode": "mandatory_extended",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/dreimal_wuerfeln=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "dreimal_wuerfeln": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-dreimal_wuerfeln=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "dreimal_wuerfeln": true,
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/capture_mode=mandatory-dreimal_wuerfeln=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "dreimal_wuerfeln": true,
+        "capture_mode": "mandatory"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-capture_mode=mandatory-dreimal_wuerfeln=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "dreimal_wuerfeln": true,
+        "capture_mode": "mandatory",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/capture_mode=mandatory_extended-dreimal_wuerfeln=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "dreimal_wuerfeln": true,
+        "capture_mode": "mandatory_extended"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-capture_mode=mandatory_extended-dreimal_wuerfeln=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "dreimal_wuerfeln": true,
+        "capture_mode": "mandatory_extended",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/dreimal_wuerfeln=True-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "dreimal_wuerfeln": true,
+        "goal_no_jump": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-dreimal_wuerfeln=True-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "dreimal_wuerfeln": true,
+        "goal_no_jump": true,
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/capture_mode=mandatory-dreimal_wuerfeln=True-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "dreimal_wuerfeln": true,
+        "goal_no_jump": true,
+        "capture_mode": "mandatory"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-capture_mode=mandatory-dreimal_wuerfeln=True-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "dreimal_wuerfeln": true,
+        "goal_no_jump": true,
+        "capture_mode": "mandatory",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/capture_mode=mandatory_extended-dreimal_wuerfeln=True-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "dreimal_wuerfeln": true,
+        "goal_no_jump": true,
+        "capture_mode": "mandatory_extended"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-capture_mode=mandatory_extended-dreimal_wuerfeln=True-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "dreimal_wuerfeln": true,
+        "goal_no_jump": true,
+        "capture_mode": "mandatory_extended",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/bonus_roll_forfeited=True-dreimal_wuerfeln=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "dreimal_wuerfeln": true,
+        "bonus_roll_forfeited": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-bonus_roll_forfeited=True-dreimal_wuerfeln=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "dreimal_wuerfeln": true,
+        "bonus_roll_forfeited": true,
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/bonus_roll_forfeited=True-capture_mode=mandatory-dreimal_wuerfeln=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "dreimal_wuerfeln": true,
+        "bonus_roll_forfeited": true,
+        "capture_mode": "mandatory"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-bonus_roll_forfeited=True-capture_mode=mandatory-dreimal_wuerfeln=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "dreimal_wuerfeln": true,
+        "bonus_roll_forfeited": true,
+        "capture_mode": "mandatory",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/bonus_roll_forfeited=True-capture_mode=mandatory_extended-dreimal_wuerfeln=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "dreimal_wuerfeln": true,
+        "bonus_roll_forfeited": true,
+        "capture_mode": "mandatory_extended"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-bonus_roll_forfeited=True-capture_mode=mandatory_extended-dreimal_wuerfeln=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "dreimal_wuerfeln": true,
+        "bonus_roll_forfeited": true,
+        "capture_mode": "mandatory_extended",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/bonus_roll_forfeited=True-dreimal_wuerfeln=True-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "dreimal_wuerfeln": true,
+        "bonus_roll_forfeited": true,
+        "goal_no_jump": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-bonus_roll_forfeited=True-dreimal_wuerfeln=True-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "dreimal_wuerfeln": true,
+        "bonus_roll_forfeited": true,
+        "goal_no_jump": true,
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/bonus_roll_forfeited=True-capture_mode=mandatory-dreimal_wuerfeln=True-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "dreimal_wuerfeln": true,
+        "bonus_roll_forfeited": true,
+        "goal_no_jump": true,
+        "capture_mode": "mandatory"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-bonus_roll_forfeited=True-capture_mode=mandatory-dreimal_wuerfeln=True-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "dreimal_wuerfeln": true,
+        "bonus_roll_forfeited": true,
+        "goal_no_jump": true,
+        "capture_mode": "mandatory",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/bonus_roll_forfeited=True-capture_mode=mandatory_extended-dreimal_wuerfeln=True-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "dreimal_wuerfeln": true,
+        "bonus_roll_forfeited": true,
+        "goal_no_jump": true,
+        "capture_mode": "mandatory_extended"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-bonus_roll_forfeited=True-capture_mode=mandatory_extended-dreimal_wuerfeln=True-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "dreimal_wuerfeln": true,
+        "bonus_roll_forfeited": true,
+        "goal_no_jump": true,
+        "capture_mode": "mandatory_extended",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/bonus_roll_after_quick_entry=True-dreimal_wuerfeln=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "dreimal_wuerfeln": true,
+        "bonus_roll_after_quick_entry": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-bonus_roll_after_quick_entry=True-dreimal_wuerfeln=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "dreimal_wuerfeln": true,
+        "bonus_roll_after_quick_entry": true,
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/bonus_roll_after_quick_entry=True-capture_mode=mandatory-dreimal_wuerfeln=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "dreimal_wuerfeln": true,
+        "bonus_roll_after_quick_entry": true,
+        "capture_mode": "mandatory"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-bonus_roll_after_quick_entry=True-capture_mode=mandatory-dreimal_wuerfeln=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "dreimal_wuerfeln": true,
+        "bonus_roll_after_quick_entry": true,
+        "capture_mode": "mandatory",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/bonus_roll_after_quick_entry=True-capture_mode=mandatory_extended-dreimal_wuerfeln=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "dreimal_wuerfeln": true,
+        "bonus_roll_after_quick_entry": true,
+        "capture_mode": "mandatory_extended"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-bonus_roll_after_quick_entry=True-capture_mode=mandatory_extended-dreimal_wuerfeln=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "dreimal_wuerfeln": true,
+        "bonus_roll_after_quick_entry": true,
+        "capture_mode": "mandatory_extended",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/bonus_roll_after_quick_entry=True-dreimal_wuerfeln=True-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "dreimal_wuerfeln": true,
+        "bonus_roll_after_quick_entry": true,
+        "goal_no_jump": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-bonus_roll_after_quick_entry=True-dreimal_wuerfeln=True-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "dreimal_wuerfeln": true,
+        "bonus_roll_after_quick_entry": true,
+        "goal_no_jump": true,
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/bonus_roll_after_quick_entry=True-capture_mode=mandatory-dreimal_wuerfeln=True-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "dreimal_wuerfeln": true,
+        "bonus_roll_after_quick_entry": true,
+        "goal_no_jump": true,
+        "capture_mode": "mandatory"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-bonus_roll_after_quick_entry=True-capture_mode=mandatory-dreimal_wuerfeln=True-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "dreimal_wuerfeln": true,
+        "bonus_roll_after_quick_entry": true,
+        "goal_no_jump": true,
+        "capture_mode": "mandatory",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/bonus_roll_after_quick_entry=True-capture_mode=mandatory_extended-dreimal_wuerfeln=True-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "dreimal_wuerfeln": true,
+        "bonus_roll_after_quick_entry": true,
+        "goal_no_jump": true,
+        "capture_mode": "mandatory_extended"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-bonus_roll_after_quick_entry=True-capture_mode=mandatory_extended-dreimal_wuerfeln=True-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "dreimal_wuerfeln": true,
+        "bonus_roll_after_quick_entry": true,
+        "goal_no_jump": true,
+        "capture_mode": "mandatory_extended",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/bonus_roll_after_quick_entry=True-bonus_roll_forfeited=True-dreimal_wuerfeln=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "dreimal_wuerfeln": true,
+        "bonus_roll_after_quick_entry": true,
+        "bonus_roll_forfeited": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-bonus_roll_after_quick_entry=True-bonus_roll_forfeited=True-dreimal_wuerfeln=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "dreimal_wuerfeln": true,
+        "bonus_roll_after_quick_entry": true,
+        "bonus_roll_forfeited": true,
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/bonus_roll_after_quick_entry=True-bonus_roll_forfeited=True-capture_mode=mandatory-dreimal_wuerfeln=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "dreimal_wuerfeln": true,
+        "bonus_roll_after_quick_entry": true,
+        "bonus_roll_forfeited": true,
+        "capture_mode": "mandatory"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-bonus_roll_after_quick_entry=True-bonus_roll_forfeited=True-capture_mode=mandatory-dreimal_wuerfeln=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "dreimal_wuerfeln": true,
+        "bonus_roll_after_quick_entry": true,
+        "bonus_roll_forfeited": true,
+        "capture_mode": "mandatory",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/bonus_roll_after_quick_entry=True-bonus_roll_forfeited=True-capture_mode=mandatory_extended-dreimal_wuerfeln=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "dreimal_wuerfeln": true,
+        "bonus_roll_after_quick_entry": true,
+        "bonus_roll_forfeited": true,
+        "capture_mode": "mandatory_extended"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-bonus_roll_after_quick_entry=True-bonus_roll_forfeited=True-capture_mode=mandatory_extended-dreimal_wuerfeln=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "dreimal_wuerfeln": true,
+        "bonus_roll_after_quick_entry": true,
+        "bonus_roll_forfeited": true,
+        "capture_mode": "mandatory_extended",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/bonus_roll_after_quick_entry=True-bonus_roll_forfeited=True-dreimal_wuerfeln=True-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "dreimal_wuerfeln": true,
+        "bonus_roll_after_quick_entry": true,
+        "bonus_roll_forfeited": true,
+        "goal_no_jump": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-bonus_roll_after_quick_entry=True-bonus_roll_forfeited=True-dreimal_wuerfeln=True-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "dreimal_wuerfeln": true,
+        "bonus_roll_after_quick_entry": true,
+        "bonus_roll_forfeited": true,
+        "goal_no_jump": true,
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/bonus_roll_after_quick_entry=True-bonus_roll_forfeited=True-capture_mode=mandatory-dreimal_wuerfeln=True-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "dreimal_wuerfeln": true,
+        "bonus_roll_after_quick_entry": true,
+        "bonus_roll_forfeited": true,
+        "goal_no_jump": true,
+        "capture_mode": "mandatory"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-bonus_roll_after_quick_entry=True-bonus_roll_forfeited=True-capture_mode=mandatory-dreimal_wuerfeln=True-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "dreimal_wuerfeln": true,
+        "bonus_roll_after_quick_entry": true,
+        "bonus_roll_forfeited": true,
+        "goal_no_jump": true,
+        "capture_mode": "mandatory",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/bonus_roll_after_quick_entry=True-bonus_roll_forfeited=True-capture_mode=mandatory_extended-dreimal_wuerfeln=True-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "dreimal_wuerfeln": true,
+        "bonus_roll_after_quick_entry": true,
+        "bonus_roll_forfeited": true,
+        "goal_no_jump": true,
+        "capture_mode": "mandatory_extended"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-bonus_roll_after_quick_entry=True-bonus_roll_forfeited=True-capture_mode=mandatory_extended-dreimal_wuerfeln=True-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "dreimal_wuerfeln": true,
+        "bonus_roll_after_quick_entry": true,
+        "bonus_roll_forfeited": true,
+        "goal_no_jump": true,
+        "capture_mode": "mandatory_extended",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/cold_start=strict",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-cold_start=strict",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/capture_mode=mandatory-cold_start=strict",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "capture_mode": "mandatory"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-capture_mode=mandatory-cold_start=strict",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "capture_mode": "mandatory",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/capture_mode=mandatory_extended-cold_start=strict",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "capture_mode": "mandatory_extended"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-capture_mode=mandatory_extended-cold_start=strict",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "capture_mode": "mandatory_extended",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/cold_start=strict-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "goal_no_jump": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-cold_start=strict-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "goal_no_jump": true,
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/capture_mode=mandatory-cold_start=strict-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "goal_no_jump": true,
+        "capture_mode": "mandatory"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-capture_mode=mandatory-cold_start=strict-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "goal_no_jump": true,
+        "capture_mode": "mandatory",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/capture_mode=mandatory_extended-cold_start=strict-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "goal_no_jump": true,
+        "capture_mode": "mandatory_extended"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-capture_mode=mandatory_extended-cold_start=strict-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "goal_no_jump": true,
+        "capture_mode": "mandatory_extended",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/bonus_roll_forfeited=True-cold_start=strict",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "bonus_roll_forfeited": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-bonus_roll_forfeited=True-cold_start=strict",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "bonus_roll_forfeited": true,
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/bonus_roll_forfeited=True-capture_mode=mandatory-cold_start=strict",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "bonus_roll_forfeited": true,
+        "capture_mode": "mandatory"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-bonus_roll_forfeited=True-capture_mode=mandatory-cold_start=strict",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "bonus_roll_forfeited": true,
+        "capture_mode": "mandatory",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/bonus_roll_forfeited=True-capture_mode=mandatory_extended-cold_start=strict",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "bonus_roll_forfeited": true,
+        "capture_mode": "mandatory_extended"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-bonus_roll_forfeited=True-capture_mode=mandatory_extended-cold_start=strict",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "bonus_roll_forfeited": true,
+        "capture_mode": "mandatory_extended",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/bonus_roll_forfeited=True-cold_start=strict-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "bonus_roll_forfeited": true,
+        "goal_no_jump": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-bonus_roll_forfeited=True-cold_start=strict-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "bonus_roll_forfeited": true,
+        "goal_no_jump": true,
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/bonus_roll_forfeited=True-capture_mode=mandatory-cold_start=strict-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "bonus_roll_forfeited": true,
+        "goal_no_jump": true,
+        "capture_mode": "mandatory"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-bonus_roll_forfeited=True-capture_mode=mandatory-cold_start=strict-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "bonus_roll_forfeited": true,
+        "goal_no_jump": true,
+        "capture_mode": "mandatory",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/bonus_roll_forfeited=True-capture_mode=mandatory_extended-cold_start=strict-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "bonus_roll_forfeited": true,
+        "goal_no_jump": true,
+        "capture_mode": "mandatory_extended"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-bonus_roll_forfeited=True-capture_mode=mandatory_extended-cold_start=strict-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "bonus_roll_forfeited": true,
+        "goal_no_jump": true,
+        "capture_mode": "mandatory_extended",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/cold_start=strict-dreimal_wuerfeln=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "dreimal_wuerfeln": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-cold_start=strict-dreimal_wuerfeln=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "dreimal_wuerfeln": true,
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/capture_mode=mandatory-cold_start=strict-dreimal_wuerfeln=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "dreimal_wuerfeln": true,
+        "capture_mode": "mandatory"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-capture_mode=mandatory-cold_start=strict-dreimal_wuerfeln=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "dreimal_wuerfeln": true,
+        "capture_mode": "mandatory",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/capture_mode=mandatory_extended-cold_start=strict-dreimal_wuerfeln=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "dreimal_wuerfeln": true,
+        "capture_mode": "mandatory_extended"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-capture_mode=mandatory_extended-cold_start=strict-dreimal_wuerfeln=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "dreimal_wuerfeln": true,
+        "capture_mode": "mandatory_extended",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/cold_start=strict-dreimal_wuerfeln=True-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "dreimal_wuerfeln": true,
+        "goal_no_jump": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-cold_start=strict-dreimal_wuerfeln=True-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "dreimal_wuerfeln": true,
+        "goal_no_jump": true,
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/capture_mode=mandatory-cold_start=strict-dreimal_wuerfeln=True-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "dreimal_wuerfeln": true,
+        "goal_no_jump": true,
+        "capture_mode": "mandatory"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-capture_mode=mandatory-cold_start=strict-dreimal_wuerfeln=True-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "dreimal_wuerfeln": true,
+        "goal_no_jump": true,
+        "capture_mode": "mandatory",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/capture_mode=mandatory_extended-cold_start=strict-dreimal_wuerfeln=True-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "dreimal_wuerfeln": true,
+        "goal_no_jump": true,
+        "capture_mode": "mandatory_extended"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-capture_mode=mandatory_extended-cold_start=strict-dreimal_wuerfeln=True-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "dreimal_wuerfeln": true,
+        "goal_no_jump": true,
+        "capture_mode": "mandatory_extended",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/bonus_roll_forfeited=True-cold_start=strict-dreimal_wuerfeln=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "dreimal_wuerfeln": true,
+        "bonus_roll_forfeited": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-bonus_roll_forfeited=True-cold_start=strict-dreimal_wuerfeln=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "dreimal_wuerfeln": true,
+        "bonus_roll_forfeited": true,
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/bonus_roll_forfeited=True-capture_mode=mandatory-cold_start=strict-dreimal_wuerfeln=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "dreimal_wuerfeln": true,
+        "bonus_roll_forfeited": true,
+        "capture_mode": "mandatory"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-bonus_roll_forfeited=True-capture_mode=mandatory-cold_start=strict-dreimal_wuerfeln=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "dreimal_wuerfeln": true,
+        "bonus_roll_forfeited": true,
+        "capture_mode": "mandatory",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/bonus_roll_forfeited=True-capture_mode=mandatory_extended-cold_start=strict-dreimal_wuerfeln=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "dreimal_wuerfeln": true,
+        "bonus_roll_forfeited": true,
+        "capture_mode": "mandatory_extended"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-bonus_roll_forfeited=True-capture_mode=mandatory_extended-cold_start=strict-dreimal_wuerfeln=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "dreimal_wuerfeln": true,
+        "bonus_roll_forfeited": true,
+        "capture_mode": "mandatory_extended",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/bonus_roll_forfeited=True-cold_start=strict-dreimal_wuerfeln=True-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "dreimal_wuerfeln": true,
+        "bonus_roll_forfeited": true,
+        "goal_no_jump": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-bonus_roll_forfeited=True-cold_start=strict-dreimal_wuerfeln=True-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "dreimal_wuerfeln": true,
+        "bonus_roll_forfeited": true,
+        "goal_no_jump": true,
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/bonus_roll_forfeited=True-capture_mode=mandatory-cold_start=strict-dreimal_wuerfeln=True-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "dreimal_wuerfeln": true,
+        "bonus_roll_forfeited": true,
+        "goal_no_jump": true,
+        "capture_mode": "mandatory"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-bonus_roll_forfeited=True-capture_mode=mandatory-cold_start=strict-dreimal_wuerfeln=True-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "dreimal_wuerfeln": true,
+        "bonus_roll_forfeited": true,
+        "goal_no_jump": true,
+        "capture_mode": "mandatory",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/bonus_roll_forfeited=True-capture_mode=mandatory_extended-cold_start=strict-dreimal_wuerfeln=True-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "dreimal_wuerfeln": true,
+        "bonus_roll_forfeited": true,
+        "goal_no_jump": true,
+        "capture_mode": "mandatory_extended"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-bonus_roll_forfeited=True-capture_mode=mandatory_extended-cold_start=strict-dreimal_wuerfeln=True-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "dreimal_wuerfeln": true,
+        "bonus_roll_forfeited": true,
+        "goal_no_jump": true,
+        "capture_mode": "mandatory_extended",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/bonus_roll_after_quick_entry=True-cold_start=strict-dreimal_wuerfeln=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "dreimal_wuerfeln": true,
+        "bonus_roll_after_quick_entry": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-bonus_roll_after_quick_entry=True-cold_start=strict-dreimal_wuerfeln=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "dreimal_wuerfeln": true,
+        "bonus_roll_after_quick_entry": true,
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/bonus_roll_after_quick_entry=True-capture_mode=mandatory-cold_start=strict-dreimal_wuerfeln=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "dreimal_wuerfeln": true,
+        "bonus_roll_after_quick_entry": true,
+        "capture_mode": "mandatory"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-bonus_roll_after_quick_entry=True-capture_mode=mandatory-cold_start=strict-dreimal_wuerfeln=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "dreimal_wuerfeln": true,
+        "bonus_roll_after_quick_entry": true,
+        "capture_mode": "mandatory",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/bonus_roll_after_quick_entry=True-capture_mode=mandatory_extended-cold_start=strict-dreimal_wuerfeln=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "dreimal_wuerfeln": true,
+        "bonus_roll_after_quick_entry": true,
+        "capture_mode": "mandatory_extended"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-bonus_roll_after_quick_entry=True-capture_mode=mandatory_extended-cold_start=strict-dreimal_wuerfeln=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "dreimal_wuerfeln": true,
+        "bonus_roll_after_quick_entry": true,
+        "capture_mode": "mandatory_extended",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/bonus_roll_after_quick_entry=True-cold_start=strict-dreimal_wuerfeln=True-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "dreimal_wuerfeln": true,
+        "bonus_roll_after_quick_entry": true,
+        "goal_no_jump": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-bonus_roll_after_quick_entry=True-cold_start=strict-dreimal_wuerfeln=True-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "dreimal_wuerfeln": true,
+        "bonus_roll_after_quick_entry": true,
+        "goal_no_jump": true,
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/bonus_roll_after_quick_entry=True-capture_mode=mandatory-cold_start=strict-dreimal_wuerfeln=True-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "dreimal_wuerfeln": true,
+        "bonus_roll_after_quick_entry": true,
+        "goal_no_jump": true,
+        "capture_mode": "mandatory"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-bonus_roll_after_quick_entry=True-capture_mode=mandatory-cold_start=strict-dreimal_wuerfeln=True-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "dreimal_wuerfeln": true,
+        "bonus_roll_after_quick_entry": true,
+        "goal_no_jump": true,
+        "capture_mode": "mandatory",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/bonus_roll_after_quick_entry=True-capture_mode=mandatory_extended-cold_start=strict-dreimal_wuerfeln=True-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "dreimal_wuerfeln": true,
+        "bonus_roll_after_quick_entry": true,
+        "goal_no_jump": true,
+        "capture_mode": "mandatory_extended"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-bonus_roll_after_quick_entry=True-capture_mode=mandatory_extended-cold_start=strict-dreimal_wuerfeln=True-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "dreimal_wuerfeln": true,
+        "bonus_roll_after_quick_entry": true,
+        "goal_no_jump": true,
+        "capture_mode": "mandatory_extended",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/bonus_roll_after_quick_entry=True-bonus_roll_forfeited=True-cold_start=strict-dreimal_wuerfeln=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "dreimal_wuerfeln": true,
+        "bonus_roll_after_quick_entry": true,
+        "bonus_roll_forfeited": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-bonus_roll_after_quick_entry=True-bonus_roll_forfeited=True-cold_start=strict-dreimal_wuerfeln=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "dreimal_wuerfeln": true,
+        "bonus_roll_after_quick_entry": true,
+        "bonus_roll_forfeited": true,
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/bonus_roll_after_quick_entry=True-bonus_roll_forfeited=True-capture_mode=mandatory-cold_start=strict-dreimal_wuerfeln=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "dreimal_wuerfeln": true,
+        "bonus_roll_after_quick_entry": true,
+        "bonus_roll_forfeited": true,
+        "capture_mode": "mandatory"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-bonus_roll_after_quick_entry=True-bonus_roll_forfeited=True-capture_mode=mandatory-cold_start=strict-dreimal_wuerfeln=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "dreimal_wuerfeln": true,
+        "bonus_roll_after_quick_entry": true,
+        "bonus_roll_forfeited": true,
+        "capture_mode": "mandatory",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/bonus_roll_after_quick_entry=True-bonus_roll_forfeited=True-capture_mode=mandatory_extended-cold_start=strict-dreimal_wuerfeln=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "dreimal_wuerfeln": true,
+        "bonus_roll_after_quick_entry": true,
+        "bonus_roll_forfeited": true,
+        "capture_mode": "mandatory_extended"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-bonus_roll_after_quick_entry=True-bonus_roll_forfeited=True-capture_mode=mandatory_extended-cold_start=strict-dreimal_wuerfeln=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "dreimal_wuerfeln": true,
+        "bonus_roll_after_quick_entry": true,
+        "bonus_roll_forfeited": true,
+        "capture_mode": "mandatory_extended",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/bonus_roll_after_quick_entry=True-bonus_roll_forfeited=True-cold_start=strict-dreimal_wuerfeln=True-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "dreimal_wuerfeln": true,
+        "bonus_roll_after_quick_entry": true,
+        "bonus_roll_forfeited": true,
+        "goal_no_jump": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-bonus_roll_after_quick_entry=True-bonus_roll_forfeited=True-cold_start=strict-dreimal_wuerfeln=True-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "dreimal_wuerfeln": true,
+        "bonus_roll_after_quick_entry": true,
+        "bonus_roll_forfeited": true,
+        "goal_no_jump": true,
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/bonus_roll_after_quick_entry=True-bonus_roll_forfeited=True-capture_mode=mandatory-cold_start=strict-dreimal_wuerfeln=True-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "dreimal_wuerfeln": true,
+        "bonus_roll_after_quick_entry": true,
+        "bonus_roll_forfeited": true,
+        "goal_no_jump": true,
+        "capture_mode": "mandatory"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-bonus_roll_after_quick_entry=True-bonus_roll_forfeited=True-capture_mode=mandatory-cold_start=strict-dreimal_wuerfeln=True-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "dreimal_wuerfeln": true,
+        "bonus_roll_after_quick_entry": true,
+        "bonus_roll_forfeited": true,
+        "goal_no_jump": true,
+        "capture_mode": "mandatory",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/bonus_roll_after_quick_entry=True-bonus_roll_forfeited=True-capture_mode=mandatory_extended-cold_start=strict-dreimal_wuerfeln=True-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "dreimal_wuerfeln": true,
+        "bonus_roll_after_quick_entry": true,
+        "bonus_roll_forfeited": true,
+        "goal_no_jump": true,
+        "capture_mode": "mandatory_extended"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-bonus_roll_after_quick_entry=True-bonus_roll_forfeited=True-capture_mode=mandatory_extended-cold_start=strict-dreimal_wuerfeln=True-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "strict",
+        "dreimal_wuerfeln": true,
+        "bonus_roll_after_quick_entry": true,
+        "bonus_roll_forfeited": true,
+        "goal_no_jump": true,
+        "capture_mode": "mandatory_extended",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/cold_start=free_entry",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "free_entry"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-cold_start=free_entry",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "free_entry",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/capture_mode=mandatory-cold_start=free_entry",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "free_entry",
+        "capture_mode": "mandatory"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-capture_mode=mandatory-cold_start=free_entry",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "free_entry",
+        "capture_mode": "mandatory",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/capture_mode=mandatory_extended-cold_start=free_entry",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "free_entry",
+        "capture_mode": "mandatory_extended"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-capture_mode=mandatory_extended-cold_start=free_entry",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "free_entry",
+        "capture_mode": "mandatory_extended",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/cold_start=free_entry-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "free_entry",
+        "goal_no_jump": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-cold_start=free_entry-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "free_entry",
+        "goal_no_jump": true,
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/capture_mode=mandatory-cold_start=free_entry-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "free_entry",
+        "goal_no_jump": true,
+        "capture_mode": "mandatory"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-capture_mode=mandatory-cold_start=free_entry-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "free_entry",
+        "goal_no_jump": true,
+        "capture_mode": "mandatory",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/capture_mode=mandatory_extended-cold_start=free_entry-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "free_entry",
+        "goal_no_jump": true,
+        "capture_mode": "mandatory_extended"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-capture_mode=mandatory_extended-cold_start=free_entry-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "free_entry",
+        "goal_no_jump": true,
+        "capture_mode": "mandatory_extended",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/bonus_roll_forfeited=True-cold_start=free_entry",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "free_entry",
+        "bonus_roll_forfeited": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-bonus_roll_forfeited=True-cold_start=free_entry",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "free_entry",
+        "bonus_roll_forfeited": true,
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/bonus_roll_forfeited=True-capture_mode=mandatory-cold_start=free_entry",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "free_entry",
+        "bonus_roll_forfeited": true,
+        "capture_mode": "mandatory"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-bonus_roll_forfeited=True-capture_mode=mandatory-cold_start=free_entry",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "free_entry",
+        "bonus_roll_forfeited": true,
+        "capture_mode": "mandatory",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/bonus_roll_forfeited=True-capture_mode=mandatory_extended-cold_start=free_entry",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "free_entry",
+        "bonus_roll_forfeited": true,
+        "capture_mode": "mandatory_extended"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-bonus_roll_forfeited=True-capture_mode=mandatory_extended-cold_start=free_entry",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "free_entry",
+        "bonus_roll_forfeited": true,
+        "capture_mode": "mandatory_extended",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/bonus_roll_forfeited=True-cold_start=free_entry-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "free_entry",
+        "bonus_roll_forfeited": true,
+        "goal_no_jump": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-bonus_roll_forfeited=True-cold_start=free_entry-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "free_entry",
+        "bonus_roll_forfeited": true,
+        "goal_no_jump": true,
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/bonus_roll_forfeited=True-capture_mode=mandatory-cold_start=free_entry-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "free_entry",
+        "bonus_roll_forfeited": true,
+        "goal_no_jump": true,
+        "capture_mode": "mandatory"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-bonus_roll_forfeited=True-capture_mode=mandatory-cold_start=free_entry-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "free_entry",
+        "bonus_roll_forfeited": true,
+        "goal_no_jump": true,
+        "capture_mode": "mandatory",
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/bonus_roll_forfeited=True-capture_mode=mandatory_extended-cold_start=free_entry-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "free_entry",
+        "bonus_roll_forfeited": true,
+        "goal_no_jump": true,
+        "capture_mode": "mandatory_extended"
+      }
+    },
+    {
+      "key": "ex4/4s4p/random/barriers=True-bonus_roll_forfeited=True-capture_mode=mandatory_extended-cold_start=free_entry-goal_no_jump=True",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 20000,
+      "rules": {
+        "cold_start": "free_entry",
+        "bonus_roll_forfeited": true,
+        "goal_no_jump": true,
+        "capture_mode": "mandatory_extended",
+        "barriers": true
+      }
+    }
+  ]
+}

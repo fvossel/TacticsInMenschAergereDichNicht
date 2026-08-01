@@ -23,8 +23,10 @@ from madnlab.eventlog.writer import SummaryRow
 from madnlab.run import counterbalance, seeds
 
 #: The pre-registration tag a run was executed under (§14). Recorded in every
-#: header and every summary row; ``unfrozen`` until the tag exists.
-PREREG_VERSION = "unfrozen"
+#: header and every summary row. The placeholder this held before the freeze
+#: was ``unfrozen``; the data generated under it was discarded rather than
+#: relabelled, so no published row carries it (D-73).
+PREREG_VERSION = "prereg-v1"
 
 
 class GameSpec(NamedTuple):
