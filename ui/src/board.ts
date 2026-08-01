@@ -31,11 +31,10 @@ const FIELD_RADIUS = 12;
 /**
  * Breathing room in the viewBox rather than shrunk content. The outermost
  * things on the board are the yards, and on the 6-seat star they sit at
- * radius 0.51·SIZE from a centre at 0.5·SIZE — six units past the edge, so
- * the top and bottom arms were clipped. The stroke on the track outline
- * adds another 13 on each side.
+ * radius 0.56·SIZE from a centre at 0.5·SIZE, so they run past the edge of
+ * the track's own square. The stroke on the outline adds another 13 a side.
  */
-const PAD = 44;
+const PAD = 66;
 
 /** The 11×11 grid the classic 4-player board is printed on. */
 const GRID = 11;
@@ -81,8 +80,8 @@ function starPoint(geometry: Geometry, field: number): Point {
   const arm = Math.floor(field / perArm);
   const index = field % perArm;
   const inward = Math.ceil(perArm / 2);
-  const outer = SIZE * 0.44;
-  const inner = SIZE * 0.14;
+  const outer = SIZE * 0.40;
+  const inner = SIZE * 0.13;
   const along =
     index < inward
       ? index / (inward - 1)
@@ -108,7 +107,7 @@ function goalPoint(geometry: Geometry, seat: number, index: number): Point {
   }
   const [x, y] = starPoint(geometry, ringField(geometry, seat, geometry.ringLength));
   const angle = Math.atan2(y - CENTER, x - CENTER);
-  const radius = SIZE * 0.25 - index * (SIZE * 0.045);
+  const radius = SIZE * 0.23 - index * (SIZE * 0.042);
   return [CENTER + Math.cos(angle) * radius, CENTER + Math.sin(angle) * radius];
 }
 
@@ -119,8 +118,12 @@ function yardPoint(geometry: Geometry, seat: number, index: number): Point {
   }
   const [x, y] = starPoint(geometry, ringField(geometry, seat, 1));
   const angle = Math.atan2(y - CENTER, x - CENTER);
-  const radius = SIZE * 0.47 + (index % 2) * (SIZE * 0.04);
-  const spread = (index < 2 ? -1 : 1) * 0.05;
+  // Set well clear of the track. On the star the entry field sits at an arm
+  // tip, so a yard placed just beyond it lands on the board rather than
+  // beside it — the 4-seat cross gets this for free by putting yards in the
+  // corners, and the star has to buy it with radius.
+  const radius = SIZE * 0.51 + (index % 2) * (SIZE * 0.05);
+  const spread = (index < 2 ? -1 : 1) * 0.058;
   return [
     CENTER + Math.cos(angle + spread) * radius,
     CENTER + Math.sin(angle + spread) * radius,
