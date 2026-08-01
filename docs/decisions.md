@@ -1819,6 +1819,66 @@ here rather than being invisible.
 
 ---
 
+### D-74 — AK-4's gate applied outside its scope, and its report contradicted itself
+**Status:** `pinned` · *post-freeze code fix* · *2026-08-01*
+
+**Two defects, found by running the campaigns.** Analysis jobs for EX-3, EX-5
+and EX-6 exited 1.
+
+1. **The report contradicted its own verdict.** `AK4Result.verdict` correctly
+   returns `INCONCLUSIVE` when the CI half-width exceeds the margin, but
+   `report()` ended with `'PASS' if self.passed else 'FAIL'`, printing **FAIL**
+   three lines below its own sentence *"This is not evidence of asymmetry."*
+   D-72 was implemented in the property and missed in the line a reader
+   actually trusts.
+2. **The gate ran outside its scope.** §11 defines AK-4 "for every calibration
+   cell (EX-1, EX-1b)". The CLI applied it to every cell of every campaign and
+   let any conclusive failure set the exit code — with a comment on that very
+   line calling it a calibration gate. D-72 had judged campaign-wide reporting
+   "harmless once inconclusive is distinguished"; that was right about
+   under-powering and incomplete about cells that are **asymmetric by design**.
+
+**Why the failures were not engine faults.** The gate's null is *every seat
+wins 1/k*. It holds only where seats are exchangeable by construction, and the
+failing cells were exactly the ones where they are not:
+
+- **EX-5's adjacent arms.** Three players sitting adjacent leave one of them a
+  long run of ring containing no opponent entry field. `6s-adjacent/spread`
+  measured 25.0 / 39.0 / 36.0 %. The evenly-spaced control passes
+  (`6s-spread/random` 33.2 / 33.3 / 33.5 %). This *is* EX-5, and D-27 put the
+  `6s-adjacent` control in the plan precisely to separate board size from
+  seating pattern. The gate was firing on the finding.
+- **EX-3's deviant cells.** One seat plays a different policy on purpose, so
+  1/k is not the reference its win rate belongs against — that comparison is
+  RQ-3's estimand.
+
+**Fix.** `seats_exchangeable(occupied, seats, agents)`: identical agents **and**
+equal cyclic gaps between occupied seats. Cells failing it are still reported
+in full — D-72's descriptive value stands, and an unexpected asymmetry is still
+something the project wants to hear about — but they do not gate.
+
+**Why this is not moving the goalposts after seeing the data.** The check that
+matters: **the calibration cells pass, and passed before this change.** EX-1
+(four seats, half-width 0.176 pp) and EX-1b (six seats, 0.152 pp) are green on
+every seat. Not one interval, rate or CI changes anywhere — the fix alters one
+printed word and which cells set an exit code, nothing computed. And §11
+already scoped AK-4 to the calibration cells, so this moves the code to the
+frozen spec rather than the spec to the code.
+
+**Root cause.** AK-4 and AK-5 had **no tests at all**. Both defects are
+invisible to ruff and mypy because both are semantically well-formed. Added
+`tests/test_ak4_gate.py`: the trichotomy, the report-line agreement, and nine
+exchangeability cases including both EX-5 arms and a deviant cell.
+
+**Data that existed when this was made (§14.2).** All eight campaigns had run
+under `prereg-v1` and their `analysis.json` files existed. No §6.4 hypothesis
+had been evaluated. The re-analysis reuses the same summary rows — the engine
+did not re-run, because nothing about the engine changed.
+
+**Affects.** §11 AK-4, D-27, D-29, D-72, `analysis/aggregate.py`, `run/cli.py`.
+
+---
+
 ## Open items
 
 **None.** Both rows that stood here are resolved, and the table is empty at the

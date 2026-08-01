@@ -94,6 +94,15 @@ def analyse(campaign_dir: Path, analysis_seed: int) -> int:
         summary_path = campaign_dir / "summary.jsonl"
     cells = aggregate.load_cells(summary_path)
 
+    # The agent assignment is not in the summary rows (D-22 fixes their key
+    # set), so the gate's scope comes from the campaign config beside them.
+    agents_by_cell: dict[str, list[str]] = {}
+    config_path = campaign_dir / "campaign.json"
+    if config_path.exists():
+        written = json.loads(config_path.read_text(encoding="utf-8"))
+        for entry in written.get("cells", []):
+            agents_by_cell[str(entry["key"])] = [str(a) for a in entry.get("agents", [])]
+
     results: dict[str, object] = {}
     failed = False
     for key, cell in sorted(cells.items()):
@@ -106,12 +115,28 @@ def analyse(campaign_dir: Path, analysis_seed: int) -> int:
 
         ak4 = aggregate.ak4(cell)
         print(ak4.report())
-        # An inconclusive cell is not a failure: AK-4 is a calibration gate
-        # (D-29) and a cell too small to resolve the margin says nothing about
-        # symmetry either way (D-72).
-        failed |= ak4.conclusive and not ak4.passed
+        # Two things keep a cell out of the gate, and neither suppresses its
+        # numbers -- the report above is printed either way (D-72's descriptive
+        # value stands).
+        #
+        # An inconclusive cell is not a failure: a cell too small to resolve
+        # the margin says nothing about symmetry either way (D-72).
+        #
+        # A cell whose seats are not exchangeable by construction is not a
+        # failure either: §11 scopes AK-4 to the calibration cells, and a
+        # deviant policy or an uneven seating gap makes 1/k the wrong
+        # reference rather than the engine wrong (D-74).
+        exchangeable = aggregate.seats_exchangeable(
+            cell.occupied, cell.seats, agents_by_cell.get(key, [])
+        )
+        gated = exchangeable and ak4.conclusive
+        if not exchangeable:
+            print("      not a calibration cell: descriptive only, does not gate")
+        failed |= gated and not ak4.passed
         results[f"{key}/ak4"] = {
             "verdict": ak4.verdict,
+            "gates": gated,
+            "exchangeable": exchangeable,
             "conclusive": ak4.conclusive,
             "passed": ak4.passed,
             "half_width_pp": ak4.half_width_pp,

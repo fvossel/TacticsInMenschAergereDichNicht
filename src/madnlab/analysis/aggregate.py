@@ -167,8 +167,40 @@ class AK4Result(NamedTuple):
                 f"[{verdict.interval.low * 100:8.4f}, {verdict.interval.high * 100:8.4f}]  "
                 f"dev {verdict.deviation_pp:+.4f} pp  {flag}"
             )
-        lines.append(f"      {'PASS' if self.passed else 'FAIL'}")
+        # Through ``verdict``, not ``passed``: an inconclusive cell printing
+        # "FAIL" here contradicts the UNDERPOWERED line three rows above it,
+        # and this is the line a reader trusts (D-74).
+        lines.append(f"      {self.verdict}")
         return "\n".join(lines)
+
+
+def seats_exchangeable(
+    occupied: Sequence[int], seats: int, agents: Sequence[str]
+) -> bool:
+    """Whether AK-4's null — every seat wins exactly 1/k — holds by construction.
+
+    §11 scopes AK-4 to the *calibration* cells, and this is the property that
+    makes a cell one. Two things must hold.
+
+    The agents must be identical. In a deviant cell one seat plays a different
+    policy on purpose, so 1/k is not the reference its win rate should be
+    compared against — that comparison is RQ-3's estimand, not a gate.
+
+    The occupied seats must be evenly spaced around the ring. Three players
+    sitting adjacent on a six-seat board leave one of them a 24-field run
+    containing no opponent entry field, and the resulting asymmetry is EX-5's
+    research question rather than an engine fault (D-27, D-74).
+    """
+    if len(set(agents)) > 1:
+        return False
+    ordered = sorted(occupied)
+    if len(ordered) < 2:
+        return True
+    gaps = {
+        (ordered[(i + 1) % len(ordered)] - ordered[i]) % seats
+        for i in range(len(ordered))
+    }
+    return len(gaps) == 1
 
 
 def ak4(
