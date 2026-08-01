@@ -56,8 +56,22 @@ def _fmt(value: float) -> str:
         return f"{value:,.0f}"
     if abs(value) >= 10:
         return f"{value:.1f}"
-    if abs(value) >= 1:
-        return f"{value:.2f}"
+    # Four decimals below 10: a CV ratio of 1.1450 and one of 1.1499 are
+    # different findings, and two decimals hides the difference.
+    return f"{value:.4f}"
+
+
+def _p(value: float) -> str:
+    """A p-value that underflowed to zero is not zero, and must not print as it.
+
+    Double precision bottoms out around 1e-308 and the normal tail reaches it
+    easily at these sample sizes. Printing "0.000e+00" would claim an exact
+    zero, which no finite sample can produce.
+    """
+    if value <= 0.0:
+        return "&lt;1e-300"
+    if value < 1e-4:
+        return f"{value:.2e}"
     return f"{value:.4f}"
 
 
@@ -68,7 +82,7 @@ def _estimate_row(estimate: Estimate, rejected: bool | None, alpha: float | None
     return (
         f"| {estimate.label}{note} | {_fmt(estimate.estimate)} | "
         f"[{_fmt(estimate.interval.low)}, {_fmt(estimate.interval.high)}] | "
-        f"{estimate.p_value:.3e} | {alpha_text} | {verdict} |"
+        f"{_p(estimate.p_value)} | {alpha_text} | {verdict} |"
     )
 
 

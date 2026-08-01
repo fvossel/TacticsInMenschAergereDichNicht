@@ -148,7 +148,7 @@ def rq1(data: Dataset, *, seed: int, resamples: int) -> FamilyResult:
             estimands.proportion_difference(
                 arm.leader_at_50_won, arm.checkpointed,
                 base.leader_at_50_won, base.checkpointed,
-                label=f"leader-at-50%% wins :: {contrast}",
+                label=f"leader-at-50% wins :: {contrast}",
             )
         )
         hypotheses.append(Hypothesis("RQ-1", "predictability_skill", contrast))
@@ -426,7 +426,7 @@ def rq1_verdict(result: FamilyResult) -> RQ1Verdict:
     directions = (
         ("lead_changes_per_turn", "lead changes per turn", +1),
         ("comeback_rate", "comeback rate", +1),
-        ("predictability_skill", "leader-at-50%% wins", -1),
+        ("predictability_skill", "leader-at-50% wins", -1),
     )
     for metric, prefix, direction in directions:
         holm_result = by_key.get((metric, contrast))
