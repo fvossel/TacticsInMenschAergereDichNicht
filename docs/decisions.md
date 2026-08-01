@@ -1667,6 +1667,57 @@ incrementally is an M2 design question at the `GameState` boundary, and it
 should run against a green AK-1 suite rather than blind.
 **Affects.** NF-2, NF-3, AK-7, D-43c, D-48, D-59.
 
+### D-69 — Stalemate: a game with no legal move anywhere ends
+**Status:** `pinned` · *found by AK-3's random-config sweep, 2026-08-01*
+**Decision.** If no unfinished seat has a legal move on **any** die value, the
+game ends as a **stalemate**. Ranks fall back to total progress — the rule §6.1
+already gives `first_winner` — with ties in ascending seat order. `stalemate`
+is a summary-row field.
+**Why the cheap test is not enough.** A round in which nobody moves is
+ordinary, not a deadlock: under `strict` a round where no one rolls a 6 has no
+legal move anywhere. Only the all-die-values test distinguishes the two, so the
+round counter is the trigger and the six-value scan is the decision.
+**Affects.** GM-3.9, GM-3.11, §6.1, LG-2.
+
+### D-70 — Abandonment: the turn bound is an outcome, not an error
+**Status:** `pinned` · *found by AK-3's random-config sweep, 2026-08-01*
+**Decision.** A game that reaches **20,000 turns** with more than one seat
+unfinished is **abandoned**, ranked by progress like a stalemate, and flagged
+`abandoned` in the summary row. Exceeding the bound is *not* an exception and
+not a defect signal.
+**Why.** AK-3's sweep produced games that never end in practice under
+`cold_start = free_entry` + `capture_mode = mandatory` at 6 players. The
+mechanism is not a deadlock — pieces keep moving — but a restoring force:
+free re-entry makes a captured piece cost almost nothing, mandatory capture on
+a crowded 48-ring board makes captures constant, and progress toward the goal
+is undone faster than it accumulates. After 20,000 turns three of six seats
+still had nothing in the goal. Such a game would terminate eventually; its
+expected length is astronomical.
+Raising on it would crash a campaign on a property of the arm. Recording it
+makes the rate measurable, which is what this project does with everything
+else.
+**Measured, so the bound is not arbitrary.** Every cell the D-59 plan actually
+contains terminates:
+
+| cell | abandonment | mean turns | longest |
+|---|---|---|---|
+| EX-1b 6s/6p all-`RANDOM` baseline | 0% | 1,218 | 1,721 |
+| EX-2 6s/6p all-`RANDOM` mandatory | 0% | 1,783 | 3,014 |
+| EX-2 6s/6p all-`GREEDY_CAPTURE` extended | 0% | 1,964 | 2,786 |
+| EX-6f 6s/6p all-`SPREAD` extended + barriers | 0% | 2,808 | 4,286 |
+| EX-6f 6s/6p mixed, extended + barriers + no-jump | 0% | 2,435 | 3,829 |
+| *(control)* `free_entry` + mandatory, 6 players | **100%** | — | — |
+
+The bound is ~4.7× the longest game observed in any planned cell. At 4 players
+— which is what EX-4 actually runs, and the only campaign containing
+`free_entry` — **none** of the 36 axis combinations abandons or stalemates;
+`free_entry` + mandatory is merely slow there (1,700–2,400 turns against the
+baseline's 442). So the pathological combination is not in the plan.
+**Binding on the analysis layer.** No estimand may be published from a cell
+with a non-negligible abandonment rate without stating it, since abandoned
+games have no winner and their ranks come from a different rule.
+**Affects.** GM-3.11, §6.1, LG-2, EX-4, the analysis layer.
+
 ---
 
 ## Open items

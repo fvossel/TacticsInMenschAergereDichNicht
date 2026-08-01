@@ -1,25 +1,26 @@
 """The game loop (GM-3), with the per-turn metric accumulation §6.2 needs.
 
-This is the minimum that makes AK-7 an honest measurement: D-43c requires the
-benchmark to run with the per-turn ``leader(t)`` recomputation *inside* the
-measured loop, so the loop has to compute it, not skip it. The event-log
-writer and the full summary row are not here yet; what is here is every cost
-that scales with turns.
+D-43c requires AK-7 to measure with the per-turn ``leader(t)`` recomputation
+inside the loop, so the loop computes it rather than deferring it.
+
+Event recording is optional and off by default: pass ``record`` a list and the
+loop appends the LG-1 event stream to it. That stream is what AK-3's replay
+validator compares, so it has to capture every decision — including the full
+offered legal-move set and the chosen index — not merely the resulting state.
 
 Turn structure (GM-3.3, GM-3.10, D-10)
 --------------------------------------
-1. **Attempt phase.** When ``dreimal_wuerfeln`` is on and the D-1 condition
-   holds — no piece on the ring track and no goal piece movable by any value
-   1..6 — the player rolls up to three times looking for a 6. A 6 terminates
-   the sequence immediately, whether or not it produced a move.
-2. **Extra rolls.** A 6 grants one ordinary follow-up roll, which chains on a
-   further 6. ``bonus_roll_forfeited`` withholds that grant when the 6 could
-   not be moved; ``bonus_roll_after_quick_entry`` adds a second grant, stacking
-   with the first, when entry happened on attempt 1 or 2.
+1. **Attempt phase.** With ``dreimal_wuerfeln`` on and the D-1 condition
+   holding — no piece on the ring and no goal piece movable by any value 1..6
+   — the player rolls up to three times looking for a 6. A 6 ends the sequence
+   immediately, whether or not it produced a move.
+2. **Extra rolls.** A 6 grants one ordinary follow-up, chaining on a further
+   6. ``bonus_roll_forfeited`` withholds it when the 6 could not be moved;
+   ``bonus_roll_after_quick_entry`` adds a second grant, stacking, when entry
+   happened on attempt 1 or 2.
 
-D-10's resulting per-turn roll budget is 1 / 4 / 5 for attempt limits of
-1 / 3 / 3-with-bonus. ``RuleSet.entry_attempts`` is the *attempt* count, not
-that budget.
+D-10's resulting per-turn roll budget is 1 / 4 / 5. ``RuleSet.entry_attempts``
+is the *attempt* count, not that budget.
 """
 
 from __future__ import annotations
@@ -33,24 +34,32 @@ from madnlab.engine.geometry import GOAL_FIELDS, PIECES_PER_SEAT, Board
 from madnlab.engine.moves import Move, MoveKind, legal_moves_with_restriction
 from madnlab.engine.rules import GameEndMode, RuleSet
 from madnlab.engine.state import GameState
+from madnlab.eventlog.events import (
+    BarrierEvent,
+    CaptureEvent,
+    Event,
+    FinishEvent,
+    GameEndEvent,
+    MoveEvent,
+    PassEvent,
+    RollEvent,
+)
 
-#: Safety valve. A turn's roll chain is geometric with p = 1/6, so reaching
-#: this needs ~64 consecutive 6s; it exists so a rule bug surfaces as a loud
-#: failure instead of a hung benchmark.
+#: A turn's roll chain is geometric with p = 1/6, so reaching this needs ~64
+#: consecutive 6s. Exceeding it *is* a defect and raises.
 MAX_ROLLS_PER_TURN = 64
 
-#: Same purpose at game scope. Play-out games are long but bounded; a game
-#: that passes this has a legality or termination defect.
-MAX_TURNS_PER_GAME = 100_000
+#: Turn bound after which a game is **abandoned** rather than played out
+#: (D-70). Not a defect signal: some rule combinations produce games whose
+#: expected length is astronomically long, and abandoning them with a recorded
+#: flag makes that a measurable property of the arm instead of a hang. 20,000
+#: is ~7x the longest legitimate mean measured (the 6-seat worst-case cell, at
+#: 2,894 turns).
+MAX_TURNS_PER_GAME = 20_000
 
 
 class GameOutcome(NamedTuple):
-    """Per-game results — the subset of §6.2 that costs per turn.
-
-    The remaining battery fields (checkpoints, comeback, entropy, barrier and
-    AK-5 counters) are derived in the summary-row layer, which is not written
-    yet; nothing here would change their cost.
-    """
+    """Per-game results — the §6.2 fields that cost per turn."""
 
     ranks: tuple[int, ...]
     winner: int
@@ -66,35 +75,63 @@ class GameOutcome(NamedTuple):
     turns_without_leader: int
     time_in_lead_by_seat: tuple[int, ...]
     extra_laps_by_seat: tuple[int, ...]
+    barriers_formed: int
+    barrier_turns: int
     capture_forcing_offered: int
     capture_forcing_violations: int
+    #: True when the game ended because no seat could move on any die value
+    #: (D-69). A measured outcome of the rule set, not an error.
+    stalemate: bool
+    #: True when the game hit :data:`MAX_TURNS_PER_GAME` with more than one
+    #: seat still unfinished (D-70). Also a measured outcome; the analysis
+    #: layer reports the rate per cell and no estimand may be published from a
+    #: cell whose rate is non-negligible without saying so.
+    abandoned: bool
 
 
 class GameTerminationError(RuntimeError):
     """A game or turn exceeded its safety bound — a legality defect."""
 
 
-def _goal_piece_movable(board: Board, state: GameState, seat: int, rules: RuleSet) -> bool:
-    """Whether any goal piece of ``seat`` could move on *some* value 1..6.
+def _is_deadlocked(
+    board: Board,
+    positions: list[int],
+    seats: Sequence[int],
+    finished: Sequence[int],
+    rules: RuleSet,
+) -> bool:
+    """Whether no unfinished seat has a legal move on **any** die value.
 
-    D-1's second conjunct, evaluated over the whole die **before** rolling.
-    Written directly rather than by calling ``legal_moves`` six times: this
-    runs once per turn whenever ``dreimal_wuerfeln`` is on.
+    Expensive — 6 legality calls per unfinished seat — so it is only consulted
+    after a full round has passed without a single move, which is cheap to
+    detect and which a live game essentially never triggers.
+
+    A round with no moves is not by itself a deadlock: under ``strict`` a round
+    in which nobody rolls a 6 has no legal move anywhere and is perfectly
+    ordinary. Only the all-values test distinguishes the two.
     """
+    state = GameState(positions=tuple(positions))
+    for seat in seats:
+        if seat in finished:
+            continue
+        for roll in range(1, 7):
+            if legal_moves_with_restriction(board, state, seat, roll, rules)[0]:
+                return False
+    return True
+
+
+def _goal_piece_movable(board: Board, state: GameState, seat: int, rules: RuleSet) -> bool:
+    """D-1's second conjunct, evaluated over the whole die before rolling."""
     ring_length = board.ring_length
     occupied = {
-        pos - ring_length - 1
-        for pos in state.seat_positions(seat)
-        if pos > ring_length
+        pos - ring_length - 1 for pos in state.seat_positions(seat) if pos > ring_length
     }
     for index in occupied:
         for roll in range(1, 7):
             target = index + roll
             if target >= GOAL_FIELDS or target in occupied:
                 continue
-            if rules.goal_no_jump and any(
-                j in occupied for j in range(index + 1, target)
-            ):
+            if rules.goal_no_jump and any(j in occupied for j in range(index + 1, target)):
                 continue
             return True
     return False
@@ -102,18 +139,29 @@ def _goal_piece_movable(board: Board, state: GameState, seat: int, rules: RuleSe
 
 def _three_attempts_apply(board: Board, state: GameState, seat: int, rules: RuleSet) -> bool:
     """The D-1 condition. Only consulted when ``dreimal_wuerfeln`` is on."""
-    ring_length = board.ring_length
-    if any(1 <= pos <= ring_length for pos in state.seat_positions(seat)):
+    if any(1 <= pos <= board.ring_length for pos in state.seat_positions(seat)):
         return False
     return not _goal_piece_movable(board, state, seat, rules)
 
 
-def _apply(positions: list[int], move: Move) -> int | None:
-    """Apply ``move`` in place. Returns the captured piece index, if any."""
-    positions[move.piece] = move.to_pos
-    if move.captures is not None:
-        positions[move.captures] = 0
-    return move.captures
+def _own_on_field(board: Board, positions: list[int], seat: int, pos: int) -> int:
+    """How many of ``seat``'s pieces stand on the ring field of ``pos``."""
+    if not 1 <= pos <= board.ring_length:
+        return 0
+    field = board.ring_field(seat, pos)
+    base = seat * PIECES_PER_SEAT
+    return sum(
+        1
+        for offset in range(PIECES_PER_SEAT)
+        if 1 <= positions[base + offset] <= board.ring_length
+        and board.ring_field(seat, positions[base + offset]) == field
+    )
+
+
+def _legal_wire(moves: Sequence[Move]) -> tuple[tuple[int, int, int, str, int | None], ...]:
+    return tuple(
+        (m.piece, m.from_pos, m.to_pos, str(m.kind), m.captures) for m in moves
+    )
 
 
 def play_game(
@@ -125,13 +173,10 @@ def play_game(
     dice: random.Random,
     agent_rngs: dict[int, random.Random],
     start_seat: int,
+    record: list[Event] | None = None,
+    max_turns: int = MAX_TURNS_PER_GAME,
 ) -> GameOutcome:
-    """Play one complete game and return its per-turn metrics.
-
-    ``play_out`` (GM-3.11) is the only mode implemented: the game runs until
-    all but one seat have finished, and finished seats are skipped in the turn
-    order.
-    """
+    """Play one complete game under ``play_out`` (GM-3.11)."""
     if rules.game_end_mode is not GameEndMode.PLAY_OUT:
         raise NotImplementedError(
             f"game_end_mode={rules.game_end_mode} is a config value the v1 "
@@ -139,32 +184,32 @@ def play_game(
         )
 
     seats = list(seats_in_play)
-    n_seats = board.seats
     positions = list(initial.positions)
     ring_length = board.ring_length
 
     finished: list[int] = []
-    captures_by_seat = [0] * n_seats
-    passes_by_seat = [0] * n_seats
-    time_in_lead = [0] * n_seats
-    extra_laps = [0] * n_seats
+    captures_by_seat = [0] * board.seats
+    passes_by_seat = [0] * board.seats
+    time_in_lead = [0] * board.seats
+    extra_laps = [0] * board.seats
 
     turns = dice_rolls = captures_total = lead_changes = turns_without_leader = 0
     forcing_offered = forcing_violations = 0
-    turns_to_first_win = 0
+    barriers_formed = barrier_turns = 0
+    turns_to_first_win = slots_to_first_win = 0
     leader: int | None = None
     turn_slots = 0
-    slots_to_first_win = 0
+    slots_without_move = 0
+    stalemate = False
+    abandoned = False
 
     order = seats[seats.index(start_seat) :] + seats[: seats.index(start_seat)]
     cursor = 0
 
     while len(finished) < len(seats) - 1:
-        if turns > MAX_TURNS_PER_GAME:
-            raise GameTerminationError(
-                f"game exceeded {MAX_TURNS_PER_GAME} turns — legality or "
-                f"termination defect (rules={rules})"
-            )
+        if turns >= max_turns:
+            abandoned = True
+            break
 
         seat = order[cursor % len(order)]
         cursor += 1
@@ -172,6 +217,13 @@ def play_game(
         if seat in finished:
             continue
         turns += 1
+
+        if rules.barriers and any(
+            _own_on_field(board, positions, s, positions[s * PIECES_PER_SEAT + p]) >= 2
+            for s in seats
+            for p in range(PIECES_PER_SEAT)
+        ):
+            barrier_turns += 1
 
         state = GameState(positions=tuple(positions))
         agent = agents[seat]
@@ -182,35 +234,102 @@ def play_game(
             if rules.dreimal_wuerfeln and _three_attempts_apply(board, state, seat, rules)
             else 1
         )
-
         pending_extra = 0
         moved_this_turn = False
-        rolls_this_turn = 0
+        roll_index = 0
 
-        for attempt in range(1, attempts + 1):
-            roll = dice.randint(1, 6)
-            dice_rolls += 1
-            rolls_this_turn += 1
+        def _take(
+            roll: int,
+            attempt: int,
+            seat: int = seat,
+            agent: Agent = agent,
+            rng: random.Random = rng,
+        ) -> tuple[bool, Move | None]:
+            """Roll, choose and apply. Returns ``(moved, move)``.
+
+            ``seat``, ``agent`` and ``rng`` are bound as defaults rather
+            than captured: a closure over the loop variables would read
+            whatever the *last* iteration left behind if it ever outlived
+            its turn, and the counters it mutates are exactly the ones
+            AK-5 is checked against.
+            """
+            nonlocal state, captures_total, forcing_offered, barriers_formed
+            if record is not None:
+                record.append(RollEvent(seat, roll, attempt))
             legal, restriction = legal_moves_with_restriction(
                 board, state, seat, roll, rules
             )
             if restriction.value == "capture":
                 forcing_offered += 1
-            if legal:
-                move = agent(board, state, seat, roll, legal, rng)
-                if move.captures is not None:
-                    captures_total += 1
-                    captures_by_seat[seat] += 1
-                if move.extra_lap:
-                    extra_laps[seat] += 1
-                _apply(positions, move)
-                state = GameState(positions=tuple(positions))
+            if not legal:
+                if record is not None:
+                    record.append(PassEvent(seat))
+                return False, None
+
+            move = agent(board, state, seat, roll, legal, rng)
+            chosen = legal.index(move)
+            if record is not None:
+                record.append(
+                    MoveEvent(
+                        seat,
+                        move.piece,
+                        move.from_pos,
+                        move.to_pos,
+                        str(move.kind),
+                        _legal_wire(legal),
+                        chosen,
+                        restriction.value,
+                    )
+                )
+
+            origin_pair = _own_on_field(board, positions, seat, move.from_pos) >= 2
+            positions[move.piece] = move.to_pos
+            if move.captures is not None:
+                victim = move.captures
+                if record is not None:
+                    record.append(
+                        CaptureEvent(
+                            seat,
+                            move.piece % PIECES_PER_SEAT,
+                            victim // PIECES_PER_SEAT,
+                            victim % PIECES_PER_SEAT,
+                            board.ring_field(seat, move.to_pos),
+                        )
+                    )
+                positions[victim] = 0
+                captures_total += 1
+                captures_by_seat[seat] += 1
+            if move.extra_lap:
+                extra_laps[seat] += 1
+
+            if rules.barriers:
+                if _own_on_field(board, positions, seat, move.to_pos) >= 2:
+                    barriers_formed += 1
+                    if record is not None:
+                        record.append(
+                            BarrierEvent(seat, board.ring_field(seat, move.to_pos), True)
+                        )
+                if origin_pair and record is not None:
+                    record.append(
+                        BarrierEvent(seat, board.ring_field(seat, move.from_pos), False)
+                    )
+
+            state = GameState(positions=tuple(positions))
+            return True, move
+
+        for attempt in range(1, attempts + 1):
+            roll = dice.randint(1, 6)
+            dice_rolls += 1
+            roll_index += 1
+            moved, move = _take(roll, roll_index)
+            if moved:
                 moved_this_turn = True
                 if roll == 6:
                     pending_extra += 1
                     if (
                         rules.bonus_roll_after_quick_entry
                         and attempt <= 2
+                        and move is not None
                         and move.kind is MoveKind.ENTER
                     ):
                         pending_extra += 1
@@ -221,85 +340,62 @@ def play_game(
                     pending_extra += 1
                 break
 
-        if not moved_this_turn:
-            passes_by_seat[seat] += 1
-
         while pending_extra > 0:
             pending_extra -= 1
-            rolls_this_turn += 1
-            if rolls_this_turn > MAX_ROLLS_PER_TURN:
+            roll_index += 1
+            if roll_index > MAX_ROLLS_PER_TURN:
                 raise GameTerminationError(
                     f"turn exceeded {MAX_ROLLS_PER_TURN} rolls — rule defect"
                 )
             roll = dice.randint(1, 6)
             dice_rolls += 1
-            legal, restriction = legal_moves_with_restriction(
-                board, state, seat, roll, rules
-            )
-            if restriction.value == "capture":
-                forcing_offered += 1
-            if legal:
-                move = agent(board, state, seat, roll, legal, rng)
-                if move.captures is not None:
-                    captures_total += 1
-                    captures_by_seat[seat] += 1
-                if move.extra_lap:
-                    extra_laps[seat] += 1
-                _apply(positions, move)
-                state = GameState(positions=tuple(positions))
+            moved, _move = _take(roll, roll_index)
+            if moved:
+                moved_this_turn = True
                 if roll == 6:
                     pending_extra += 1
-            else:
-                if roll == 6 and not rules.bonus_roll_forfeited:
-                    pending_extra += 1
+            elif roll == 6 and not rules.bonus_roll_forfeited:
+                pending_extra += 1
 
-        # -- finishing ------------------------------------------------------
+        if not moved_this_turn:
+            passes_by_seat[seat] += 1
+            slots_without_move += 1
+            # A full round with no move anywhere is the cheap trigger; the
+            # all-die-values test below is what actually decides (D-69).
+            if slots_without_move >= len(seats) and _is_deadlocked(
+                board, positions, seats, finished, rules
+            ):
+                stalemate = True
+                break
+        else:
+            slots_without_move = 0
+
         base = seat * PIECES_PER_SEAT
         if seat not in finished and all(
             positions[base + p] > ring_length for p in range(PIECES_PER_SEAT)
         ):
             finished.append(seat)
+            if record is not None:
+                record.append(FinishEvent(seat, len(finished)))
             if len(finished) == 1:
                 turns_to_first_win = turns
                 slots_to_first_win = turn_slots
 
-        # -- leader(t), over the first-win segment (§6.1, §6.2) -------------
         if not finished:
-            best = -1
-            best_seat = -1
-            tie = False
-            for s in seats:
-                b = s * PIECES_PER_SEAT
-                total = (
-                    positions[b] + positions[b + 1] + positions[b + 2] + positions[b + 3]
-                )
-                if total > best:
-                    best, best_seat, tie = total, s, False
-                elif total == best:
-                    tie = True
-            if tie:
-                # On ties the previous leader persists iff it is itself among
-                # the tied maxima; otherwise the lowest tied seat index (D-18).
-                if leader is not None:
-                    b = leader * PIECES_PER_SEAT
-                    if (
-                        positions[b]
-                        + positions[b + 1]
-                        + positions[b + 2]
-                        + positions[b + 3]
-                    ) != best:
-                        leader = min(
-                            s
-                            for s in seats
-                            if sum(
-                                positions[s * PIECES_PER_SEAT + p]
-                                for p in range(PIECES_PER_SEAT)
-                            )
-                            == best
-                        )
+            totals = {
+                s: sum(positions[s * PIECES_PER_SEAT + p] for p in range(PIECES_PER_SEAT))
+                for s in seats
+            }
+            best = max(totals.values())
+            tied = [s for s in seats if totals[s] == best]
+            if len(tied) == 1:
+                new_leader: int | None = tied[0]
+            elif leader is not None and leader in tied:
                 new_leader = leader
+            elif leader is not None:
+                new_leader = min(tied)
             else:
-                new_leader = best_seat
+                new_leader = None
             if new_leader is None:
                 turns_without_leader += 1
             else:
@@ -309,7 +405,19 @@ def play_game(
             leader = new_leader
 
     unfinished = [s for s in seats if s not in finished]
+    if stalemate or abandoned:
+        # Ranks for a game that did not play out fall back to total
+        # progress, the rule §6.1 gives ``first_winner``; ties keep ascending
+        # seat order.
+        unfinished.sort(
+            key=lambda s: (
+                -sum(positions[s * PIECES_PER_SEAT + p] for p in range(PIECES_PER_SEAT)),
+                s,
+            )
+        )
     ranks = tuple(finished) + tuple(unfinished)
+    if record is not None:
+        record.append(GameEndEvent(ranks))
     players = len(seats)
     return GameOutcome(
         ranks=ranks,
@@ -326,6 +434,10 @@ def play_game(
         turns_without_leader=turns_without_leader,
         time_in_lead_by_seat=tuple(time_in_lead),
         extra_laps_by_seat=tuple(extra_laps),
+        barriers_formed=barriers_formed,
+        barrier_turns=barrier_turns,
         capture_forcing_offered=forcing_offered,
         capture_forcing_violations=forcing_violations,
+        stalemate=stalemate,
+        abandoned=abandoned,
     )
