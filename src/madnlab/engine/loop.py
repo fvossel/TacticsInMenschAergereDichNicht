@@ -70,15 +70,48 @@ class GameOutcome(NamedTuple):
     rounds_to_first_win: int
     captures_total: int
     captures_by_seat: tuple[int, ...]
+    #: Captures *suffered*. Not derivable from ``captures_by_seat``: that says
+    #: who struck, this says who was struck, and RQ-1's dynamics ask both.
+    captured_by_seat: tuple[int, ...]
     passes_by_seat: tuple[int, ...]
+    #: Turns in which the D-1 condition held at turn start, counted whether or
+    #: not ``dreimal_wuerfeln`` is on — under the baseline it measures how long
+    #: a seat sat waiting to enter, which is the quantity §6.2 names. Overlaps
+    #: ``passes_by_seat`` by construction; the two must never be summed.
+    entry_waits_by_seat: tuple[int, ...]
     lead_changes: int
     turns_without_leader: int
     time_in_lead_by_seat: tuple[int, ...]
     extra_laps_by_seat: tuple[int, ...]
     barriers_formed: int
     barrier_turns: int
+    #: Turns at whose start *this seat* had a barrier standing. Sums to more
+    #: than ``barrier_turns`` when two seats hold one simultaneously, which is
+    #: why §6.2 keeps both.
+    barrier_turns_by_seat: tuple[int, ...]
     capture_forcing_offered: int
     capture_forcing_violations: int
+    #: The ``mandatory_extended`` half of AK-5's invariant (§11). Offered
+    #: counts decisions where every legal move carried an extra lap.
+    forced_extra_lap_offered: int
+    forced_extra_lap_violations: int
+    #: §6.2 checkpoint ranks: the eventual winner's progress rank at
+    #: ``ceil(k * turns_to_first_win)``, standard competition ranking. ``-1``
+    #: when the game never produced a first win (stalemate or abandoned), so a
+    #: missing checkpoint can never be read as rank 0.
+    winner_rank_at_50: int
+    winner_rank_at_75: int
+    winner_rank_at_50_tied: bool
+    #: Winner's checkpoint rank >= 2 (2-3 players) or >= 3 (4+). The threshold
+    #: travels with the row so a comeback rate can never be compared across
+    #: player counts without it (§6.2).
+    comeback: bool
+    comeback_rank_threshold: int
+    comeback_depth: float
+    #: Progress gap winner vs. runner-up at the first win; the normalized form
+    #: is the one that survives a change of ``seats``.
+    final_margin: int
+    final_margin_norm: float
     #: True when the game ended because no seat could move on any die value
     #: (D-69). A measured outcome of the rule set, not an error.
     stalemate: bool
@@ -189,12 +222,23 @@ def play_game(
 
     finished: list[int] = []
     captures_by_seat = [0] * board.seats
+    captured_by_seat = [0] * board.seats
     passes_by_seat = [0] * board.seats
+    entry_waits = [0] * board.seats
     time_in_lead = [0] * board.seats
     extra_laps = [0] * board.seats
+    barrier_turns_seat = [0] * board.seats
+
+    #: Per-seat progress after each turn of the first-win segment, so §6.2's
+    #: checkpoints can be read off once ``turns_to_first_win`` is known — it is
+    #: not known until the win happens, and the checkpoint is defined as a
+    #: fraction of it. Dropped when the row is built.
+    progress_trace: list[tuple[int, ...]] = []
+    final_margin = 0
 
     turns = dice_rolls = captures_total = lead_changes = turns_without_leader = 0
     forcing_offered = forcing_violations = 0
+    extra_lap_offered = extra_lap_violations = 0
     barriers_formed = barrier_turns = 0
     turns_to_first_win = slots_to_first_win = 0
     leader: int | None = None
@@ -218,22 +262,31 @@ def play_game(
             continue
         turns += 1
 
-        if rules.barriers and any(
-            _own_on_field(board, positions, s, positions[s * PIECES_PER_SEAT + p]) >= 2
-            for s in seats
-            for p in range(PIECES_PER_SEAT)
-        ):
-            barrier_turns += 1
+        if rules.barriers:
+            holders = {
+                s
+                for s in seats
+                for p in range(PIECES_PER_SEAT)
+                if _own_on_field(board, positions, s, positions[s * PIECES_PER_SEAT + p]) >= 2
+            }
+            if holders:
+                barrier_turns += 1
+            for holder in holders:
+                barrier_turns_seat[holder] += 1
 
         state = GameState(positions=tuple(positions))
         agent = agents[seat]
         rng = agent_rngs[seat]
 
-        attempts = (
-            rules.entry_attempts
-            if rules.dreimal_wuerfeln and _three_attempts_apply(board, state, seat, rules)
-            else 1
-        )
+        # The D-1 condition is evaluated every turn, not only when the variant
+        # that acts on it is enabled: under the baseline it is the "waiting to
+        # enter" measurement §6.2 asks for, and a counter that only exists in
+        # one arm cannot be compared across arms.
+        waiting = _three_attempts_apply(board, state, seat, rules)
+        if waiting:
+            entry_waits[seat] += 1
+
+        attempts = rules.entry_attempts if rules.dreimal_wuerfeln and waiting else 1
         pending_extra = 0
         moved_this_turn = False
         roll_index = 0
@@ -254,6 +307,7 @@ def play_game(
             AK-5 is checked against.
             """
             nonlocal state, captures_total, forcing_offered, barriers_formed
+            nonlocal extra_lap_offered
             if record is not None:
                 record.append(RollEvent(seat, roll, attempt))
             legal, restriction = legal_moves_with_restriction(
@@ -261,6 +315,12 @@ def play_game(
             )
             if restriction.value == "capture":
                 forcing_offered += 1
+                # The extended-capture obligation is *offered* when the
+                # narrowed set leaves the seat no way to satisfy it without
+                # taking another lap — that is the clause AK-5's second half
+                # is about, and it is a property of the set, not of the pick.
+                if legal and all(m.extra_lap for m in legal):
+                    extra_lap_offered += 1
             if not legal:
                 if record is not None:
                     record.append(PassEvent(seat))
@@ -299,6 +359,7 @@ def play_game(
                 positions[victim] = 0
                 captures_total += 1
                 captures_by_seat[seat] += 1
+                captured_by_seat[victim // PIECES_PER_SEAT] += 1
             if move.extra_lap:
                 extra_laps[seat] += 1
 
@@ -371,6 +432,7 @@ def play_game(
             slots_without_move = 0
 
         base = seat * PIECES_PER_SEAT
+        first_win_this_turn = False
         if seat not in finished and all(
             positions[base + p] > ring_length for p in range(PIECES_PER_SEAT)
         ):
@@ -380,12 +442,19 @@ def play_game(
             if len(finished) == 1:
                 turns_to_first_win = turns
                 slots_to_first_win = turn_slots
+                first_win_this_turn = True
+
+        totals = {
+            s: sum(positions[s * PIECES_PER_SEAT + p] for p in range(PIECES_PER_SEAT))
+            for s in seats
+        }
+        if not finished or first_win_this_turn:
+            progress_trace.append(tuple(totals[s] for s in seats))
+        if first_win_this_turn:
+            others = sorted((totals[s] for s in seats if s != seat), reverse=True)
+            final_margin = totals[seat] - others[0] if others else 0
 
         if not finished:
-            totals = {
-                s: sum(positions[s * PIECES_PER_SEAT + p] for p in range(PIECES_PER_SEAT))
-                for s in seats
-            }
             best = max(totals.values())
             tied = [s for s in seats if totals[s] == best]
             if len(tied) == 1:
@@ -419,6 +488,35 @@ def play_game(
     if record is not None:
         record.append(GameEndEvent(ranks))
     players = len(seats)
+    #: Every piece home: the four goal fields are ``ring_length+1 .. +4``.
+    max_progress = 4 * ring_length + 10
+
+    def _checkpoint(num: int, den: int) -> tuple[int, bool]:
+        """The winner's competition rank at ``ceil(num/den * turns_to_first_win)``.
+
+        Integer arithmetic throughout: the checkpoint is a turn index, and
+        ``int(0.75 * 4)`` is 2 on some floats and 3 on others. Returns ``-1``
+        when there was no first win, so a caller cannot mistake "no checkpoint"
+        for "the winner led".
+        """
+        if turns_to_first_win <= 0 or not progress_trace:
+            return -1, False
+        turn = -(-turns_to_first_win * num // den)
+        snapshot = progress_trace[max(1, min(turn, len(progress_trace))) - 1]
+        winner_index = seats.index(ranks[0])
+        mine = snapshot[winner_index]
+        # Standard competition ranking (1, 2, 2, 4): one plus the number
+        # strictly ahead, so a tied winner takes the best rank of its group.
+        rank = 1 + sum(1 for value in snapshot if value > mine)
+        tied = any(
+            value == mine for index, value in enumerate(snapshot) if index != winner_index
+        )
+        return rank, tied
+
+    rank_50, tied_50 = _checkpoint(1, 2)
+    rank_75, _ = _checkpoint(3, 4)
+    threshold = 2 if players <= 3 else 3
+
     return GameOutcome(
         ranks=ranks,
         winner=ranks[0],
@@ -429,15 +527,28 @@ def play_game(
         rounds_to_first_win=-(-slots_to_first_win // players),
         captures_total=captures_total,
         captures_by_seat=tuple(captures_by_seat),
+        captured_by_seat=tuple(captured_by_seat),
         passes_by_seat=tuple(passes_by_seat),
+        entry_waits_by_seat=tuple(entry_waits),
         lead_changes=lead_changes,
         turns_without_leader=turns_without_leader,
         time_in_lead_by_seat=tuple(time_in_lead),
         extra_laps_by_seat=tuple(extra_laps),
         barriers_formed=barriers_formed,
         barrier_turns=barrier_turns,
+        barrier_turns_by_seat=tuple(barrier_turns_seat),
         capture_forcing_offered=forcing_offered,
         capture_forcing_violations=forcing_violations,
+        forced_extra_lap_offered=extra_lap_offered,
+        forced_extra_lap_violations=extra_lap_violations,
+        winner_rank_at_50=rank_50,
+        winner_rank_at_75=rank_75,
+        winner_rank_at_50_tied=tied_50,
+        comeback=rank_50 >= threshold if rank_50 > 0 else False,
+        comeback_rank_threshold=threshold,
+        comeback_depth=(rank_50 - 1) / (players - 1) if rank_50 > 0 and players > 1 else 0.0,
+        final_margin=final_margin,
+        final_margin_norm=final_margin / max_progress if max_progress else 0.0,
         stalemate=stalemate,
         abandoned=abandoned,
     )

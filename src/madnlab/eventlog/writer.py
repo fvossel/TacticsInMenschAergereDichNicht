@@ -123,15 +123,28 @@ class SummaryRow(NamedTuple):
     rounds_to_first_win: int
     captures_total: int
     captures_by_seat: tuple[int, ...]
+    captured_by_seat: tuple[int, ...]
     passes_by_seat: tuple[int, ...]
+    entry_waits_by_seat: tuple[int, ...]
     lead_changes: int
     turns_without_leader: int
     time_in_lead_by_seat: tuple[int, ...]
     extra_laps_by_seat: tuple[int, ...]
     barriers_formed: int
     barrier_turns: int
+    barrier_turns_by_seat: tuple[int, ...]
     capture_forcing_offered: int
     capture_forcing_violations: int
+    forced_extra_lap_offered: int
+    forced_extra_lap_violations: int
+    winner_rank_at_50: int
+    winner_rank_at_75: int
+    winner_rank_at_50_tied: bool
+    comeback: bool
+    comeback_rank_threshold: int
+    comeback_depth: float
+    final_margin: int
+    final_margin_norm: float
     #: True when the game ended in deadlock rather than with a finisher (D-69).
     stalemate: bool
     #: True when the game hit the turn bound unfinished (D-70).
