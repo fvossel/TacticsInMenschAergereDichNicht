@@ -1,11 +1,16 @@
 /**
  * Board rendering (UI-3).
  *
- * One renderer for both geometries. The ring is drawn as a ring — schematic
- * rather than the classic cross — because the same code then serves the 4-seat
- * and 6-seat boards without a per-board layout table, which is the property
- * §2.1 asks of the engine and there is no reason for the viewer to give it up.
- * The cross skin is a nice-to-have, not a requirement.
+ * The 4-seat board is drawn as the board people actually own: the cross on an
+ * 11×11 grid, 40 fields around its outer edge, four yards in the corners and
+ * four goal columns running into the middle. It is *constructed* rather than
+ * tabulated — one quadrant of ten fields, rotated three times — so §2.1's
+ * property that positions are a pure function of (seats, seat index) survives
+ * into the drawing instead of being re-entered by hand.
+ *
+ * The 6-seat board has no canonical printing, so it is the same idea
+ * generalised: six arms, radius following the V the cross makes (5.1 → 1.41 →
+ * 5.1 grid units per quadrant). Both read as a board with corners.
  */
 
 import type { Frame, Geometry } from "./replay";
@@ -22,17 +27,104 @@ export const SEAT_COLORS = [
 
 const SIZE = 620;
 const CENTER = SIZE / 2;
-const RING_RADIUS = 250;
-const FIELD_RADIUS = 11;
+const FIELD_RADIUS = 12;
+/**
+ * Breathing room in the viewBox rather than shrunk content. The outermost
+ * things on the board are the yards, and on the 6-seat star they sit at
+ * radius 0.51·SIZE from a centre at 0.5·SIZE — six units past the edge, so
+ * the top and bottom arms were clipped. The stroke on the track outline
+ * adds another 13 on each side.
+ */
+const PAD = 44;
 
-/** Angle of a ring field. Field 0 sits at the top, and the ring runs clockwise. */
-function fieldAngle(geometry: Geometry, field: number): number {
-  return (field / geometry.ringLength) * Math.PI * 2 - Math.PI / 2;
+/** The 11×11 grid the classic 4-player board is printed on. */
+const GRID = 11;
+const CELL = SIZE / GRID;
+
+type Point = [number, number];
+
+function cellPoint([gx, gy]: Point): Point {
+  return [(gx + 0.5) * CELL, (gy + 0.5) * CELL];
 }
 
-function ringPoint(geometry: Geometry, field: number, radius = RING_RADIUS): [number, number] {
-  const angle = fieldAngle(geometry, field);
+/** Quarter turn about the board centre — the symmetry the whole board has. */
+function rotate([gx, gy]: Point): Point {
+  return [GRID - 1 - gy, gx];
+}
+
+function rotateTimes(point: Point, times: number): Point {
+  let result = point;
+  for (let index = 0; index < times; index += 1) result = rotate(result);
+  return result;
+}
+
+/**
+ * One quadrant of the ring: five fields inward along an arm's edge, four back
+ * out along the next arm's edge, then the field at the tip. Field 0 is seat
+ * 0's entry, and rotating the quadrant puts every other entry exactly
+ * `spacing` fields later — which is what §2.1 asserts, here as geometry.
+ */
+const QUADRANT: Point[] = [
+  [0, 4], [1, 4], [2, 4], [3, 4], [4, 4],
+  [4, 3], [4, 2], [4, 1], [4, 0], [5, 0],
+];
+
+/** Seat 0's goal column, running inward between the two horizontal arms. */
+const GOAL_COLUMN: Point[] = [[1, 5], [2, 5], [3, 5], [4, 5]];
+
+/** Seat 0's yard: the corner block beside its entry. */
+const YARD_BLOCK: Point[] = [[0, 0], [1, 0], [0, 1], [1, 1]];
+
+/** The 6-arm generalisation, with the cross's V-shaped radius profile. */
+function starPoint(geometry: Geometry, field: number): Point {
+  const perArm = geometry.spacing;
+  const arm = Math.floor(field / perArm);
+  const index = field % perArm;
+  const inward = Math.ceil(perArm / 2);
+  const outer = SIZE * 0.44;
+  const inner = SIZE * 0.14;
+  const along =
+    index < inward
+      ? index / (inward - 1)
+      : 1 - (index - inward + 1) / (perArm - inward);
+  const radius = outer - (outer - inner) * along;
+  const angle =
+    ((arm + (index + 0.5) / perArm) / geometry.seats) * Math.PI * 2 - Math.PI / 2;
   return [CENTER + Math.cos(angle) * radius, CENTER + Math.sin(angle) * radius];
+}
+
+/** Absolute position of ring field `field`. */
+export function fieldPoint(geometry: Geometry, field: number): Point {
+  if (geometry.seats !== 4) return starPoint(geometry, field);
+  const arm = Math.floor(field / geometry.spacing);
+  const index = field % geometry.spacing;
+  return cellPoint(rotateTimes(QUADRANT[index] as Point, arm));
+}
+
+/** Position of `seat`'s goal field `index` (0 = outermost). */
+function goalPoint(geometry: Geometry, seat: number, index: number): Point {
+  if (geometry.seats === 4) {
+    return cellPoint(rotateTimes(GOAL_COLUMN[index] as Point, seat));
+  }
+  const [x, y] = starPoint(geometry, ringField(geometry, seat, geometry.ringLength));
+  const angle = Math.atan2(y - CENTER, x - CENTER);
+  const radius = SIZE * 0.25 - index * (SIZE * 0.045);
+  return [CENTER + Math.cos(angle) * radius, CENTER + Math.sin(angle) * radius];
+}
+
+/** Position of `seat`'s yard slot `index`. */
+function yardPoint(geometry: Geometry, seat: number, index: number): Point {
+  if (geometry.seats === 4) {
+    return cellPoint(rotateTimes(YARD_BLOCK[index] as Point, seat));
+  }
+  const [x, y] = starPoint(geometry, ringField(geometry, seat, 1));
+  const angle = Math.atan2(y - CENTER, x - CENTER);
+  const radius = SIZE * 0.47 + (index % 2) * (SIZE * 0.04);
+  const spread = (index < 2 ? -1 : 1) * 0.05;
+  return [
+    CENTER + Math.cos(angle + spread) * radius,
+    CENTER + Math.sin(angle + spread) * radius,
+  ];
 }
 
 function svgEl<K extends keyof SVGElementTagNameMap>(
@@ -54,15 +146,27 @@ export interface BoardOptions {
 export function renderBoard(frame: Frame, options: BoardOptions): SVGSVGElement {
   const { geometry, occupied, highlighted } = options;
   const svg = svgEl("svg", {
-    viewBox: `0 0 ${SIZE} ${SIZE}`,
+    viewBox: `${-PAD} ${-PAD} ${SIZE + 2 * PAD} ${SIZE + 2 * PAD}`,
     class: "board",
     role: "img",
     "aria-label": `${geometry.seats}-seat board`,
   });
 
-  // -- ring fields ---------------------------------------------------------
+  // The printed outline of the track, which is what gives the board its
+  // corners: the ring fields in order are exactly the cross's perimeter.
+  const outline: Point[] = [];
   for (let field = 0; field < geometry.ringLength; field += 1) {
-    const [x, y] = ringPoint(geometry, field);
+    outline.push(fieldPoint(geometry, field));
+  }
+  svg.append(
+    svgEl("polygon", {
+      points: outline.map(([x, y]) => `${x},${y}`).join(" "),
+      class: "board-outline",
+    }),
+  );
+
+  for (let field = 0; field < geometry.ringLength; field += 1) {
+    const [x, y] = fieldPoint(geometry, field);
     const owner = occupied.find((seat) => ringField(geometry, seat, 1) === field);
     const isBarrier = frame.barrierFields.has(field);
     const circle = svgEl("circle", {
@@ -77,45 +181,33 @@ export function renderBoard(frame: Frame, options: BoardOptions): SVGSVGElement 
     svg.append(circle);
   }
 
-  // -- goal columns, radiating inward from each seat's goal entry -----------
-  for (const seat of occupied) {
-    const entryField = ringField(geometry, seat, geometry.ringLength);
-    const angle = fieldAngle(geometry, entryField);
+  // Goals and yards are drawn for **every** seat the board has, occupied or
+  // not: a real board keeps all four arms whether or not four people are
+  // playing, and the empty seat is the whole point of every cell where
+  // players < seats.
+  for (let seat = 0; seat < geometry.seats; seat += 1) {
+    const color = SEAT_COLORS[seat % 6] ?? "#888";
+    const vacant = occupied.includes(seat) ? "" : " vacant";
     for (let index = 0; index < GOAL_FIELDS; index += 1) {
-      const radius = RING_RADIUS - 34 - index * 30;
+      const [x, y] = goalPoint(geometry, seat, index);
       svg.append(
         svgEl("circle", {
-          cx: CENTER + Math.cos(angle) * radius,
-          cy: CENTER + Math.sin(angle) * radius,
-          r: FIELD_RADIUS - 1,
-          class: "goal",
-          stroke: SEAT_COLORS[seat % 6] ?? "#888",
+          cx: x, cy: y, r: FIELD_RADIUS - 1, class: `goal${vacant}`, stroke: color,
         }),
       );
     }
-  }
-
-  // -- yards ---------------------------------------------------------------
-  for (const seat of occupied) {
-    const angle = fieldAngle(geometry, ringField(geometry, seat, 1));
     for (let index = 0; index < PIECES_PER_SEAT; index += 1) {
-      const radius = RING_RADIUS + 32 + (index % 2) * 26;
-      const spread = (index < 2 ? -1 : 1) * 0.055;
+      const [x, y] = yardPoint(geometry, seat, index);
       svg.append(
         svgEl("circle", {
-          cx: CENTER + Math.cos(angle + spread) * radius,
-          cy: CENTER + Math.sin(angle + spread) * radius,
-          r: FIELD_RADIUS - 2,
-          class: "yard",
-          stroke: SEAT_COLORS[seat % 6] ?? "#888",
+          cx: x, cy: y, r: FIELD_RADIUS - 2, class: `yard${vacant}`, stroke: color,
         }),
       );
     }
   }
 
-  // -- pieces --------------------------------------------------------------
-  // Drawn last so they sit above the fields, and grouped per field so a
-  // barrier's two pieces are visibly offset rather than one hiding the other.
+  // Pieces last, so they sit above the fields, and offset per field so a
+  // barrier's two pieces are visible rather than one hiding the other.
   const perField = new Map<string, number>();
   for (const seat of occupied) {
     for (let piece = 0; piece < PIECES_PER_SEAT; piece += 1) {
@@ -127,24 +219,16 @@ export function renderBoard(frame: Frame, options: BoardOptions): SVGSVGElement 
       if (pos === 0) {
         const slot = perField.get(`yard-${seat}`) ?? 0;
         perField.set(`yard-${seat}`, slot + 1);
-        const angle = fieldAngle(geometry, ringField(geometry, seat, 1));
-        const radius = RING_RADIUS + 32 + (slot % 2) * 26;
-        const spread = (slot < 2 ? -1 : 1) * 0.055;
-        cx = CENTER + Math.cos(angle + spread) * radius;
-        cy = CENTER + Math.sin(angle + spread) * radius;
+        [cx, cy] = yardPoint(geometry, seat, slot);
       } else if (pos <= geometry.ringLength) {
         const field = ringField(geometry, seat, pos);
         const stack = perField.get(`ring-${field}`) ?? 0;
         perField.set(`ring-${field}`, stack + 1);
-        const [x, y] = ringPoint(geometry, field, RING_RADIUS + stack * 9);
-        cx = x;
-        cy = y;
+        const [x, y] = fieldPoint(geometry, field);
+        cx = x + stack * 7;
+        cy = y - stack * 7;
       } else {
-        const index = pos - geometry.ringLength - 1;
-        const angle = fieldAngle(geometry, ringField(geometry, seat, geometry.ringLength));
-        const radius = RING_RADIUS - 34 - index * 30;
-        cx = CENTER + Math.cos(angle) * radius;
-        cy = CENTER + Math.sin(angle) * radius;
+        [cx, cy] = goalPoint(geometry, seat, pos - geometry.ringLength - 1);
       }
 
       const node = svgEl("circle", { cx, cy, r: FIELD_RADIUS - 3, class: "piece", fill: color });

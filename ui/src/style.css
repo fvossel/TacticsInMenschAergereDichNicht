@@ -23,6 +23,12 @@ main { display: grid; grid-template-columns: minmax(420px, 1fr) 420px; gap: 16px
 .field.target { fill: #1f3a5c; stroke: var(--accent); stroke-width: 2.5; }
 .goal { fill: #1a1d23; stroke-width: 2; }
 .yard { fill: #1a1d23; stroke-width: 1.5; stroke-dasharray: 3 3; }
+/* Seats the board has but nobody is sitting in: drawn, not hidden. */
+.goal.vacant, .yard.vacant { opacity: 0.22; }
+/* The printed track. Its corners are the cross. */
+.board-outline { fill: #191c22; stroke: #2c313a; stroke-width: 26;
+  stroke-linejoin: round; }
+.piece { stroke: #0d0f13; stroke-width: 1.5; }
 .piece { stroke: #0d0f12; stroke-width: 1.5; }
 .controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 button, select { background: #262a32; color: var(--text); border: 1px solid var(--line); border-radius: 6px; padding: 6px 12px; cursor: pointer; font-size: 13px; }
