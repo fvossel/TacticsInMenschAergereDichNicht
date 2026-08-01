@@ -184,7 +184,8 @@ def analyse(campaign_dir: Path, analysis_seed: int) -> int:
 
 
 def build_report(
-    run_dirs: list[Path], out: Path, analysis_seed: int, resamples: int
+    run_dirs: list[Path], out: Path, analysis_seed: int,
+    resamples: int, workers: int = 1,
 ) -> int:
     """Run §6.4's four families over every campaign and write the §8 report."""
     from madnlab.analysis import families, report
@@ -204,7 +205,8 @@ def build_report(
         ("RQ-4", families.rq4),
     ):
         family_started = time.perf_counter()
-        result = function(data, seed=analysis_seed, resamples=resamples)
+        kwargs = {"workers": workers} if name == "RQ-2" else {}
+        result = function(data, seed=analysis_seed, resamples=resamples, **kwargs)
         rejected = sum(1 for r in result.holm if r.rejected)
         print(
             f"  {name}: {len(result.estimates)} tests, {rejected} rejected, "
@@ -269,6 +271,7 @@ def main(argv: list[str] | None = None) -> int:
     report_cmd.add_argument("--out", type=Path, required=True)
     report_cmd.add_argument("--analysis-seed", type=int, default=20260801)
     report_cmd.add_argument("--resamples", type=int, default=1_000)
+    report_cmd.add_argument("--workers", type=int, default=1)
 
     args = parser.parse_args(argv)
     try:
@@ -283,7 +286,8 @@ def main(argv: list[str] | None = None) -> int:
             return analyse(args.campaign_dir, args.analysis_seed)
         if args.command == "report":
             return build_report(
-                args.run_dirs, args.out, args.analysis_seed, args.resamples
+                args.run_dirs, args.out, args.analysis_seed,
+                args.resamples, args.workers,
             )
         return run_campaign(args.config, args.out, args.workers)
     except ConfigError as error:

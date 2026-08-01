@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import json
 from collections.abc import Sequence
+from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 from typing import NamedTuple
 
@@ -183,17 +184,37 @@ RQ2_AXES = (
 )
 
 
-def rq2(data: Dataset, *, seed: int, resamples: int) -> FamilyResult:
+def _mean_difference_job(
+    payload: tuple[list[float], list[float], str, int, int],
+) -> Estimate:
+    """One pooled mean difference, at module scope so it can be pickled."""
+    sample_a, sample_b, label, seed, resamples = payload
+    return estimands.mean_difference(
+        sample_a, sample_b, label=label, seed=seed, resamples=resamples
+    )
+
+
+def rq2(
+    data: Dataset, *, seed: int, resamples: int, workers: int = 1
+) -> FamilyResult:
     """Main effects, pooled over the EX-4 factorial.
 
     Pooling is what makes n = 20,000 per cell enough: a two-level axis is
     estimated from all 84 cells at each level, so the contrast rests on 1.68M
     games and resolves to 0.18 pp. Nothing here is a per-cell claim.
+
+    The nine bootstrap contrasts are independent of each other, so ``workers``
+    runs them in parallel. That is a scheduling decision and nothing else — the
+    seed of each contrast is fixed by its index, so the numbers do not depend
+    on how many workers ran them, which is the property AK-2 asserts for the
+    engine and which an analysis has no more right to give up than a run does.
     """
     keys = data.matching("ex4/")
-    estimates: list[Estimate] = []
+    estimates: list[Estimate | None] = []
     hypotheses: list[Hypothesis] = []
     unavailable: list[str] = []
+    jobs: list[tuple[list[float], list[float], str, int, int]] = []
+    slots: list[int] = []
 
     for index, (name, rule_key, level_a, level_b) in enumerate(RQ2_AXES):
         def level_of(key: str, _rule: str = rule_key) -> str:
@@ -218,19 +239,32 @@ def rq2(data: Dataset, *, seed: int, resamples: int) -> FamilyResult:
         )
         hypotheses.append(Hypothesis("RQ-2", "win_rate_by_starting_seat", name))
 
-        estimates.append(
-            estimands.mean_difference(
+        slots.append(len(estimates))
+        estimates.append(None)
+        jobs.append(
+            (
                 _pooled_lengths(arm_a),
                 _pooled_lengths(arm_b),
-                label=f"rounds to first win :: {name}",
-                seed=seed + 200 + index,
-                resamples=resamples,
+                f"rounds to first win :: {name}",
+                seed + 200 + index,
+                resamples,
             )
         )
         hypotheses.append(Hypothesis("RQ-2", "rounds_to_first_win", name))
 
-    results = holm([e.p_value for e in estimates], hypotheses) if estimates else []
-    return FamilyResult("RQ-2", estimates, results, unavailable)
+    if jobs and workers > 1:
+        with ProcessPoolExecutor(max_workers=min(workers, len(jobs))) as pool:
+            for slot, estimate in zip(
+                slots, pool.map(_mean_difference_job, jobs), strict=True
+            ):
+                estimates[slot] = estimate
+    else:
+        for slot, job in zip(slots, jobs, strict=True):
+            estimates[slot] = _mean_difference_job(job)
+
+    resolved = [e for e in estimates if e is not None]
+    results = holm([e.p_value for e in resolved], hypotheses) if resolved else []
+    return FamilyResult("RQ-2", resolved, results, unavailable)
 
 
 def rq3(data: Dataset, *, seed: int, resamples: int) -> FamilyResult:
@@ -455,10 +489,12 @@ def rq1_verdict(result: FamilyResult) -> RQ1Verdict:
     return RQ1Verdict(cv_ok and conjuncts >= 2, cv_lower, cv_ok, conjuncts, detail)
 
 
-def run_all(data: Dataset, *, seed: int, resamples: int) -> list[FamilyResult]:
+def run_all(
+    data: Dataset, *, seed: int, resamples: int, workers: int = 1
+) -> list[FamilyResult]:
     return [
         rq1(data, seed=seed, resamples=resamples),
-        rq2(data, seed=seed, resamples=resamples),
+        rq2(data, seed=seed, resamples=resamples, workers=workers),
         rq3(data, seed=seed, resamples=resamples),
         rq4(data, seed=seed, resamples=resamples),
     ]
