@@ -24,50 +24,69 @@ from madnlab.run.counterbalance import describe
 from madnlab.run.game import PREREG_VERSION
 
 
-def _write_gzip(path: Path, payload: bytes) -> None:
-    """Write gzip deterministically.
+def run_campaign(
+    config_path: Path,
+    output_dir: Path,
+    workers: int,
+    shard: int = 0,
+    shards: int = 1,
+) -> int:
+    """Play a campaign, streaming each cell's rows to disk as it finishes.
 
-    ``mtime=0`` and a fixed compression level: the default embeds the current
-    time in the header, which would make two runs of the same configuration
-    differ in bytes and break AK-2 for no reason at all.
+    **Streaming, not accumulating.** A summary row costs ~16.7 KB as live
+    Python objects — measured, not estimated: EX-6's 7.42M rows peaked at
+    124 GB. Holding a 50M-row campaign would need 800 GB. Each cell is written
+    and dropped instead, so peak memory is one cell rather than one campaign.
+
+    **Sharding by cell.** ``--shard i/n`` runs only the cells with
+    ``index % n == i``. Game seeds come from ``(master_seed, cell_key,
+    game_index)`` and never from the shard, so which node ran a cell cannot
+    reach the numbers — the same property D-33 gives worker count, extended to
+    machines. Each shard writes its own summary; the analysis reads them all.
     """
-    with gzip.GzipFile(filename="", mode="wb", fileobj=path.open("wb"), mtime=0) as handle:
-        handle.write(payload)
-
-
-def run_campaign(config_path: Path, output_dir: Path, workers: int) -> int:
     config = load(config_path)
     output_dir.mkdir(parents=True, exist_ok=True)
+
+    planned = list(config.specs())
+    mine = [(i, s, g) for i, (s, g) in enumerate(planned) if i % shards == shard]
 
     print(f"campaign: {config.name}")
     print(f"engine:   {ENGINE_VERSION}")
     print(f"seed:     {config.master_seed}")
-    print(f"cells:    {len(config.cells)}  games: {total_games(config):,}")
+    print(f"cells:    {len(planned)}  games: {total_games(config):,}")
+    if shards > 1:
+        print(f"shard:    {shard + 1}/{shards} -> {len(mine)} cells")
     print(f"workers:  {workers}\n")
 
-    all_rows = []
-    started = time.perf_counter()
-    for spec, games in config.specs():
-        cell_started = time.perf_counter()
-        rows = run_cell(spec, games=games, workers=workers)
-        elapsed = time.perf_counter() - cell_started
-        abandoned = sum(1 for row in rows if row.abandoned)
-        stalemated = sum(1 for row in rows if row.stalemate)
-        print(
-            f"  {spec.cell_key:<34} {games:>9,} games  "
-            f"{elapsed:>7.1f}s  {games / elapsed:>7.1f}/s  "
-            f"{describe(spec.balance())}"
-            + (f"  ABANDONED {abandoned}" if abandoned else "")
-            + (f"  STALEMATE {stalemated}" if stalemated else "")
-        )
-        all_rows.extend(rows)
-
     summary_path = output_dir / "summary.jsonl.gz"
-    _write_gzip(summary_path, summary_bytes(all_rows))
+    written = 0
+    started = time.perf_counter()
+    with gzip.GzipFile(
+        filename="", mode="wb", fileobj=summary_path.open("wb"), mtime=0
+    ) as handle:
+        for _index, spec, games in mine:
+            cell_started = time.perf_counter()
+            rows = run_cell(spec, games=games, workers=workers)
+            elapsed = time.perf_counter() - cell_started
+            abandoned = sum(1 for row in rows if row.abandoned)
+            stalemated = sum(1 for row in rows if row.stalemate)
+            print(
+                f"  {spec.cell_key:<40} {games:>9,} games  "
+                f"{elapsed:>7.1f}s  {games / elapsed:>7.1f}/s  "
+                f"{describe(spec.balance())}"
+                + (f"  ABANDONED {abandoned}" if abandoned else "")
+                + (f"  STALEMATE {stalemated}" if stalemated else ""),
+                flush=True,
+            )
+            handle.write(summary_bytes(rows))
+            written += len(rows)
+            del rows
 
     payload = resolved_payload(config)
     payload["engine_version"] = ENGINE_VERSION
-    payload["rows"] = len(all_rows)
+    payload["rows"] = written
+    if shards > 1:
+        payload["shard"] = [shard, shards]
     (output_dir / "campaign.json").write_text(
         json.dumps(payload, ensure_ascii=True, separators=(",", ":"), sort_keys=True) + "\n",
         encoding="utf-8",
@@ -76,7 +95,7 @@ def run_campaign(config_path: Path, output_dir: Path, workers: int) -> int:
 
     total_elapsed = time.perf_counter() - started
     print(
-        f"\n{len(all_rows):,} rows in {total_elapsed:.1f}s "
+        f"\n{written:,} rows in {total_elapsed:.1f}s "
         f"-> {summary_path.name} ({summary_path.stat().st_size:,} bytes)"
     )
     return 0
@@ -211,6 +230,11 @@ def build_report(
         ("RQ-4", families.rq4),
         ("RQ-5", families.rq5),
         ("RQ-6", families.rq6),
+        ("RQ-7", families.rq7),
+        ("RQ-8", families.rq8),
+        ("RQ-9", families.rq9),
+        ("RQ-10", families.rq10),
+        ("RQ-11", families.rq11),
     ):
         family_started = time.perf_counter()
         kwargs = {"workers": workers} if name == "RQ-2" else {}
@@ -274,6 +298,8 @@ def main(argv: list[str] | None = None) -> int:
     run.add_argument("config", type=Path)
     run.add_argument("--out", type=Path, required=True)
     run.add_argument("--workers", type=int, default=1)
+    run.add_argument("--shard", type=int, default=0)
+    run.add_argument("--shards", type=int, default=1)
 
     check = sub.add_parser("check", help="resolve a configuration without running it")
     check.add_argument("config", type=Path)
@@ -307,7 +333,9 @@ def main(argv: list[str] | None = None) -> int:
                 args.run_dirs, args.out, args.analysis_seed,
                 args.resamples, args.workers,
             )
-        return run_campaign(args.config, args.out, args.workers)
+        return run_campaign(
+            args.config, args.out, args.workers, args.shard, args.shards
+        )
     except ConfigError as error:
         print(f"configuration error: {error}", file=sys.stderr)
         return 2

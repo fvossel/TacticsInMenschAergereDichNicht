@@ -926,3 +926,56 @@ every RQ-1 result above it is meaningless.
 6 players all-`RANDOM`, and `GREEDY_CAPTURE` against a `RANDOM` field at 4
 players under `optional` and `mandatory`. 1.5M games. Hypotheses 1, 2, 7, 8
 and 9 read cells that already exist.
+
+---
+
+## 17. The interaction matrix (families RQ-7 … RQ-11)
+
+§6.4's RQ-4 tests ten *named* interactions and declares the rest descriptive.
+That was a power argument, and with the compute available it does not hold:
+Holm's cost is nearly flat in family size. Going from 10 tests to 200 raises
+the games needed per arm from 199,688 to 304,271 — a factor of 1.5, because
+the normal tail is thin and α/200 is barely further out than α/10. What
+limited the earlier plan was never the correction; it was the sample.
+
+So every pairing is tested, on **five metrics** each: win rate by starting
+seat, `rounds_to_first_win`, `captures_total`, `lead_changes_per_turn`, and
+the comeback rate. Two proportions and three means; `cell_metric` returns the
+variance *of the estimate* for either kind, so a difference-in-differences can
+add four of them without knowing which it got.
+
+| Family | Interaction | Contrasts | Tests | Campaign |
+|---|---|---:|---:|---|
+| RQ-7 | rule × rule | 21 axis pairs | 105 | EX-4, pooled |
+| RQ-8 | rule × strategy | 9 × 4 deviants | 180 | EX-9 |
+| RQ-9 | rule × player count | 9 × 3 counts | 135 | EX-10 |
+| RQ-10 | strategy × player count | 4 × 3 counts | 60 | EX-11 + EX-10 |
+| RQ-11 | rule × seating | 9 × 1 | 45 | EX-12 |
+
+**RQ-7 costs nothing.** A two-way interaction among EX-4's seven axes averages
+each of its four arms over the other five, so every arm is 42 of the 168
+cells. At 40,000 games per cell that is 1.68M games per arm, against the
+601,249 a 0.5 pp interaction needs in a family of 180. The factorial RQ-2
+already paid for answers all 21 rule pairs.
+
+**Two axes are pinned to one contrast each.** `cold_start` and `capture_mode`
+have three levels; a 2×2 interaction needs two, and choosing them after seeing
+the data would be a selection. RQ-7 uses `strict` vs `one_piece_out` and
+`mandatory` vs `optional`. `free_entry` cannot appear: cells carrying it have
+both entry axes pinned off (D-13), so three of the four arms would be empty.
+
+**One pair has no interaction to estimate.** `bonus_roll_after_quick_entry` is
+nested under `dreimal_wuerfeln`, so no cell exists with the bonus on and the
+three-attempt rule off. That pair is reported as *not evaluated* rather than
+quietly skipped. Everywhere else the nested axis is contrasted against the
+`dreimal` configuration, not the baseline — against the baseline it would move
+two flags at once and credit one of them with the whole effect.
+
+**Player counts are contrasted at a fixed board.** RQ-9 and RQ-10 run entirely
+on the 6-seat board (D-12); a count contrast across board sizes measures the
+board as much as the count.
+
+**Arms.** EX-9 (50 cells), EX-10 (40), EX-11 (16), EX-12 (20), all at
+n = 600,000 — every arm here is a single cell, so it carries alone what EX-4
+gets from pooling. 75.6M games; with EX-4 raised to 40,000 per cell the plan
+totals **531 cells and 99,650,002 games**.

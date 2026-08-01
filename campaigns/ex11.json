@@ -1,0 +1,232 @@
+{
+  "name": "EX11",
+  "description": "RQ-10 strategy x player count",
+  "master_seed": 20261022,
+  "log_events": {
+    "mode": "sample",
+    "k": 100
+  },
+  "prereg_version": "prereg-v1",
+  "cells": [
+    {
+      "key": "ex11/6s2p/spread-vs-random/baseline",
+      "seats": 6,
+      "players": 2,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "SPREAD",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {}
+    },
+    {
+      "key": "ex11/6s3p/spread-vs-random/baseline",
+      "seats": 6,
+      "players": 3,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "SPREAD",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {}
+    },
+    {
+      "key": "ex11/6s4p/spread-vs-random/baseline",
+      "seats": 6,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "SPREAD",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {}
+    },
+    {
+      "key": "ex11/6s6p/spread-vs-random/baseline",
+      "seats": 6,
+      "players": 6,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "SPREAD",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {}
+    },
+    {
+      "key": "ex11/6s2p/focus_front-vs-random/baseline",
+      "seats": 6,
+      "players": 2,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_FRONT",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {}
+    },
+    {
+      "key": "ex11/6s3p/focus_front-vs-random/baseline",
+      "seats": 6,
+      "players": 3,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_FRONT",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {}
+    },
+    {
+      "key": "ex11/6s4p/focus_front-vs-random/baseline",
+      "seats": 6,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_FRONT",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {}
+    },
+    {
+      "key": "ex11/6s6p/focus_front-vs-random/baseline",
+      "seats": 6,
+      "players": 6,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_FRONT",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {}
+    },
+    {
+      "key": "ex11/6s2p/focus_rear-vs-random/baseline",
+      "seats": 6,
+      "players": 2,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_REAR",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {}
+    },
+    {
+      "key": "ex11/6s3p/focus_rear-vs-random/baseline",
+      "seats": 6,
+      "players": 3,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_REAR",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {}
+    },
+    {
+      "key": "ex11/6s4p/focus_rear-vs-random/baseline",
+      "seats": 6,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_REAR",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {}
+    },
+    {
+      "key": "ex11/6s6p/focus_rear-vs-random/baseline",
+      "seats": 6,
+      "players": 6,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_REAR",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {}
+    },
+    {
+      "key": "ex11/6s2p/greedy_capture-vs-random/baseline",
+      "seats": 6,
+      "players": 2,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "GREEDY_CAPTURE",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {}
+    },
+    {
+      "key": "ex11/6s3p/greedy_capture-vs-random/baseline",
+      "seats": 6,
+      "players": 3,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "GREEDY_CAPTURE",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {}
+    },
+    {
+      "key": "ex11/6s4p/greedy_capture-vs-random/baseline",
+      "seats": 6,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "GREEDY_CAPTURE",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {}
+    },
+    {
+      "key": "ex11/6s6p/greedy_capture-vs-random/baseline",
+      "seats": 6,
+      "players": 6,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "GREEDY_CAPTURE",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {}
+    }
+  ]
+}

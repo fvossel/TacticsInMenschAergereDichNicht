@@ -29,6 +29,7 @@ from madnlab.analysis.intervals import (
 from madnlab.analysis.multiplicity import (
     CONFIRMATORY_TOTAL,
     FAMILIES,
+    INTERACTION_FAMILIES,
     Hypothesis,
     family_hypotheses,
     family_size,
@@ -210,14 +211,25 @@ def test_holm_is_monotone_a_failure_stops_everything_after_it():
     assert [r.rejected for r in results] == [False, False, False]
 
 
-def test_the_confirmatory_families_still_add_up_to_forty():
-    """§6.4 is the pre-registration; drift here is drift in the claim."""
-    total = sum(family_size(name) for name in FAMILIES)
-    assert total == CONFIRMATORY_TOTAL, {n: family_size(n) for n in FAMILIES}
+def test_the_confirmatory_families_still_add_up():
+    """The declared total is the pre-registration; drift here is drift in the claim.
+
+    The core families are enumerated contrast by contrast; the interaction
+    families of §17 are declared as sizes, because their contrasts are the
+    product of an axis list and a variant list and writing that product out
+    twice is how two copies of it drift apart.
+    """
+    core = sum(family_size(name) for name in FAMILIES)
+    assert core + sum(INTERACTION_FAMILIES.values()) == CONFIRMATORY_TOTAL, {
+        n: family_size(n) for n in FAMILIES
+    }
     assert family_size("RQ-1") == 8
     assert family_size("RQ-2") == 18
     assert family_size("RQ-3") == 4
     assert family_size("RQ-4") == 10
+    assert family_size("RQ-5") == 8
+    assert family_size("RQ-6") == 9
+    assert INTERACTION_FAMILIES["RQ-7"] == 21 * 5
     for name in FAMILIES:
         assert len(family_hypotheses(name)) == family_size(name)
         assert len({h.contrast + h.metric for h in family_hypotheses(name)}) == family_size(name)

@@ -1,0 +1,807 @@
+{
+  "name": "EX9",
+  "description": "RQ-8 rule x strategy",
+  "master_seed": 20261020,
+  "log_events": {
+    "mode": "sample",
+    "k": 100
+  },
+  "prereg_version": "prereg-v1",
+  "cells": [
+    {
+      "key": "ex9/4s4p/random/baseline",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {}
+    },
+    {
+      "key": "ex9/4s4p/spread/baseline",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "SPREAD",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {}
+    },
+    {
+      "key": "ex9/4s4p/focus_front/baseline",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_FRONT",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {}
+    },
+    {
+      "key": "ex9/4s4p/focus_rear/baseline",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_REAR",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {}
+    },
+    {
+      "key": "ex9/4s4p/greedy_capture/baseline",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "GREEDY_CAPTURE",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {}
+    },
+    {
+      "key": "ex9/4s4p/random/cold_start=strict",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "cold_start": "strict"
+      }
+    },
+    {
+      "key": "ex9/4s4p/spread/cold_start=strict",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "SPREAD",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "cold_start": "strict"
+      }
+    },
+    {
+      "key": "ex9/4s4p/focus_front/cold_start=strict",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_FRONT",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "cold_start": "strict"
+      }
+    },
+    {
+      "key": "ex9/4s4p/focus_rear/cold_start=strict",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_REAR",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "cold_start": "strict"
+      }
+    },
+    {
+      "key": "ex9/4s4p/greedy_capture/cold_start=strict",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "GREEDY_CAPTURE",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "cold_start": "strict"
+      }
+    },
+    {
+      "key": "ex9/4s4p/random/cold_start=free_entry",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "cold_start": "free_entry"
+      }
+    },
+    {
+      "key": "ex9/4s4p/spread/cold_start=free_entry",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "SPREAD",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "cold_start": "free_entry"
+      }
+    },
+    {
+      "key": "ex9/4s4p/focus_front/cold_start=free_entry",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_FRONT",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "cold_start": "free_entry"
+      }
+    },
+    {
+      "key": "ex9/4s4p/focus_rear/cold_start=free_entry",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_REAR",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "cold_start": "free_entry"
+      }
+    },
+    {
+      "key": "ex9/4s4p/greedy_capture/cold_start=free_entry",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "GREEDY_CAPTURE",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "cold_start": "free_entry"
+      }
+    },
+    {
+      "key": "ex9/4s4p/random/capture=mandatory",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "capture_mode": "mandatory"
+      }
+    },
+    {
+      "key": "ex9/4s4p/spread/capture=mandatory",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "SPREAD",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "capture_mode": "mandatory"
+      }
+    },
+    {
+      "key": "ex9/4s4p/focus_front/capture=mandatory",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_FRONT",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "capture_mode": "mandatory"
+      }
+    },
+    {
+      "key": "ex9/4s4p/focus_rear/capture=mandatory",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_REAR",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "capture_mode": "mandatory"
+      }
+    },
+    {
+      "key": "ex9/4s4p/greedy_capture/capture=mandatory",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "GREEDY_CAPTURE",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "capture_mode": "mandatory"
+      }
+    },
+    {
+      "key": "ex9/4s4p/random/capture=mandatory_extended",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "capture_mode": "mandatory_extended"
+      }
+    },
+    {
+      "key": "ex9/4s4p/spread/capture=mandatory_extended",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "SPREAD",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "capture_mode": "mandatory_extended"
+      }
+    },
+    {
+      "key": "ex9/4s4p/focus_front/capture=mandatory_extended",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_FRONT",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "capture_mode": "mandatory_extended"
+      }
+    },
+    {
+      "key": "ex9/4s4p/focus_rear/capture=mandatory_extended",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_REAR",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "capture_mode": "mandatory_extended"
+      }
+    },
+    {
+      "key": "ex9/4s4p/greedy_capture/capture=mandatory_extended",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "GREEDY_CAPTURE",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "capture_mode": "mandatory_extended"
+      }
+    },
+    {
+      "key": "ex9/4s4p/random/dreimal",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "dreimal_wuerfeln": true
+      }
+    },
+    {
+      "key": "ex9/4s4p/spread/dreimal",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "SPREAD",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "dreimal_wuerfeln": true
+      }
+    },
+    {
+      "key": "ex9/4s4p/focus_front/dreimal",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_FRONT",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "dreimal_wuerfeln": true
+      }
+    },
+    {
+      "key": "ex9/4s4p/focus_rear/dreimal",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_REAR",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "dreimal_wuerfeln": true
+      }
+    },
+    {
+      "key": "ex9/4s4p/greedy_capture/dreimal",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "GREEDY_CAPTURE",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "dreimal_wuerfeln": true
+      }
+    },
+    {
+      "key": "ex9/4s4p/random/bonus_quick",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "dreimal_wuerfeln": true,
+        "bonus_roll_after_quick_entry": true
+      }
+    },
+    {
+      "key": "ex9/4s4p/spread/bonus_quick",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "SPREAD",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "dreimal_wuerfeln": true,
+        "bonus_roll_after_quick_entry": true
+      }
+    },
+    {
+      "key": "ex9/4s4p/focus_front/bonus_quick",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_FRONT",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "dreimal_wuerfeln": true,
+        "bonus_roll_after_quick_entry": true
+      }
+    },
+    {
+      "key": "ex9/4s4p/focus_rear/bonus_quick",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_REAR",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "dreimal_wuerfeln": true,
+        "bonus_roll_after_quick_entry": true
+      }
+    },
+    {
+      "key": "ex9/4s4p/greedy_capture/bonus_quick",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "GREEDY_CAPTURE",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "dreimal_wuerfeln": true,
+        "bonus_roll_after_quick_entry": true
+      }
+    },
+    {
+      "key": "ex9/4s4p/random/goal_no_jump",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "goal_no_jump": true
+      }
+    },
+    {
+      "key": "ex9/4s4p/spread/goal_no_jump",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "SPREAD",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "goal_no_jump": true
+      }
+    },
+    {
+      "key": "ex9/4s4p/focus_front/goal_no_jump",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_FRONT",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "goal_no_jump": true
+      }
+    },
+    {
+      "key": "ex9/4s4p/focus_rear/goal_no_jump",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_REAR",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "goal_no_jump": true
+      }
+    },
+    {
+      "key": "ex9/4s4p/greedy_capture/goal_no_jump",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "GREEDY_CAPTURE",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "goal_no_jump": true
+      }
+    },
+    {
+      "key": "ex9/4s4p/random/barriers",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex9/4s4p/spread/barriers",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "SPREAD",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex9/4s4p/focus_front/barriers",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_FRONT",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex9/4s4p/focus_rear/barriers",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_REAR",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex9/4s4p/greedy_capture/barriers",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "GREEDY_CAPTURE",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex9/4s4p/random/bonus_forfeited",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "bonus_roll_forfeited": true
+      }
+    },
+    {
+      "key": "ex9/4s4p/spread/bonus_forfeited",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "SPREAD",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "bonus_roll_forfeited": true
+      }
+    },
+    {
+      "key": "ex9/4s4p/focus_front/bonus_forfeited",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_FRONT",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "bonus_roll_forfeited": true
+      }
+    },
+    {
+      "key": "ex9/4s4p/focus_rear/bonus_forfeited",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "FOCUS_REAR",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "bonus_roll_forfeited": true
+      }
+    },
+    {
+      "key": "ex9/4s4p/greedy_capture/bonus_forfeited",
+      "seats": 4,
+      "players": 4,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "GREEDY_CAPTURE",
+        "RANDOM",
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "bonus_roll_forfeited": true
+      }
+    }
+  ]
+}

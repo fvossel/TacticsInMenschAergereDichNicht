@@ -28,6 +28,9 @@ OUT = ROOT / "campaigns"
 
 #: D-59's two tiers.
 DESCRIPTIVE = 20_000
+#: EX-4 alone: its 168 cells are the pooled arms of RQ-7's 21 rule-pair
+#: interactions, 42 cells per arm (§17).
+EX4_N = 40_000
 CONFIRMATORY = {"ex2": 250_000, "ex3": 200_000, "ex5": 250_000, "ex6": 400_000,
                 "ex7": 200_000, "ex8": 250_000}
 
@@ -156,7 +159,7 @@ def ex4() -> list[dict[str, Any]]:
         if barriers:
             rules["barriers"] = True
         flags = "-".join(f"{k}={v}" for k, v in sorted(rules.items())) or "baseline"
-        cells.append(cell(f"ex4/4s4p/random/{flags}", 4, 4, ("RANDOM",) * 4, DESCRIPTIVE, rules))
+        cells.append(cell(f"ex4/4s4p/random/{flags}", 4, 4, ("RANDOM",) * 4, EX4_N, rules))
     return cells
 
 
@@ -319,6 +322,94 @@ def ex8() -> list[dict[str, Any]]:
     return cells
 
 
+#: The ten rule configurations the interaction campaigns cross against
+#: everything else: the baseline plus each §2.4 axis moved one level. Named
+#: here once because four campaigns and five families all index into them.
+#: ``bonus_quick`` carries ``dreimal_wuerfeln`` with it — the flag is nested
+#: (§2.4) and its contrast is against ``dreimal`` rather than the baseline.
+RULE_CONFIGS: tuple[tuple[str, dict[str, Any]], ...] = (
+    ("baseline", {}),
+    ("cold_start=strict", {"cold_start": "strict"}),
+    ("cold_start=free_entry", {"cold_start": "free_entry"}),
+    ("capture=mandatory", {"capture_mode": "mandatory"}),
+    ("capture=mandatory_extended", {"capture_mode": "mandatory_extended"}),
+    ("dreimal", {"dreimal_wuerfeln": True}),
+    ("bonus_quick", {"dreimal_wuerfeln": True, "bonus_roll_after_quick_entry": True}),
+    ("goal_no_jump", {"goal_no_jump": True}),
+    ("barriers", {"barriers": True}),
+    ("bonus_forfeited", {"bonus_roll_forfeited": True}),
+)
+
+#: n per interaction cell. A 0.5 pp interaction in a family of 180 needs
+#: 601,249 games per arm (§17), and here every arm is a single cell.
+INTERACTION_N = 600_000
+
+
+def ex9() -> list[dict[str, Any]]:
+    """RQ-8: does a rule change what a strategy is worth? (§17)"""
+    fields: tuple[tuple[str, str | None], ...] = (
+        ("random", None),
+        ("spread", "SPREAD"),
+        ("focus_front", "FOCUS_FRONT"),
+        ("focus_rear", "FOCUS_REAR"),
+        ("greedy_capture", "GREEDY_CAPTURE"),
+    )
+    cells = []
+    for (rule_name, rules), (field_name, deviant) in itertools.product(
+        RULE_CONFIGS, fields
+    ):
+        agents = ("RANDOM",) * 4 if deviant is None else (deviant,) + ("RANDOM",) * 3
+        cells.append(
+            cell(f"ex9/4s4p/{field_name}/{rule_name}", 4, 4, agents, INTERACTION_N, rules)
+        )
+    return cells
+
+
+def ex10() -> list[dict[str, Any]]:
+    """RQ-9: does a rule's effect depend on how many people are playing?
+
+    All on the 6-seat board (D-12): a player-count contrast at mixed board
+    sizes measures the board as much as the count.
+    """
+    return [
+        cell(
+            f"ex10/6s{players}p/random/{rule_name}",
+            6, players, ("RANDOM",) * players, INTERACTION_N, rules,
+        )
+        for (rule_name, rules), players in itertools.product(RULE_CONFIGS, (2, 3, 4, 6))
+    ]
+
+
+def ex11() -> list[dict[str, Any]]:
+    """RQ-10: does a strategy's worth depend on the number of opponents?
+
+    The RANDOM arm of every contrast is EX-10's baseline cell at the same
+    player count, so it is not duplicated here.
+    """
+    return [
+        cell(
+            f"ex11/6s{players}p/{deviant.lower()}-vs-random/baseline",
+            6, players, (deviant,) + ("RANDOM",) * (players - 1), INTERACTION_N,
+        )
+        for deviant, players in itertools.product(
+            ("SPREAD", "FOCUS_FRONT", "FOCUS_REAR", "GREEDY_CAPTURE"), (2, 3, 4, 6)
+        )
+    ]
+
+
+def ex12() -> list[dict[str, Any]]:
+    """RQ-11: does a rule land differently depending on where people sit?"""
+    return [
+        cell(
+            f"ex12/2p/4s-{pattern}/random/{rule_name}",
+            4, 2, ("RANDOM",) * 2, INTERACTION_N, rules, pattern=pattern,
+        )
+        for (rule_name, rules), pattern in itertools.product(
+            RULE_CONFIGS, ("adjacent", "opposite")
+        )
+    ]
+
+
 CAMPAIGNS = {
     "ex2": ("RQ-1 Schlagzwang", 20261010, ex2),
     "ex3": ("RQ-3 movement strategies", 20261011, ex3),
@@ -328,11 +419,16 @@ CAMPAIGNS = {
     # A fresh seed, and its own pre-registration (§15, D-78).
     "ex7": ("RQ-5 seat exposure", 20261015, ex7),
     "ex8": ("RQ-6 turn order, capture play, middle seat", 20261016, ex8),
+    "ex9": ("RQ-8 rule x strategy", 20261020, ex9),
+    "ex10": ("RQ-9 rule x player count", 20261021, ex10),
+    "ex11": ("RQ-10 strategy x player count", 20261022, ex11),
+    "ex12": ("RQ-11 rule x seating", 20261023, ex12),
 }
 
 #: D-59's cell counts. Asserted, so the plan and the files cannot drift.
 EXPECTED_CELLS = {"ex2": 36, "ex3": 64, "ex4": 168, "ex5": 10, "ex6": 105,
-                  "ex7": 14, "ex8": 6}
+                  "ex7": 14, "ex8": 6, "ex9": 50, "ex10": 40, "ex11": 16,
+                  "ex12": 20}
 
 
 def main() -> int:

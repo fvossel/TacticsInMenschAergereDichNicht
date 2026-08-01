@@ -116,6 +116,7 @@ def summarize_cell(rows: Sequence[dict[str, Any]]) -> CellSummary:
         "comeback_depth",
         "final_margin",
         "final_margin_norm",
+        "lead_changes_per_turn",
     )
     vector_fields = (
         "captures_by_seat",
@@ -150,7 +151,9 @@ def summarize_cell(rows: Sequence[dict[str, Any]]) -> CellSummary:
         # The per-turn form is the k-comparable one (§6.2), and the segment
         # it belongs to is the first-win segment.
         segment = row["turns_to_first_win"]
-        changes_per_turn.append(row["lead_changes"] / segment if segment else 0.0)
+        per_turn = row["lead_changes"] / segment if segment else 0.0
+        changes_per_turn.append(per_turn)
+        row = {**row, "lead_changes_per_turn": per_turn}
         if row["winner_rank_at_50"] > 0:
             checkpointed += 1
             comebacks += bool(row["comeback"])

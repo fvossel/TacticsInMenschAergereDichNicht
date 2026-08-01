@@ -1,0 +1,290 @@
+{
+  "name": "EX12",
+  "description": "RQ-11 rule x seating",
+  "master_seed": 20261023,
+  "log_events": {
+    "mode": "sample",
+    "k": 100
+  },
+  "prereg_version": "prereg-v1",
+  "cells": [
+    {
+      "key": "ex12/2p/4s-adjacent/random/baseline",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {}
+    },
+    {
+      "key": "ex12/2p/4s-opposite/random/baseline",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "opposite",
+      "agents": [
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {}
+    },
+    {
+      "key": "ex12/2p/4s-adjacent/random/cold_start=strict",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "cold_start": "strict"
+      }
+    },
+    {
+      "key": "ex12/2p/4s-opposite/random/cold_start=strict",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "opposite",
+      "agents": [
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "cold_start": "strict"
+      }
+    },
+    {
+      "key": "ex12/2p/4s-adjacent/random/cold_start=free_entry",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "cold_start": "free_entry"
+      }
+    },
+    {
+      "key": "ex12/2p/4s-opposite/random/cold_start=free_entry",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "opposite",
+      "agents": [
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "cold_start": "free_entry"
+      }
+    },
+    {
+      "key": "ex12/2p/4s-adjacent/random/capture=mandatory",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "capture_mode": "mandatory"
+      }
+    },
+    {
+      "key": "ex12/2p/4s-opposite/random/capture=mandatory",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "opposite",
+      "agents": [
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "capture_mode": "mandatory"
+      }
+    },
+    {
+      "key": "ex12/2p/4s-adjacent/random/capture=mandatory_extended",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "capture_mode": "mandatory_extended"
+      }
+    },
+    {
+      "key": "ex12/2p/4s-opposite/random/capture=mandatory_extended",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "opposite",
+      "agents": [
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "capture_mode": "mandatory_extended"
+      }
+    },
+    {
+      "key": "ex12/2p/4s-adjacent/random/dreimal",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "dreimal_wuerfeln": true
+      }
+    },
+    {
+      "key": "ex12/2p/4s-opposite/random/dreimal",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "opposite",
+      "agents": [
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "dreimal_wuerfeln": true
+      }
+    },
+    {
+      "key": "ex12/2p/4s-adjacent/random/bonus_quick",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "dreimal_wuerfeln": true,
+        "bonus_roll_after_quick_entry": true
+      }
+    },
+    {
+      "key": "ex12/2p/4s-opposite/random/bonus_quick",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "opposite",
+      "agents": [
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "dreimal_wuerfeln": true,
+        "bonus_roll_after_quick_entry": true
+      }
+    },
+    {
+      "key": "ex12/2p/4s-adjacent/random/goal_no_jump",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "goal_no_jump": true
+      }
+    },
+    {
+      "key": "ex12/2p/4s-opposite/random/goal_no_jump",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "opposite",
+      "agents": [
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "goal_no_jump": true
+      }
+    },
+    {
+      "key": "ex12/2p/4s-adjacent/random/barriers",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex12/2p/4s-opposite/random/barriers",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "opposite",
+      "agents": [
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "barriers": true
+      }
+    },
+    {
+      "key": "ex12/2p/4s-adjacent/random/bonus_forfeited",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "adjacent",
+      "agents": [
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "bonus_roll_forfeited": true
+      }
+    },
+    {
+      "key": "ex12/2p/4s-opposite/random/bonus_forfeited",
+      "seats": 4,
+      "players": 2,
+      "seat_pattern": "opposite",
+      "agents": [
+        "RANDOM",
+        "RANDOM"
+      ],
+      "games": 600000,
+      "rules": {
+        "bonus_roll_forfeited": true
+      }
+    }
+  ]
+}

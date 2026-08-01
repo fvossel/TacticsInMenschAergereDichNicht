@@ -19,7 +19,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {}
     },
     {
@@ -33,7 +33,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "barriers": true
       }
@@ -49,7 +49,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "capture_mode": "mandatory"
       }
@@ -65,7 +65,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "capture_mode": "mandatory",
         "barriers": true
@@ -82,7 +82,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "capture_mode": "mandatory_extended"
       }
@@ -98,7 +98,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "capture_mode": "mandatory_extended",
         "barriers": true
@@ -115,7 +115,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "goal_no_jump": true
       }
@@ -131,7 +131,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "goal_no_jump": true,
         "barriers": true
@@ -148,7 +148,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "goal_no_jump": true,
         "capture_mode": "mandatory"
@@ -165,7 +165,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "goal_no_jump": true,
         "capture_mode": "mandatory",
@@ -183,7 +183,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "goal_no_jump": true,
         "capture_mode": "mandatory_extended"
@@ -200,7 +200,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "goal_no_jump": true,
         "capture_mode": "mandatory_extended",
@@ -218,7 +218,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "bonus_roll_forfeited": true
       }
@@ -234,7 +234,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "bonus_roll_forfeited": true,
         "barriers": true
@@ -251,7 +251,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "bonus_roll_forfeited": true,
         "capture_mode": "mandatory"
@@ -268,7 +268,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "bonus_roll_forfeited": true,
         "capture_mode": "mandatory",
@@ -286,7 +286,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "bonus_roll_forfeited": true,
         "capture_mode": "mandatory_extended"
@@ -303,7 +303,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "bonus_roll_forfeited": true,
         "capture_mode": "mandatory_extended",
@@ -321,7 +321,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "bonus_roll_forfeited": true,
         "goal_no_jump": true
@@ -338,7 +338,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "bonus_roll_forfeited": true,
         "goal_no_jump": true,
@@ -356,7 +356,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "bonus_roll_forfeited": true,
         "goal_no_jump": true,
@@ -374,7 +374,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "bonus_roll_forfeited": true,
         "goal_no_jump": true,
@@ -393,7 +393,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "bonus_roll_forfeited": true,
         "goal_no_jump": true,
@@ -411,7 +411,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "bonus_roll_forfeited": true,
         "goal_no_jump": true,
@@ -430,7 +430,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "dreimal_wuerfeln": true
       }
@@ -446,7 +446,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "dreimal_wuerfeln": true,
         "barriers": true
@@ -463,7 +463,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "dreimal_wuerfeln": true,
         "capture_mode": "mandatory"
@@ -480,7 +480,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "dreimal_wuerfeln": true,
         "capture_mode": "mandatory",
@@ -498,7 +498,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "dreimal_wuerfeln": true,
         "capture_mode": "mandatory_extended"
@@ -515,7 +515,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "dreimal_wuerfeln": true,
         "capture_mode": "mandatory_extended",
@@ -533,7 +533,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "dreimal_wuerfeln": true,
         "goal_no_jump": true
@@ -550,7 +550,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "dreimal_wuerfeln": true,
         "goal_no_jump": true,
@@ -568,7 +568,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "dreimal_wuerfeln": true,
         "goal_no_jump": true,
@@ -586,7 +586,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "dreimal_wuerfeln": true,
         "goal_no_jump": true,
@@ -605,7 +605,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "dreimal_wuerfeln": true,
         "goal_no_jump": true,
@@ -623,7 +623,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "dreimal_wuerfeln": true,
         "goal_no_jump": true,
@@ -642,7 +642,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "dreimal_wuerfeln": true,
         "bonus_roll_forfeited": true
@@ -659,7 +659,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "dreimal_wuerfeln": true,
         "bonus_roll_forfeited": true,
@@ -677,7 +677,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "dreimal_wuerfeln": true,
         "bonus_roll_forfeited": true,
@@ -695,7 +695,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "dreimal_wuerfeln": true,
         "bonus_roll_forfeited": true,
@@ -714,7 +714,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "dreimal_wuerfeln": true,
         "bonus_roll_forfeited": true,
@@ -732,7 +732,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "dreimal_wuerfeln": true,
         "bonus_roll_forfeited": true,
@@ -751,7 +751,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "dreimal_wuerfeln": true,
         "bonus_roll_forfeited": true,
@@ -769,7 +769,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "dreimal_wuerfeln": true,
         "bonus_roll_forfeited": true,
@@ -788,7 +788,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "dreimal_wuerfeln": true,
         "bonus_roll_forfeited": true,
@@ -807,7 +807,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "dreimal_wuerfeln": true,
         "bonus_roll_forfeited": true,
@@ -827,7 +827,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "dreimal_wuerfeln": true,
         "bonus_roll_forfeited": true,
@@ -846,7 +846,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "dreimal_wuerfeln": true,
         "bonus_roll_forfeited": true,
@@ -866,7 +866,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "dreimal_wuerfeln": true,
         "bonus_roll_after_quick_entry": true
@@ -883,7 +883,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "dreimal_wuerfeln": true,
         "bonus_roll_after_quick_entry": true,
@@ -901,7 +901,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "dreimal_wuerfeln": true,
         "bonus_roll_after_quick_entry": true,
@@ -919,7 +919,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "dreimal_wuerfeln": true,
         "bonus_roll_after_quick_entry": true,
@@ -938,7 +938,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "dreimal_wuerfeln": true,
         "bonus_roll_after_quick_entry": true,
@@ -956,7 +956,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "dreimal_wuerfeln": true,
         "bonus_roll_after_quick_entry": true,
@@ -975,7 +975,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "dreimal_wuerfeln": true,
         "bonus_roll_after_quick_entry": true,
@@ -993,7 +993,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "dreimal_wuerfeln": true,
         "bonus_roll_after_quick_entry": true,
@@ -1012,7 +1012,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "dreimal_wuerfeln": true,
         "bonus_roll_after_quick_entry": true,
@@ -1031,7 +1031,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "dreimal_wuerfeln": true,
         "bonus_roll_after_quick_entry": true,
@@ -1051,7 +1051,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "dreimal_wuerfeln": true,
         "bonus_roll_after_quick_entry": true,
@@ -1070,7 +1070,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "dreimal_wuerfeln": true,
         "bonus_roll_after_quick_entry": true,
@@ -1090,7 +1090,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "dreimal_wuerfeln": true,
         "bonus_roll_after_quick_entry": true,
@@ -1108,7 +1108,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "dreimal_wuerfeln": true,
         "bonus_roll_after_quick_entry": true,
@@ -1127,7 +1127,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "dreimal_wuerfeln": true,
         "bonus_roll_after_quick_entry": true,
@@ -1146,7 +1146,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "dreimal_wuerfeln": true,
         "bonus_roll_after_quick_entry": true,
@@ -1166,7 +1166,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "dreimal_wuerfeln": true,
         "bonus_roll_after_quick_entry": true,
@@ -1185,7 +1185,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "dreimal_wuerfeln": true,
         "bonus_roll_after_quick_entry": true,
@@ -1205,7 +1205,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "dreimal_wuerfeln": true,
         "bonus_roll_after_quick_entry": true,
@@ -1224,7 +1224,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "dreimal_wuerfeln": true,
         "bonus_roll_after_quick_entry": true,
@@ -1244,7 +1244,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "dreimal_wuerfeln": true,
         "bonus_roll_after_quick_entry": true,
@@ -1264,7 +1264,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "dreimal_wuerfeln": true,
         "bonus_roll_after_quick_entry": true,
@@ -1285,7 +1285,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "dreimal_wuerfeln": true,
         "bonus_roll_after_quick_entry": true,
@@ -1305,7 +1305,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "dreimal_wuerfeln": true,
         "bonus_roll_after_quick_entry": true,
@@ -1326,7 +1326,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict"
       }
@@ -1342,7 +1342,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "barriers": true
@@ -1359,7 +1359,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "capture_mode": "mandatory"
@@ -1376,7 +1376,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "capture_mode": "mandatory",
@@ -1394,7 +1394,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "capture_mode": "mandatory_extended"
@@ -1411,7 +1411,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "capture_mode": "mandatory_extended",
@@ -1429,7 +1429,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "goal_no_jump": true
@@ -1446,7 +1446,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "goal_no_jump": true,
@@ -1464,7 +1464,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "goal_no_jump": true,
@@ -1482,7 +1482,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "goal_no_jump": true,
@@ -1501,7 +1501,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "goal_no_jump": true,
@@ -1519,7 +1519,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "goal_no_jump": true,
@@ -1538,7 +1538,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "bonus_roll_forfeited": true
@@ -1555,7 +1555,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "bonus_roll_forfeited": true,
@@ -1573,7 +1573,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "bonus_roll_forfeited": true,
@@ -1591,7 +1591,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "bonus_roll_forfeited": true,
@@ -1610,7 +1610,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "bonus_roll_forfeited": true,
@@ -1628,7 +1628,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "bonus_roll_forfeited": true,
@@ -1647,7 +1647,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "bonus_roll_forfeited": true,
@@ -1665,7 +1665,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "bonus_roll_forfeited": true,
@@ -1684,7 +1684,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "bonus_roll_forfeited": true,
@@ -1703,7 +1703,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "bonus_roll_forfeited": true,
@@ -1723,7 +1723,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "bonus_roll_forfeited": true,
@@ -1742,7 +1742,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "bonus_roll_forfeited": true,
@@ -1762,7 +1762,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "dreimal_wuerfeln": true
@@ -1779,7 +1779,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "dreimal_wuerfeln": true,
@@ -1797,7 +1797,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "dreimal_wuerfeln": true,
@@ -1815,7 +1815,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "dreimal_wuerfeln": true,
@@ -1834,7 +1834,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "dreimal_wuerfeln": true,
@@ -1852,7 +1852,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "dreimal_wuerfeln": true,
@@ -1871,7 +1871,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "dreimal_wuerfeln": true,
@@ -1889,7 +1889,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "dreimal_wuerfeln": true,
@@ -1908,7 +1908,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "dreimal_wuerfeln": true,
@@ -1927,7 +1927,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "dreimal_wuerfeln": true,
@@ -1947,7 +1947,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "dreimal_wuerfeln": true,
@@ -1966,7 +1966,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "dreimal_wuerfeln": true,
@@ -1986,7 +1986,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "dreimal_wuerfeln": true,
@@ -2004,7 +2004,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "dreimal_wuerfeln": true,
@@ -2023,7 +2023,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "dreimal_wuerfeln": true,
@@ -2042,7 +2042,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "dreimal_wuerfeln": true,
@@ -2062,7 +2062,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "dreimal_wuerfeln": true,
@@ -2081,7 +2081,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "dreimal_wuerfeln": true,
@@ -2101,7 +2101,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "dreimal_wuerfeln": true,
@@ -2120,7 +2120,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "dreimal_wuerfeln": true,
@@ -2140,7 +2140,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "dreimal_wuerfeln": true,
@@ -2160,7 +2160,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "dreimal_wuerfeln": true,
@@ -2181,7 +2181,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "dreimal_wuerfeln": true,
@@ -2201,7 +2201,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "dreimal_wuerfeln": true,
@@ -2222,7 +2222,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "dreimal_wuerfeln": true,
@@ -2240,7 +2240,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "dreimal_wuerfeln": true,
@@ -2259,7 +2259,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "dreimal_wuerfeln": true,
@@ -2278,7 +2278,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "dreimal_wuerfeln": true,
@@ -2298,7 +2298,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "dreimal_wuerfeln": true,
@@ -2317,7 +2317,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "dreimal_wuerfeln": true,
@@ -2337,7 +2337,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "dreimal_wuerfeln": true,
@@ -2356,7 +2356,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "dreimal_wuerfeln": true,
@@ -2376,7 +2376,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "dreimal_wuerfeln": true,
@@ -2396,7 +2396,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "dreimal_wuerfeln": true,
@@ -2417,7 +2417,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "dreimal_wuerfeln": true,
@@ -2437,7 +2437,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "dreimal_wuerfeln": true,
@@ -2458,7 +2458,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "dreimal_wuerfeln": true,
@@ -2477,7 +2477,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "dreimal_wuerfeln": true,
@@ -2497,7 +2497,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "dreimal_wuerfeln": true,
@@ -2517,7 +2517,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "dreimal_wuerfeln": true,
@@ -2538,7 +2538,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "dreimal_wuerfeln": true,
@@ -2558,7 +2558,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "dreimal_wuerfeln": true,
@@ -2579,7 +2579,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "dreimal_wuerfeln": true,
@@ -2599,7 +2599,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "dreimal_wuerfeln": true,
@@ -2620,7 +2620,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "dreimal_wuerfeln": true,
@@ -2641,7 +2641,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "dreimal_wuerfeln": true,
@@ -2663,7 +2663,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "dreimal_wuerfeln": true,
@@ -2684,7 +2684,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "strict",
         "dreimal_wuerfeln": true,
@@ -2706,7 +2706,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "free_entry"
       }
@@ -2722,7 +2722,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "free_entry",
         "barriers": true
@@ -2739,7 +2739,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "free_entry",
         "capture_mode": "mandatory"
@@ -2756,7 +2756,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "free_entry",
         "capture_mode": "mandatory",
@@ -2774,7 +2774,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "free_entry",
         "capture_mode": "mandatory_extended"
@@ -2791,7 +2791,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "free_entry",
         "capture_mode": "mandatory_extended",
@@ -2809,7 +2809,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "free_entry",
         "goal_no_jump": true
@@ -2826,7 +2826,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "free_entry",
         "goal_no_jump": true,
@@ -2844,7 +2844,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "free_entry",
         "goal_no_jump": true,
@@ -2862,7 +2862,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "free_entry",
         "goal_no_jump": true,
@@ -2881,7 +2881,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "free_entry",
         "goal_no_jump": true,
@@ -2899,7 +2899,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "free_entry",
         "goal_no_jump": true,
@@ -2918,7 +2918,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "free_entry",
         "bonus_roll_forfeited": true
@@ -2935,7 +2935,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "free_entry",
         "bonus_roll_forfeited": true,
@@ -2953,7 +2953,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "free_entry",
         "bonus_roll_forfeited": true,
@@ -2971,7 +2971,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "free_entry",
         "bonus_roll_forfeited": true,
@@ -2990,7 +2990,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "free_entry",
         "bonus_roll_forfeited": true,
@@ -3008,7 +3008,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "free_entry",
         "bonus_roll_forfeited": true,
@@ -3027,7 +3027,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "free_entry",
         "bonus_roll_forfeited": true,
@@ -3045,7 +3045,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "free_entry",
         "bonus_roll_forfeited": true,
@@ -3064,7 +3064,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "free_entry",
         "bonus_roll_forfeited": true,
@@ -3083,7 +3083,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "free_entry",
         "bonus_roll_forfeited": true,
@@ -3103,7 +3103,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "free_entry",
         "bonus_roll_forfeited": true,
@@ -3122,7 +3122,7 @@
         "RANDOM",
         "RANDOM"
       ],
-      "games": 20000,
+      "games": 40000,
       "rules": {
         "cold_start": "free_entry",
         "bonus_roll_forfeited": true,

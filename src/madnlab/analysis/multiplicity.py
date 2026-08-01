@@ -117,8 +117,19 @@ FAMILIES: dict[str, tuple[tuple[str, ...], tuple[str, ...]]] = {
     ),
 }
 
-#: The total §6.4, §15 and §16 declare together.
-CONFIRMATORY_TOTAL = 57
+#: §17's interaction matrix. Sizes rather than contrast lists: the contrasts
+#: are the product of an axis list and a variant list and enumerating them
+#: twice is how the two copies drift apart.
+INTERACTION_FAMILIES: dict[str, int] = {
+    "RQ-7": 21 * 5,   # 7 EX-4 axes, pairwise, x 5 metrics
+    "RQ-8": 9 * 4 * 5,
+    "RQ-9": 9 * 3 * 5,
+    "RQ-10": 4 * 3 * 5,
+    "RQ-11": 9 * 1 * 5,
+}
+
+#: The total §6.4, §15, §16 and §17 declare together.
+CONFIRMATORY_TOTAL = 57 + sum(INTERACTION_FAMILIES.values())
 
 
 

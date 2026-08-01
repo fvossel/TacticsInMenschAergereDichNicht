@@ -14,8 +14,9 @@ headline cell. Both live here, in code, rather than in a reader's head.
 
 from __future__ import annotations
 
+import itertools
 import json
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 from typing import NamedTuple
@@ -526,6 +527,11 @@ def run_all(
         rq4(data, seed=seed, resamples=resamples),
         rq5(data),
         rq6(data),
+        rq7(data),
+        rq8(data),
+        rq9(data),
+        rq10(data),
+        rq11(data),
     ]
 
 
@@ -824,3 +830,309 @@ def rq6(data: Dataset, *, seed: int = 0, resamples: int = 0) -> FamilyResult:
 
     results = holm([e.p_value for e in estimates], hypotheses) if estimates else []
     return FamilyResult("RQ-6", estimates, results, unavailable)
+
+
+# -- §17: the interaction matrix --------------------------------------------
+
+#: The five metrics every interaction family is measured on. Two proportions
+#: and three means; the accessor below hides the difference so an interaction
+#: is one function rather than five.
+INTERACTION_METRICS = (
+    "win_rate_by_starting_seat",
+    "rounds_to_first_win",
+    "captures_total",
+    "lead_changes_per_turn",
+    "comeback_rate",
+)
+
+
+def cell_metric(cell: CellSummary, metric: str) -> tuple[float, float, int]:
+    """``(value, variance of the estimate, n)`` for one metric of one cell.
+
+    Proportions carry ``p(1-p)/n``; means carry the sample variance over ``n``
+    from the accumulated squares. Returning the variance *of the estimate*
+    rather than of the observations is what lets a difference-in-differences
+    add four of them without knowing which kind it got.
+    """
+    if metric == "win_rate_by_starting_seat":
+        if cell.games == 0:
+            return 0.0, 0.0, 0
+        p = cell.wins_by_turn_offset.get(0, 0) / cell.games
+        return p, p * (1 - p) / cell.games, cell.games
+    if metric == "comeback_rate":
+        if cell.checkpointed == 0:
+            return 0.0, 0.0, 0
+        p = cell.comebacks / cell.checkpointed
+        return p, p * (1 - p) / cell.checkpointed, cell.checkpointed
+    value = cell.metric_means.get(metric, float("nan"))
+    variance = cell.metric_vars.get(metric, 0.0)
+    return value, variance / cell.games if cell.games else 0.0, cell.games
+
+
+def interaction(
+    a1: CellSummary,
+    a0: CellSummary,
+    b1: CellSummary,
+    b0: CellSummary,
+    metric: str,
+    label: str,
+) -> Estimate:
+    """``(a1 - a0) - (b1 - b0)`` on ``metric``. Four independent cells."""
+    parts = [cell_metric(c, metric) for c in (a1, a0, b1, b0)]
+    if any(n == 0 for _, _, n in parts):
+        return Estimate(label, 0.0, intervals.Interval(0.0, 0.0, 0.0, 0.95), 1.0, 0, 0,
+                        note="empty arm")
+    values = [v for v, _, _ in parts]
+    estimate = (values[0] - values[1]) - (values[2] - values[3])
+    se = sum(var for _, var, _ in parts) ** 0.5
+    z_crit = intervals.z_for(0.95)
+    interval = intervals.Interval(
+        estimate, estimate - z_crit * se, estimate + z_crit * se, 0.95
+    )
+    p_value = estimands.two_sided_p(estimate / se) if se > 0 else 1.0
+    total = sum(n for _, _, n in parts)
+    return Estimate(label, estimate, interval, p_value, total, total)
+
+
+def pooled_interaction(
+    a1: Sequence[CellSummary],
+    a0: Sequence[CellSummary],
+    b1: Sequence[CellSummary],
+    b0: Sequence[CellSummary],
+    metric: str,
+    label: str,
+) -> Estimate:
+    """The same, with each arm pooled over many cells.
+
+    This is what makes RQ-7 free: a two-way interaction among EX-4's seven
+    axes averages each arm over the other five, so every arm is 42 cells and
+    the contrast rests on far more games than any single cell holds.
+    """
+    def combine(cells: Sequence[CellSummary]) -> tuple[float, float, int]:
+        parts = [cell_metric(c, metric) for c in cells]
+        total = sum(n for _, _, n in parts)
+        if total == 0:
+            return 0.0, 0.0, 0
+        # Weighted mean, and the variance of that weighted mean.
+        value = sum(v * n for v, _, n in parts) / total
+        variance = sum(var * (n / total) ** 2 for _, var, n in parts)
+        return value, variance, total
+
+    arms = [combine(group) for group in (a1, a0, b1, b0)]
+    if any(n == 0 for _, _, n in arms):
+        return Estimate(label, 0.0, intervals.Interval(0.0, 0.0, 0.0, 0.95), 1.0, 0, 0,
+                        note="empty arm")
+    values = [v for v, _, _ in arms]
+    estimate = (values[0] - values[1]) - (values[2] - values[3])
+    se = sum(var for _, var, _ in arms) ** 0.5
+    z_crit = intervals.z_for(0.95)
+    interval = intervals.Interval(
+        estimate, estimate - z_crit * se, estimate + z_crit * se, 0.95
+    )
+    p_value = estimands.two_sided_p(estimate / se) if se > 0 else 1.0
+    total = sum(n for _, _, n in arms)
+    return Estimate(label, estimate, interval, p_value, total, total)
+
+
+#: RQ-7's seven EX-4 axes, as (name, rule key, on level, off level). The two
+#: three-level axes are pinned to one contrast each — a 2x2 interaction needs
+#: two levels, and choosing them from the data afterwards would be a
+#: selection. `free_entry` is therefore not an RQ-7 level: cells carrying it
+#: have both entry axes pinned off (D-13) and could not form the four arms.
+RQ7_AXES: tuple[tuple[str, str, str, str], ...] = (
+    ("cold_start", "cold_start", "strict", "one_piece_out"),
+    ("capture_mode", "capture_mode", "mandatory", "optional"),
+    ("dreimal", "dreimal_wuerfeln", "True", "False"),
+    ("bonus_quick", "bonus_roll_after_quick_entry", "True", "False"),
+    ("goal_no_jump", "goal_no_jump", "True", "False"),
+    ("barriers", "barriers", "True", "False"),
+    ("bonus_forfeited", "bonus_roll_forfeited", "True", "False"),
+)
+
+#: The nine §2.4 axis contrasts as *named rule configurations*, which is how
+#: EX-9, EX-10 and EX-12 key their cells. ``bonus_quick`` is nested under
+#: ``dreimal`` (§2.4), so its off-level is the ``dreimal`` configuration and
+#: not the baseline — otherwise the contrast would move two flags at once and
+#: attribute the whole effect to one of them.
+CONFIG_AXES: tuple[tuple[str, str, str], ...] = (
+    ("cold_start:strict", "cold_start=strict", "baseline"),
+    ("cold_start:free_entry", "cold_start=free_entry", "baseline"),
+    ("capture:mandatory", "capture=mandatory", "baseline"),
+    ("capture:mandatory_extended", "capture=mandatory_extended", "baseline"),
+    ("dreimal", "dreimal", "baseline"),
+    ("bonus_quick", "bonus_quick", "dreimal"),
+    ("goal_no_jump", "goal_no_jump", "baseline"),
+    ("barriers", "barriers", "baseline"),
+    ("bonus_forfeited", "bonus_forfeited", "baseline"),
+)
+
+#: RQ-9 and RQ-10 contrast each player count against four, which is the count
+#: the rest of the plan uses as its reference.
+PLAYER_CONTRASTS = (2, 3, 6)
+REFERENCE_PLAYERS = 4
+
+
+def _family(
+    name: str,
+    rows: Sequence[tuple[str, Estimate]],
+    unavailable: Sequence[str],
+) -> FamilyResult:
+    estimates = [estimate for _, estimate in rows]
+    hypotheses = [
+        Hypothesis(name, "interaction", contrast) for contrast, _ in rows
+    ]
+    results = holm([e.p_value for e in estimates], hypotheses) if estimates else []
+    return FamilyResult(name, estimates, results, list(unavailable))
+
+
+def rq7(data: Dataset, *, seed: int = 0, resamples: int = 0) -> FamilyResult:
+    """Rule x rule, pooled over EX-4's factorial (§17).
+
+    Free: a two-way interaction among seven axes averages each of its four
+    arms over the other five, so every arm is 42 of EX-4's 168 cells. At
+    40,000 games per cell that is 1.68M games per arm against the 601,249 a
+    0.5 pp interaction needs. The factorial was already paid for by RQ-2.
+    """
+    del seed, resamples
+    keys = data.matching("ex4/")
+    rows: list[tuple[str, Estimate]] = []
+    unavailable: list[str] = []
+
+    def level(key: str, rule: str) -> str:
+        return data.rules.get(key, {}).get(rule, "")
+
+    for (name_a, rule_a, on_a, off_a), (name_b, rule_b, on_b, off_b) in (
+        itertools.combinations(RQ7_AXES, 2)
+    ):
+        def arm(
+            a_level: str,
+            b_level: str,
+            _rule_a: str = rule_a,
+            _rule_b: str = rule_b,
+        ) -> list[CellSummary]:
+            # Bound as defaults, not captured: a closure over the loop
+            # variables would read whatever the last pair left behind if it
+            # ever outlived its iteration — the same trap the game loop's
+            # ``_take`` avoids the same way.
+            return [
+                data.cells[k]
+                for k in keys
+                if level(k, _rule_a) == a_level and level(k, _rule_b) == b_level
+            ]
+
+        arms = (arm(on_a, on_b), arm(on_a, off_b), arm(off_a, on_b), arm(off_a, off_b))
+        contrast = f"{name_a} x {name_b}"
+        if any(not group for group in arms):
+            # The nested axis has no (dreimal off, bonus on) cell by
+            # construction, so that pair genuinely has no interaction to
+            # estimate. Named rather than dropped.
+            unavailable.extend(f"{metric} @ {contrast}" for metric in INTERACTION_METRICS)
+            continue
+        for metric in INTERACTION_METRICS:
+            rows.append(
+                (
+                    f"{contrast} :: {metric}",
+                    pooled_interaction(*arms, metric, f"{metric} :: {contrast}"),
+                )
+            )
+    return _family("RQ-7", rows, unavailable)
+
+
+def _config_interaction_family(
+    data: Dataset,
+    name: str,
+    key_for: Callable[[str, str], str],
+    variants: Sequence[tuple[str, str]],
+) -> FamilyResult:
+    """Every §2.4 axis crossed with each entry of ``variants``.
+
+    ``key_for(variant, config)`` names the cell; ``variants`` supplies the
+    other factor and its baseline as ``(label, baseline_label)`` pairs.
+    """
+    rows: list[tuple[str, Estimate]] = []
+    unavailable: list[str] = []
+    for (axis, on_config, off_config), (variant, base_variant) in itertools.product(
+        CONFIG_AXES, variants
+    ):
+        contrast = f"{axis} x {variant}"
+        cells = [
+            data.cells.get(key_for(variant, on_config)),
+            data.cells.get(key_for(variant, off_config)),
+            data.cells.get(key_for(base_variant, on_config)),
+            data.cells.get(key_for(base_variant, off_config)),
+        ]
+        if any(c is None for c in cells):
+            unavailable.extend(f"{metric} @ {contrast}" for metric in INTERACTION_METRICS)
+            continue
+        a1, a0, b1, b0 = (c for c in cells if c is not None)
+        for metric in INTERACTION_METRICS:
+            rows.append(
+                (
+                    f"{contrast} :: {metric}",
+                    interaction(a1, a0, b1, b0, metric, f"{metric} :: {contrast}"),
+                )
+            )
+    return _family(name, rows, unavailable)
+
+
+def rq8(data: Dataset, *, seed: int = 0, resamples: int = 0) -> FamilyResult:
+    """Rule x strategy: does a rule change what a strategy is worth? (EX-9)"""
+    del seed, resamples
+    return _config_interaction_family(
+        data,
+        "RQ-8",
+        lambda field, config: f"ex9/4s4p/{field}/{config}",
+        (("spread", "random"), ("focus_front", "random"),
+         ("focus_rear", "random"), ("greedy_capture", "random")),
+    )
+
+
+def rq9(data: Dataset, *, seed: int = 0, resamples: int = 0) -> FamilyResult:
+    """Rule x player count, all on the 6-seat board (D-12). EX-10."""
+    del seed, resamples
+    return _config_interaction_family(
+        data,
+        "RQ-9",
+        lambda players, config: f"ex10/6s{players}p/random/{config}",
+        tuple((str(p), str(REFERENCE_PLAYERS)) for p in PLAYER_CONTRASTS),
+    )
+
+
+def rq10(data: Dataset, *, seed: int = 0, resamples: int = 0) -> FamilyResult:
+    """Strategy x player count (EX-11 against EX-10's baseline arms)."""
+    del seed, resamples
+    rows: list[tuple[str, Estimate]] = []
+    unavailable: list[str] = []
+    for deviant, players in itertools.product(
+        ("spread", "focus_front", "focus_rear", "greedy_capture"), PLAYER_CONTRASTS
+    ):
+        contrast = f"{deviant} x {players}p"
+        cells = [
+            data.cells.get(f"ex11/6s{players}p/{deviant}-vs-random/baseline"),
+            data.cells.get(f"ex10/6s{players}p/random/baseline"),
+            data.cells.get(f"ex11/6s{REFERENCE_PLAYERS}p/{deviant}-vs-random/baseline"),
+            data.cells.get(f"ex10/6s{REFERENCE_PLAYERS}p/random/baseline"),
+        ]
+        if any(c is None for c in cells):
+            unavailable.extend(f"{metric} @ {contrast}" for metric in INTERACTION_METRICS)
+            continue
+        a1, a0, b1, b0 = (c for c in cells if c is not None)
+        for metric in INTERACTION_METRICS:
+            rows.append(
+                (
+                    f"{contrast} :: {metric}",
+                    interaction(a1, a0, b1, b0, metric, f"{metric} :: {contrast}"),
+                )
+            )
+    return _family("RQ-10", rows, unavailable)
+
+
+def rq11(data: Dataset, *, seed: int = 0, resamples: int = 0) -> FamilyResult:
+    """Rule x seating: does a rule land differently by where people sit? EX-12."""
+    del seed, resamples
+    return _config_interaction_family(
+        data,
+        "RQ-11",
+        lambda pattern, config: f"ex12/2p/4s-{pattern}/random/{config}",
+        (("opposite", "adjacent"),),
+    )
