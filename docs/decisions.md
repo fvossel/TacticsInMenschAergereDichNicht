@@ -1641,6 +1641,32 @@ touches the helper. The player-count guard is split so each bound carries its
 own message and citation.
 **Affects.** §2.2, AK-8b, D-30.
 
+### D-68 — AK-7 result, and NF-2 restated per turn
+**Status:** `pinned` · *amends NF-2* · *measured 2026-08-01*
+**Result.** AK-7 **missed**: 235–282 games/s on the baseline cell and 32–34 on
+the worst case, against NF-2's 1,000.
+**Why the target as written is not one budget.** The two cells differ 6.5× in
+*game length* — 442 turns against 2,894 — because a 6-player play-out game is
+simply longer. Per turn they are within 1.3× of each other (8.0 µs against
+10.3 µs). NF-2's figure is stated per game and calibrated on baseline games,
+so it silently means a different budget in every cell, and no optimization can
+close a 32× gap that is mostly a rule property.
+**Amendment.** NF-2's target is restated as **≤ 2.3 µs per turn** (the per-turn
+equivalent of 1,000 baseline games/s). Measured: **8.0 µs**, i.e. 3.5× over —
+which is the quantity an optimization pass can actually move.
+**NF-2's blocking clause is lifted.** "Optimized before any feature work
+continues" was written when NF-3 capped workers at 8. D-48 removed the cap,
+and the D-59 plan measures at **60 CPU-hours — 28 minutes on one 128-core
+node, 7 on four**, weighted over twelve representative configurations rather
+than extrapolated. Performance is therefore not on the critical path and does
+not gate AK-1 or the milestones after it.
+**Optimization candidate, recorded not acted on.** `_ring_occupancy` is
+rebuilt from scratch on every `legal_moves` call (~78k calls per 150 baseline
+games) and drives most of the 586k `ring_field` calls. Carrying occupancy
+incrementally is an M2 design question at the `GameState` boundary, and it
+should run against a green AK-1 suite rather than blind.
+**Affects.** NF-2, NF-3, AK-7, D-43c, D-48, D-59.
+
 ---
 
 ## Open items
