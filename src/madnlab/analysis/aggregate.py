@@ -50,9 +50,24 @@ class CellSummary(NamedTuple):
     stalemated: int
     capture_forcing_offered: int
     capture_forcing_violations: int
+    forced_extra_lap_offered: int
+    forced_extra_lap_violations: int
     forced_extra_laps: int
     mean_rounds_to_first_win: float
     rounds_to_first_win: tuple[int, ...]
+    #: Per-game vectors the §6.4 contrasts resample. Kept as vectors rather
+    #: than means because SQ-6 makes the game the unit and a bootstrap needs
+    #: the sample, not its summary.
+    lead_changes_per_turn: tuple[float, ...]
+    #: Games whose winner's 50% checkpoint rank is defined — the denominator
+    #: for both dynamics proportions. Smaller than ``games`` exactly when a
+    #: game never produced a first win.
+    checkpointed: int
+    comebacks: int
+    leader_at_50_won: int
+    #: Mean of every numeric §6.2 field, for the §14.4 all-results table. A
+    #: cell publishes its whole battery whether or not a hypothesis reads it.
+    metric_means: dict[str, float]
 
 
 def summarize_cell(rows: Sequence[dict[str, Any]]) -> CellSummary:
@@ -73,6 +88,40 @@ def summarize_cell(rows: Sequence[dict[str, Any]]) -> CellSummary:
     wins_by_offset: dict[int, int] = dict.fromkeys(range(len(seat_list)), 0)
     lengths: list[int] = []
     abandoned = stalemated = offered = violations = laps = 0
+    lap_offered = lap_violations = 0
+    changes_per_turn: list[float] = []
+    checkpointed = comebacks = leader_won = 0
+    #: Scalar §6.2 fields, plus the per-seat ones summed to a game total. The
+    #: sum is the k-comparable form for a battery table; per-seat profiles are
+    #: what AK-4 and the seat contrasts read, and they read the rows directly.
+    scalar_fields = (
+        "turns",
+        "rounds",
+        "dice_rolls",
+        "turns_to_first_win",
+        "rounds_to_first_win",
+        "captures_total",
+        "lead_changes",
+        "turns_without_leader",
+        "barriers_formed",
+        "barrier_turns",
+        "capture_forcing_offered",
+        "forced_extra_lap_offered",
+        "winner_rank_at_50",
+        "winner_rank_at_75",
+        "comeback_depth",
+        "final_margin",
+        "final_margin_norm",
+    )
+    vector_fields = (
+        "captures_by_seat",
+        "captured_by_seat",
+        "passes_by_seat",
+        "entry_waits_by_seat",
+        "extra_laps_by_seat",
+        "barrier_turns_by_seat",
+    )
+    totals: dict[str, float] = dict.fromkeys(scalar_fields + vector_fields, 0.0)
 
     for row in rows:
         winner = row["winner"]
@@ -89,8 +138,25 @@ def summarize_cell(rows: Sequence[dict[str, Any]]) -> CellSummary:
         stalemated += bool(row["stalemate"])
         offered += row["capture_forcing_offered"]
         violations += row["capture_forcing_violations"]
+        lap_offered += row["forced_extra_lap_offered"]
+        lap_violations += row["forced_extra_lap_violations"]
         laps += sum(row["extra_laps_by_seat"])
 
+        # The per-turn form is the k-comparable one (§6.2), and the segment
+        # it belongs to is the first-win segment.
+        segment = row["turns_to_first_win"]
+        changes_per_turn.append(row["lead_changes"] / segment if segment else 0.0)
+        if row["winner_rank_at_50"] > 0:
+            checkpointed += 1
+            comebacks += bool(row["comeback"])
+            leader_won += row["winner_rank_at_50"] == 1
+
+        for field in scalar_fields:
+            totals[field] += row[field]
+        for field in vector_fields:
+            totals[field] += sum(row[field])
+
+    games = len(rows)
     return CellSummary(
         cell_key=first["cell_key"],
         games=len(rows),
@@ -103,9 +169,16 @@ def summarize_cell(rows: Sequence[dict[str, Any]]) -> CellSummary:
         stalemated=stalemated,
         capture_forcing_offered=offered,
         capture_forcing_violations=violations,
+        forced_extra_lap_offered=lap_offered,
+        forced_extra_lap_violations=lap_violations,
         forced_extra_laps=laps,
         mean_rounds_to_first_win=sum(lengths) / len(lengths),
         rounds_to_first_win=tuple(lengths),
+        lead_changes_per_turn=tuple(changes_per_turn),
+        checkpointed=checkpointed,
+        comebacks=comebacks,
+        leader_at_50_won=leader_won,
+        metric_means={field: value / games for field, value in totals.items()},
     )
 
 
@@ -258,13 +331,19 @@ class AK5Result(NamedTuple):
     games: int
     offered: int
     violations: int
+    #: §11's second half. It was specified from the start and never
+    #: implemented, so AK-5 reported PASS on one of its two invariants for
+    #: every cell of every campaign (D-75).
+    lap_offered: int
+    lap_violations: int
     passed: bool
 
     def report(self) -> str:
         return (
             f"AK-5  {self.cell_key}  n={self.games:,}  "
-            f"capture obligations offered {self.offered:,}  "
-            f"violations {self.violations}  "
+            f"capture obligations offered {self.offered:,} violations {self.violations}  "
+            f"extra-lap obligations offered {self.lap_offered:,} "
+            f"violations {self.lap_violations}  "
             f"{'PASS' if self.passed else 'FAIL'}"
         )
 
@@ -284,7 +363,13 @@ def ak5(cell: CellSummary) -> AK5Result:
         games=cell.games,
         offered=cell.capture_forcing_offered,
         violations=cell.capture_forcing_violations,
-        passed=cell.capture_forcing_violations == 0 and cell.capture_forcing_offered > 0,
+        lap_offered=cell.forced_extra_lap_offered,
+        lap_violations=cell.forced_extra_lap_violations,
+        passed=(
+            cell.capture_forcing_violations == 0
+            and cell.forced_extra_lap_violations == 0
+            and cell.capture_forcing_offered > 0
+        ),
     )
 
 

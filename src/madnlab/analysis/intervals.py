@@ -191,6 +191,102 @@ def bca_bootstrap(
     )
 
 
+def bca_two_sample(
+    sample_a: Sequence[float],
+    sample_b: Sequence[float],
+    statistic: Callable[[Sequence[float], Sequence[float]], float],
+    *,
+    resamples: int = 1_000,
+    level: float = 0.95,
+    seed: int,
+    jackknife_groups: int = 100,
+) -> Interval:
+    """BCa for a two-sample contrast — a difference or a ratio between arms.
+
+    Not expressible through :func:`bca_bootstrap`. Concatenating the arms and
+    resampling the result mixes them in every draw, which produces the
+    *permutation null* rather than a confidence interval: the point estimate
+    lands outside its own interval, which is how this was caught. Each arm has
+    to be resampled independently, because each arm is its own population.
+
+    **Grouped jackknife.** Textbook BCa jackknifes one observation at a time —
+    O(n) statistic evaluations, each O(n). At the confirmatory sample sizes
+    (250k games per arm) that is 10^11 operations and simply cannot be run.
+    The acceleration is therefore estimated by deleting *groups* of
+    consecutive observations, the standard delete-d construction. With
+    ``jackknife_groups`` at 100 the cost drops to 100 evaluations while the
+    skewness it measures is unchanged — the grouping is a variance-reduction
+    device, not an approximation of a different quantity.
+    """
+    values_a, values_b = list(sample_a), list(sample_b)
+    n_a, n_b = len(values_a), len(values_b)
+    if n_a < 2 or n_b < 2:
+        raise ValueError(f"BCa needs at least 2 observations per arm, got {n_a}/{n_b}")
+    if resamples < 100:
+        raise ValueError(f"resamples must be at least 100, got {resamples}")
+
+    observed = statistic(values_a, values_b)
+    rng = random.Random(seed)
+    replicates = sorted(
+        statistic(
+            rng.choices(values_a, k=n_a),
+            rng.choices(values_b, k=n_b),
+        )
+        for _ in range(resamples)
+    )
+
+    below = sum(1 for value in replicates if value < observed)
+    if below == 0 or below == resamples:
+        alpha = (1 - level) / 2
+        return Interval(
+            estimate=observed,
+            low=_percentile(replicates, alpha),
+            high=_percentile(replicates, 1 - alpha),
+            level=level,
+        )
+    z0 = _NORMAL.inv_cdf(below / resamples)
+
+    jackknife: list[float] = []
+    for arm, (values, other, first) in enumerate(
+        ((values_a, values_b, True), (values_b, values_a, False))
+    ):
+        groups = min(jackknife_groups, len(values))
+        size = len(values) // groups
+        for index in range(groups):
+            start = index * size
+            stop = len(values) if index == groups - 1 else start + size
+            reduced = values[:start] + values[stop:]
+            if len(reduced) < 2:
+                continue
+            jackknife.append(
+                statistic(reduced, other) if first else statistic(other, reduced)
+            )
+        del arm
+
+    if len(jackknife) < 2:
+        acceleration = 0.0
+    else:
+        mean_jack = sum(jackknife) / len(jackknife)
+        deviations = [mean_jack - value for value in jackknife]
+        numerator = sum(d**3 for d in deviations)
+        denominator = 6 * (sum(d * d for d in deviations) ** 1.5)
+        acceleration = numerator / denominator if denominator else 0.0
+
+    z_alpha = z_for(level)
+    lower_fraction = _NORMAL.cdf(
+        z0 + (z0 - z_alpha) / (1 - acceleration * (z0 - z_alpha))
+    )
+    upper_fraction = _NORMAL.cdf(
+        z0 + (z0 + z_alpha) / (1 - acceleration * (z0 + z_alpha))
+    )
+    return Interval(
+        estimate=observed,
+        low=_percentile(replicates, lower_fraction),
+        high=_percentile(replicates, upper_fraction),
+        level=level,
+    )
+
+
 def coefficient_of_variation(values: Sequence[float]) -> float:
     """SD over mean. The scale-free dispersion measure SQ-3 makes primary."""
     n = len(values)

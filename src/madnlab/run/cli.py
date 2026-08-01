@@ -21,6 +21,7 @@ from madnlab.analysis.config import AnalysisConfig, manifest, write_manifest
 from madnlab.run.campaign import run_cell, summary_bytes
 from madnlab.run.config import ConfigError, load, resolved_payload, total_games
 from madnlab.run.counterbalance import describe
+from madnlab.run.game import PREREG_VERSION
 
 
 def _write_gzip(path: Path, payload: bytes) -> None:
@@ -182,6 +183,69 @@ def analyse(campaign_dir: Path, analysis_seed: int) -> int:
     return 1 if failed else 0
 
 
+def build_report(
+    run_dirs: list[Path], out: Path, analysis_seed: int, resamples: int
+) -> int:
+    """Run §6.4's four families over every campaign and write the §8 report."""
+    from madnlab.analysis import families, report
+
+    data = families.load_dataset(run_dirs)
+    if not data.cells:
+        print(f"no campaign data in {[str(d) for d in run_dirs]}", file=sys.stderr)
+        return 2
+    print(f"{len(data.cells)} cells, {sum(c.games for c in data.cells.values()):,} games")
+
+    started = time.perf_counter()
+    results = []
+    for name, function in (
+        ("RQ-1", families.rq1),
+        ("RQ-2", families.rq2),
+        ("RQ-3", families.rq3),
+        ("RQ-4", families.rq4),
+    ):
+        family_started = time.perf_counter()
+        result = function(data, seed=analysis_seed, resamples=resamples)
+        rejected = sum(1 for r in result.holm if r.rejected)
+        print(
+            f"  {name}: {len(result.estimates)} tests, {rejected} rejected, "
+            f"{len(result.unavailable)} unavailable "
+            f"({time.perf_counter() - family_started:.1f}s)"
+        )
+        results.append(result)
+
+    verdict = families.rq1_verdict(results[0])
+    print(f"\nRQ-1: {'SUPPORTED' if verdict.supported else 'NOT SUPPORTED'}")
+    for line in verdict.detail:
+        print(f"  {line}")
+
+    # A cell is confirmatory when a §6.4 contrast reads it. Derived from the
+    # sample sizes §8 assigned rather than re-listed here, so the label cannot
+    # drift from the plan that produced it.
+    confirmatory = {
+        key for key, cell in data.cells.items() if cell.games > 20_100
+    }
+    document = report.render(
+        data,
+        results,
+        verdict,
+        confirmatory=confirmatory,
+        provenance={
+            "prereg_version": PREREG_VERSION,
+            "engine_version": ENGINE_VERSION,
+            "campaigns": ", ".join(sorted(d.name for d in run_dirs)),
+            "analysis_seed": analysis_seed,
+            "resamples": resamples,
+        },
+    )
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(document, encoding="utf-8", newline="\n")
+    print(
+        f"\n-> {out} ({len(document):,} bytes, "
+        f"{time.perf_counter() - started:.1f}s total)"
+    )
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="madnlab", description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
@@ -198,6 +262,14 @@ def main(argv: list[str] | None = None) -> int:
     analyse_cmd.add_argument("campaign_dir", type=Path)
     analyse_cmd.add_argument("--analysis-seed", type=int, default=20260801)
 
+    report_cmd = sub.add_parser(
+        "report", help="run the §6.4 families over every campaign and write results.md"
+    )
+    report_cmd.add_argument("run_dirs", type=Path, nargs="+")
+    report_cmd.add_argument("--out", type=Path, required=True)
+    report_cmd.add_argument("--analysis-seed", type=int, default=20260801)
+    report_cmd.add_argument("--resamples", type=int, default=1_000)
+
     args = parser.parse_args(argv)
     try:
         if args.command == "check":
@@ -209,6 +281,10 @@ def main(argv: list[str] | None = None) -> int:
             return 0
         if args.command == "analyse":
             return analyse(args.campaign_dir, args.analysis_seed)
+        if args.command == "report":
+            return build_report(
+                args.run_dirs, args.out, args.analysis_seed, args.resamples
+            )
         return run_campaign(args.config, args.out, args.workers)
     except ConfigError as error:
         print(f"configuration error: {error}", file=sys.stderr)

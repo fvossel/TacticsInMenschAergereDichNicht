@@ -41,9 +41,16 @@ def cell(
         stalemated=0,
         capture_forcing_offered=0,
         capture_forcing_violations=0,
+        forced_extra_lap_offered=0,
+        forced_extra_lap_violations=0,
         forced_extra_laps=0,
         mean_rounds_to_first_win=0.0,
         rounds_to_first_win=(),
+        lead_changes_per_turn=(),
+        checkpointed=0,
+        comebacks=0,
+        leader_at_50_won=0,
+        metric_means={},
     )
 
 
