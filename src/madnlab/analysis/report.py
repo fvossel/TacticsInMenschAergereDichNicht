@@ -215,20 +215,51 @@ def seat_profile_table(
     measurement, and it is the one AK-4 is deliberately not allowed to gate on
     (D-74). This table is exactly those cells.
     """
-    lines = [
-        "| Cell | n | per-seat win rates | spread |",
-        "|---|---:|---|---:|",
-    ]
+    profiles: list[tuple[float, str, int, str]] = []
     for key in sorted(cells):
         cell = cells[key]
         if seats_exchangeable(cell.occupied, cell.seats, agents.get(key, ())):
             continue
         rates = [cell.wins_by_seat.get(seat, 0) / cell.games for seat in cell.occupied]
-        profile = " / ".join(f"{rate * 100:.2f}%" for rate in rates)
-        lines.append(
-            f"| `{key}` | {cell.games:,} | {profile} | "
-            f"{(max(rates) - min(rates)) * 100:.2f} pp |"
+        profiles.append(
+            (
+                (max(rates) - min(rates)) * 100,
+                key,
+                cell.games,
+                " / ".join(f"{rate * 100:.2f}%" for rate in rates),
+            )
         )
+
+    lines: list[str] = []
+    if profiles:
+        widest = sorted(profiles, reverse=True)[:5]
+        lines.extend(
+            [
+                f"**The largest asymmetries, of {len(profiles)} such cells.** These "
+                "are **not pre-registered**: no §6.4 hypothesis asks about them, "
+                "they carry no multiplicity correction, and they are reported "
+                "because §14.4 requires every result to appear — not as a claim "
+                "the study set out to test. Anything here worth believing needs "
+                "its own pre-registered replication.",
+                "",
+            ]
+        )
+        lines.extend(
+            f"- `{key}` — {profile} (**{spread:.2f} pp**, n = {games:,})"
+            for spread, key, games, profile in widest
+        )
+        lines.append("")
+
+    lines.extend(
+        [
+            "| Cell | n | per-seat win rates | spread |",
+            "|---|---:|---|---:|",
+        ]
+    )
+    lines.extend(
+        f"| `{key}` | {games:,} | {profile} | {spread:.2f} pp |"
+        for spread, key, games, profile in profiles
+    )
     return lines
 
 

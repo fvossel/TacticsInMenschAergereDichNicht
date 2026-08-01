@@ -14,7 +14,7 @@ Measured effects of the optional rules and movement strategies of *Mensch ärger
 
 ## 1. Reading this document
 
-Sections 2 and 3 are **confirmatory**: 40 hypotheses fixed in §6.4 before any campaign ran, Holm-corrected within each family. Section 5 is **descriptive** — computed, published, and explicitly not error-controlled. §14.4 requires every §6.2 metric of every cell to appear whether or not anything depends on it, which is why section 5 is long and unselective.
+Sections 2 and 3 are **confirmatory**: 40 hypotheses fixed in §6.4 before any campaign ran, Holm-corrected within each family. Sections 4 to 6 are **descriptive** — computed, published, and explicitly not error-controlled. §14.4 requires every §6.2 metric of every cell to appear whether or not anything depends on it, which is why section 6 is long and unselective.
 
 Game outcomes: **0 abandoned**, **0 stalemated** out of 16,430,642. Both are measured outcomes of the rule set (D-69, D-70), not errors; no estimand is published from a cell with a non-negligible rate without saying so.
 
@@ -505,7 +505,171 @@ AK-4 is a harness and geometry gate scoped to the calibration cells (§11, D-74)
 | `ex6f/6s6p/spread-vs-random/mandatory_extended` | INCONCLUSIVE | no | 0.6858 | 4,458,073 / 0 | 84,538 / 0 |
 | `ex6f/6s6p/spread-vs-random/optional` | INCONCLUSIVE | no | 0.6764 | — | — |
 
-## 4. Starting-player advantage
+## 4. Seat profiles where seats are not exchangeable
+
+Where the field is homogeneous and the seats are exchangeable, §6.3's symmetry identity fixes every seat at 1/k for any rule set, so a per-seat rate there states arithmetic rather than a measurement. These are the cells where that does not hold — an uneven seating gap, or one seat playing a different policy — and the profile is the finding. AK-4 reports these as failures and deliberately does not gate on them (D-74): the asymmetry is what EX-5 set out to measure.
+
+| Cell | n | per-seat win rates | spread |
+|---|---:|---|---:|
+| `ex2/4s2p/greedy_capture/mandatory` | 20,000 | 50.61% / 49.39% | 1.22 pp |
+| `ex2/4s2p/greedy_capture/mandatory_extended` | 20,000 | 52.59% / 47.41% | 5.18 pp |
+| `ex2/4s2p/greedy_capture/optional` | 20,000 | 49.80% / 50.20% | 0.39 pp |
+| `ex2/4s2p/random/mandatory` | 20,000 | 50.32% / 49.68% | 0.64 pp |
+| `ex2/4s2p/random/mandatory_extended` | 20,000 | 53.41% / 46.59% | 6.83 pp |
+| `ex2/4s2p/random/optional` | 20,000 | 47.83% / 52.18% | 4.35 pp |
+| `ex2/4s2p/spread/mandatory` | 20,000 | 39.61% / 60.39% | 20.78 pp |
+| `ex2/4s2p/spread/mandatory_extended` | 20,000 | 40.80% / 59.20% | 18.40 pp |
+| `ex2/4s2p/spread/optional` | 20,000 | 35.55% / 64.45% | 28.91 pp |
+| `ex2/4s3p/greedy_capture/mandatory` | 20,001 | 33.07% / 34.24% / 32.69% | 1.55 pp |
+| `ex2/4s3p/greedy_capture/mandatory_extended` | 20,001 | 35.54% / 33.16% / 31.30% | 4.24 pp |
+| `ex2/4s3p/greedy_capture/optional` | 20,001 | 33.40% / 33.81% / 32.79% | 1.02 pp |
+| `ex2/4s3p/random/mandatory` | 20,001 | 33.71% / 33.86% / 32.43% | 1.43 pp |
+| `ex2/4s3p/random/mandatory_extended` | 20,001 | 35.39% / 33.71% / 30.90% | 4.48 pp |
+| `ex2/4s3p/random/optional` | 20,001 | 33.97% / 34.14% / 31.88% | 2.26 pp |
+| `ex2/4s3p/spread/mandatory` | 20,001 | 30.45% / 36.44% / 33.10% | 5.99 pp |
+| `ex2/4s3p/spread/mandatory_extended` | 20,001 | 30.96% / 36.39% / 32.65% | 5.42 pp |
+| `ex2/4s3p/spread/optional` | 20,001 | 29.78% / 37.37% / 32.85% | 7.58 pp |
+| `ex3/deviant/4s2p/focus_front-vs-focus_rear` | 20,000 | 51.34% / 48.66% | 2.68 pp |
+| `ex3/deviant/4s2p/focus_front-vs-random` | 20,000 | 51.14% / 48.86% | 2.28 pp |
+| `ex3/deviant/4s2p/focus_front-vs-spread` | 20,000 | 50.89% / 49.11% | 1.78 pp |
+| `ex3/deviant/4s2p/focus_rear-vs-focus_front` | 20,000 | 51.50% / 48.50% | 3.00 pp |
+| `ex3/deviant/4s2p/focus_rear-vs-random` | 20,000 | 45.40% / 54.61% | 9.21 pp |
+| `ex3/deviant/4s2p/focus_rear-vs-spread` | 20,000 | 37.59% / 62.41% | 24.83 pp |
+| `ex3/deviant/4s2p/random-vs-focus_front` | 20,000 | 50.43% / 49.56% | 0.87 pp |
+| `ex3/deviant/4s2p/random-vs-focus_rear` | 20,000 | 44.94% / 55.06% | 10.13 pp |
+| `ex3/deviant/4s2p/random-vs-spread` | 20,000 | 43.96% / 56.04% | 12.07 pp |
+| `ex3/deviant/4s2p/spread-vs-focus_front` | 20,000 | 51.48% / 48.52% | 2.96 pp |
+| `ex3/deviant/4s2p/spread-vs-focus_rear` | 20,000 | 37.85% / 62.14% | 24.29 pp |
+| `ex3/deviant/4s2p/spread-vs-random` | 20,000 | 44.03% / 55.97% | 11.94 pp |
+| `ex3/deviant/4s3p/focus_front-vs-focus_rear` | 20,007 | 33.35% / 34.09% / 32.56% | 1.53 pp |
+| `ex3/deviant/4s3p/focus_front-vs-random` | 20,007 | 34.21% / 33.55% / 32.24% | 1.97 pp |
+| `ex3/deviant/4s3p/focus_front-vs-spread` | 20,007 | 33.58% / 34.08% / 32.33% | 1.75 pp |
+| `ex3/deviant/4s3p/focus_rear-vs-focus_front` | 20,007 | 35.35% / 32.94% / 31.71% | 3.64 pp |
+| `ex3/deviant/4s3p/focus_rear-vs-random` | 20,007 | 33.11% / 34.50% / 32.39% | 2.10 pp |
+| `ex3/deviant/4s3p/focus_rear-vs-spread` | 20,007 | 30.10% / 36.27% / 33.63% | 6.17 pp |
+| `ex3/deviant/4s3p/random-vs-focus_front` | 20,007 | 34.79% / 33.23% / 31.98% | 2.81 pp |
+| `ex3/deviant/4s3p/random-vs-focus_rear` | 20,007 | 31.70% / 34.93% / 33.37% | 3.22 pp |
+| `ex3/deviant/4s3p/random-vs-spread` | 20,007 | 31.51% / 35.43% / 33.06% | 3.91 pp |
+| `ex3/deviant/4s3p/spread-vs-focus_front` | 20,007 | 35.78% / 33.17% / 31.05% | 4.73 pp |
+| `ex3/deviant/4s3p/spread-vs-focus_rear` | 20,007 | 30.47% / 36.45% / 33.07% | 5.98 pp |
+| `ex3/deviant/4s3p/spread-vs-random` | 20,007 | 32.59% / 34.95% / 32.46% | 2.48 pp |
+| `ex3/deviant/4s4p/focus_front-vs-focus_rear` | 20,000 | 25.21% / 24.65% / 25.02% / 25.11% | 0.55 pp |
+| `ex3/deviant/4s4p/focus_front-vs-random` | 200,000 | 25.09% / 24.98% / 24.91% / 25.01% | 0.18 pp |
+| `ex3/deviant/4s4p/focus_front-vs-spread` | 20,000 | 25.11% / 24.98% / 25.02% / 24.89% | 0.21 pp |
+| `ex3/deviant/4s4p/focus_rear-vs-focus_front` | 20,000 | 25.08% / 25.21% / 25.00% / 24.70% | 0.51 pp |
+| `ex3/deviant/4s4p/focus_rear-vs-random` | 200,000 | 25.04% / 25.09% / 24.76% / 25.11% | 0.34 pp |
+| `ex3/deviant/4s4p/focus_rear-vs-spread` | 20,000 | 24.70% / 24.79% / 25.49% / 25.03% | 0.79 pp |
+| `ex3/deviant/4s4p/random-vs-focus_front` | 20,000 | 24.85% / 25.16% / 25.74% / 24.25% | 1.50 pp |
+| `ex3/deviant/4s4p/random-vs-focus_rear` | 20,000 | 24.98% / 24.73% / 24.95% / 25.35% | 0.61 pp |
+| `ex3/deviant/4s4p/random-vs-spread` | 20,000 | 24.51% / 24.98% / 25.07% / 25.44% | 0.93 pp |
+| `ex3/deviant/4s4p/spread-vs-focus_front` | 20,000 | 24.89% / 24.87% / 25.16% / 25.07% | 0.29 pp |
+| `ex3/deviant/4s4p/spread-vs-focus_rear` | 20,000 | 25.62% / 25.36% / 24.54% / 24.48% | 1.13 pp |
+| `ex3/deviant/4s4p/spread-vs-random` | 200,000 | 25.00% / 25.17% / 24.70% / 25.13% | 0.47 pp |
+| `ex3/deviant/6s6p/focus_front-vs-focus_rear` | 20,016 | 17.15% / 16.20% / 16.80% / 16.52% / 16.88% / 16.47% | 0.95 pp |
+| `ex3/deviant/6s6p/focus_front-vs-random` | 20,016 | 16.64% / 16.55% / 16.22% / 17.06% / 16.99% / 16.55% | 0.84 pp |
+| `ex3/deviant/6s6p/focus_front-vs-spread` | 20,016 | 16.75% / 16.56% / 16.41% / 16.66% / 16.66% / 16.97% | 0.56 pp |
+| `ex3/deviant/6s6p/focus_rear-vs-focus_front` | 20,016 | 16.76% / 16.45% / 16.88% / 16.78% / 16.58% / 16.56% | 0.43 pp |
+| `ex3/deviant/6s6p/focus_rear-vs-random` | 20,016 | 16.85% / 16.15% / 16.79% / 16.64% / 16.97% / 16.61% | 0.81 pp |
+| `ex3/deviant/6s6p/focus_rear-vs-spread` | 20,016 | 16.67% / 16.47% / 16.94% / 17.03% / 16.20% / 16.70% | 0.83 pp |
+| `ex3/deviant/6s6p/random-vs-focus_front` | 20,016 | 17.00% / 17.36% / 16.25% / 16.13% / 16.98% / 16.29% | 1.22 pp |
+| `ex3/deviant/6s6p/random-vs-focus_rear` | 20,016 | 17.10% / 16.45% / 16.53% / 16.49% / 16.53% / 16.91% | 0.65 pp |
+| `ex3/deviant/6s6p/random-vs-spread` | 20,016 | 16.34% / 16.48% / 17.33% / 16.50% / 16.77% / 16.59% | 0.99 pp |
+| `ex3/deviant/6s6p/spread-vs-focus_front` | 20,016 | 16.38% / 16.50% / 16.75% / 16.60% / 17.10% / 16.67% | 0.72 pp |
+| `ex3/deviant/6s6p/spread-vs-focus_rear` | 20,016 | 16.60% / 16.60% / 16.92% / 16.84% / 16.63% / 16.42% | 0.49 pp |
+| `ex3/deviant/6s6p/spread-vs-random` | 20,016 | 16.77% / 16.77% / 16.69% / 16.88% / 16.58% / 16.31% | 0.57 pp |
+| `ex3/homogeneous/4s2p/focus_front` | 20,000 | 51.76% / 48.24% | 3.52 pp |
+| `ex3/homogeneous/4s2p/focus_rear` | 20,000 | 39.22% / 60.78% | 21.57 pp |
+| `ex3/homogeneous/4s2p/random` | 20,000 | 48.45% / 51.55% | 3.10 pp |
+| `ex3/homogeneous/4s2p/spread` | 20,000 | 35.77% / 64.23% | 28.46 pp |
+| `ex3/homogeneous/4s3p/focus_front` | 20,001 | 35.52% / 32.26% / 32.21% | 3.31 pp |
+| `ex3/homogeneous/4s3p/focus_rear` | 20,001 | 30.83% / 36.42% / 32.75% | 5.59 pp |
+| `ex3/homogeneous/4s3p/random` | 20,001 | 33.09% / 34.17% / 32.74% | 1.43 pp |
+| `ex3/homogeneous/4s3p/spread` | 20,001 | 29.47% / 37.59% / 32.94% | 8.12 pp |
+| `ex5/2p/adjacent/random` | 20,000 | 48.27% / 51.73% | 3.46 pp |
+| `ex5/2p/adjacent/spread` | 20,000 | 35.27% / 64.72% | 29.45 pp |
+| `ex5/3p/4s-adjacent/random` | 250,002 | 33.30% / 33.88% / 32.82% | 1.06 pp |
+| `ex5/3p/4s-adjacent/spread` | 250,002 | 29.88% / 37.19% / 32.93% | 7.31 pp |
+| `ex5/3p/6s-adjacent/random` | 250,002 | 32.94% / 34.82% / 32.23% | 2.59 pp |
+| `ex5/3p/6s-adjacent/spread` | 250,002 | 25.02% / 38.99% / 35.99% | 13.97 pp |
+| `ex6b/4s4p/focus_front-vs-random/mandatory` | 400,000 | 25.12% / 25.03% / 24.92% / 24.94% | 0.20 pp |
+| `ex6b/4s4p/focus_front-vs-random/mandatory_extended` | 400,000 | 25.10% / 25.07% / 24.95% / 24.87% | 0.23 pp |
+| `ex6b/4s4p/focus_front-vs-random/optional` | 400,000 | 24.94% / 24.81% / 25.08% / 25.17% | 0.36 pp |
+| `ex6b/4s4p/focus_rear-vs-random/mandatory` | 20,000 | 25.67% / 25.20% / 24.62% / 24.50% | 1.17 pp |
+| `ex6b/4s4p/focus_rear-vs-random/mandatory_extended` | 20,000 | 25.26% / 25.11% / 24.53% / 25.11% | 0.73 pp |
+| `ex6b/4s4p/focus_rear-vs-random/optional` | 20,000 | 24.39% / 25.39% / 24.96% / 25.26% | 1.00 pp |
+| `ex6b/4s4p/greedy_capture-vs-random/mandatory` | 20,000 | 25.25% / 24.81% / 24.91% / 25.04% | 0.44 pp |
+| `ex6b/4s4p/greedy_capture-vs-random/mandatory_extended` | 20,000 | 25.05% / 24.55% / 24.99% / 25.41% | 0.86 pp |
+| `ex6b/4s4p/greedy_capture-vs-random/optional` | 20,000 | 24.71% / 25.24% / 24.77% / 25.27% | 0.56 pp |
+| `ex6b/4s4p/spread-vs-random/mandatory` | 400,000 | 25.01% / 24.93% / 24.92% / 25.14% | 0.22 pp |
+| `ex6b/4s4p/spread-vs-random/mandatory_extended` | 400,000 | 25.12% / 24.96% / 24.94% / 24.98% | 0.18 pp |
+| `ex6b/4s4p/spread-vs-random/optional` | 400,000 | 24.97% / 25.00% / 25.02% / 25.01% | 0.05 pp |
+| `ex6d/4s4p/focus_front-vs-random/barriers=False` | 400,000 | 24.99% / 24.96% / 25.10% / 24.95% | 0.15 pp |
+| `ex6d/4s4p/focus_front-vs-random/barriers=True` | 400,000 | 25.01% / 24.98% / 25.06% / 24.95% | 0.12 pp |
+| `ex6d/4s4p/focus_rear-vs-random/barriers=False` | 20,000 | 25.00% / 25.00% / 24.74% / 25.26% | 0.52 pp |
+| `ex6d/4s4p/focus_rear-vs-random/barriers=True` | 20,000 | 24.77% / 25.01% / 24.90% / 25.32% | 0.56 pp |
+| `ex6d/4s4p/greedy_capture-vs-random/barriers=False` | 20,000 | 25.05% / 25.41% / 24.80% / 24.73% | 0.68 pp |
+| `ex6d/4s4p/greedy_capture-vs-random/barriers=True` | 20,000 | 25.64% / 24.93% / 24.52% / 24.91% | 1.12 pp |
+| `ex6d/4s4p/spread-vs-random/barriers=False` | 400,000 | 25.07% / 24.92% / 24.97% / 25.04% | 0.15 pp |
+| `ex6d/4s4p/spread-vs-random/barriers=True` | 400,000 | 24.98% / 24.99% / 24.98% / 25.05% | 0.07 pp |
+| `ex6e/6s2p/random/mandatory` | 400,000 | 50.32% / 49.68% | 0.64 pp |
+| `ex6e/6s2p/random/mandatory_extended` | 20,000 | 54.11% / 45.89% | 8.22 pp |
+| `ex6e/6s2p/random/optional` | 400,000 | 47.01% / 52.99% | 5.98 pp |
+| `ex6e/6s3p/random/mandatory` | 20,001 | 34.94% / 33.91% / 31.15% | 3.79 pp |
+| `ex6e/6s3p/random/mandatory_extended` | 20,001 | 38.37% / 32.99% / 28.64% | 9.72 pp |
+| `ex6e/6s3p/random/optional` | 20,001 | 32.74% / 34.60% / 32.65% | 1.95 pp |
+| `ex6e/6s4p/random/mandatory` | 20,000 | 26.17% / 25.85% / 24.97% / 23.00% | 3.17 pp |
+| `ex6e/6s4p/random/mandatory_extended` | 20,000 | 28.18% / 26.12% / 24.44% / 21.27% | 6.91 pp |
+| `ex6e/6s4p/random/optional` | 20,000 | 25.41% / 27.15% / 25.46% / 21.98% | 5.18 pp |
+| `ex6f/6s2p/focus_front-vs-random/mandatory` | 20,000 | 54.87% / 45.13% | 9.74 pp |
+| `ex6f/6s2p/focus_front-vs-random/mandatory_extended` | 20,000 | 56.39% / 43.60% | 12.79 pp |
+| `ex6f/6s2p/focus_front-vs-random/optional` | 20,000 | 52.25% / 47.74% | 4.51 pp |
+| `ex6f/6s2p/focus_rear-vs-random/mandatory` | 20,000 | 46.32% / 53.68% | 7.36 pp |
+| `ex6f/6s2p/focus_rear-vs-random/mandatory_extended` | 20,000 | 50.42% / 49.58% | 0.85 pp |
+| `ex6f/6s2p/focus_rear-vs-random/optional` | 20,000 | 43.23% / 56.77% | 13.55 pp |
+| `ex6f/6s2p/greedy_capture-vs-random/mandatory` | 20,000 | 50.29% / 49.71% | 0.57 pp |
+| `ex6f/6s2p/greedy_capture-vs-random/mandatory_extended` | 20,000 | 54.14% / 45.86% | 8.29 pp |
+| `ex6f/6s2p/greedy_capture-vs-random/optional` | 20,000 | 48.87% / 51.13% | 2.26 pp |
+| `ex6f/6s2p/spread-vs-random/mandatory` | 20,000 | 45.27% / 54.73% | 9.46 pp |
+| `ex6f/6s2p/spread-vs-random/mandatory_extended` | 20,000 | 49.28% / 50.72% | 1.45 pp |
+| `ex6f/6s2p/spread-vs-random/optional` | 20,000 | 41.43% / 58.57% | 17.14 pp |
+| `ex6f/6s3p/focus_front-vs-random/mandatory` | 20,007 | 37.29% / 33.07% / 29.64% | 7.65 pp |
+| `ex6f/6s3p/focus_front-vs-random/mandatory_extended` | 20,007 | 40.37% / 31.98% / 27.65% | 12.73 pp |
+| `ex6f/6s3p/focus_front-vs-random/optional` | 20,007 | 35.14% / 33.80% / 31.05% | 4.09 pp |
+| `ex6f/6s3p/focus_rear-vs-random/mandatory` | 20,007 | 32.89% / 34.39% / 32.72% | 1.67 pp |
+| `ex6f/6s3p/focus_rear-vs-random/mandatory_extended` | 20,007 | 37.31% / 33.96% / 28.73% | 8.58 pp |
+| `ex6f/6s3p/focus_rear-vs-random/optional` | 20,007 | 31.64% / 35.89% / 32.46% | 4.25 pp |
+| `ex6f/6s3p/greedy_capture-vs-random/mandatory` | 20,007 | 34.05% / 34.50% / 31.45% | 3.05 pp |
+| `ex6f/6s3p/greedy_capture-vs-random/mandatory_extended` | 20,007 | 38.25% / 33.62% / 28.13% | 10.12 pp |
+| `ex6f/6s3p/greedy_capture-vs-random/optional` | 20,007 | 33.60% / 34.34% / 32.05% | 2.29 pp |
+| `ex6f/6s3p/spread-vs-random/mandatory` | 20,007 | 33.26% / 35.34% / 31.39% | 3.95 pp |
+| `ex6f/6s3p/spread-vs-random/mandatory_extended` | 20,007 | 36.22% / 34.72% / 29.06% | 7.16 pp |
+| `ex6f/6s3p/spread-vs-random/optional` | 20,007 | 31.90% / 35.70% / 32.40% | 3.79 pp |
+| `ex6f/6s4p/focus_front-vs-random/mandatory` | 20,000 | 27.88% / 25.45% / 23.89% / 22.78% | 5.11 pp |
+| `ex6f/6s4p/focus_front-vs-random/mandatory_extended` | 20,000 | 29.73% / 26.10% / 22.95% / 21.21% | 8.52 pp |
+| `ex6f/6s4p/focus_front-vs-random/optional` | 20,000 | 27.02% / 25.85% / 25.04% / 22.10% | 4.93 pp |
+| `ex6f/6s4p/focus_rear-vs-random/mandatory` | 20,000 | 25.30% / 26.28% / 25.77% / 22.64% | 3.64 pp |
+| `ex6f/6s4p/focus_rear-vs-random/mandatory_extended` | 20,000 | 28.08% / 26.14% / 24.07% / 21.71% | 6.37 pp |
+| `ex6f/6s4p/focus_rear-vs-random/optional` | 20,000 | 25.11% / 26.83% / 26.37% / 21.68% | 5.15 pp |
+| `ex6f/6s4p/greedy_capture-vs-random/mandatory` | 20,000 | 25.64% / 26.52% / 25.17% / 22.66% | 3.86 pp |
+| `ex6f/6s4p/greedy_capture-vs-random/mandatory_extended` | 20,000 | 29.54% / 26.61% / 23.21% / 20.64% | 8.89 pp |
+| `ex6f/6s4p/greedy_capture-vs-random/optional` | 20,000 | 25.91% / 26.80% / 25.54% / 21.75% | 5.05 pp |
+| `ex6f/6s4p/spread-vs-random/mandatory` | 20,000 | 25.77% / 26.16% / 25.36% / 22.71% | 3.46 pp |
+| `ex6f/6s4p/spread-vs-random/mandatory_extended` | 20,000 | 28.17% / 26.15% / 24.73% / 20.95% | 7.21 pp |
+| `ex6f/6s4p/spread-vs-random/optional` | 20,000 | 25.19% / 27.25% / 25.74% / 21.82% | 5.43 pp |
+| `ex6f/6s6p/focus_front-vs-random/mandatory` | 20,016 | 16.63% / 16.88% / 16.63% / 16.31% / 16.94% / 16.62% | 0.63 pp |
+| `ex6f/6s6p/focus_front-vs-random/mandatory_extended` | 20,016 | 16.83% / 16.39% / 16.66% / 16.75% / 16.92% / 16.45% | 0.53 pp |
+| `ex6f/6s6p/focus_front-vs-random/optional` | 20,016 | 16.81% / 16.51% / 16.68% / 16.84% / 16.75% / 16.41% | 0.43 pp |
+| `ex6f/6s6p/focus_rear-vs-random/mandatory` | 20,016 | 16.59% / 16.46% / 16.70% / 16.96% / 16.49% / 16.81% | 0.50 pp |
+| `ex6f/6s6p/focus_rear-vs-random/mandatory_extended` | 20,016 | 17.02% / 16.57% / 16.61% / 16.58% / 16.76% / 16.46% | 0.56 pp |
+| `ex6f/6s6p/focus_rear-vs-random/optional` | 20,016 | 16.41% / 16.31% / 16.68% / 16.62% / 17.02% / 16.96% | 0.71 pp |
+| `ex6f/6s6p/greedy_capture-vs-random/mandatory` | 20,016 | 16.48% / 17.07% / 16.72% / 16.73% / 16.68% / 16.33% | 0.74 pp |
+| `ex6f/6s6p/greedy_capture-vs-random/mandatory_extended` | 20,016 | 17.49% / 16.41% / 16.50% / 16.71% / 16.38% / 16.52% | 1.11 pp |
+| `ex6f/6s6p/greedy_capture-vs-random/optional` | 20,016 | 16.75% / 16.44% / 16.30% / 16.63% / 16.88% / 17.00% | 0.69 pp |
+| `ex6f/6s6p/spread-vs-random/mandatory` | 20,016 | 16.33% / 17.18% / 16.68% / 16.39% / 16.76% / 16.67% | 0.84 pp |
+| `ex6f/6s6p/spread-vs-random/mandatory_extended` | 20,016 | 17.12% / 16.82% / 16.38% / 15.77% / 17.23% / 16.69% | 1.46 pp |
+| `ex6f/6s6p/spread-vs-random/optional` | 20,016 | 16.54% / 16.76% / 16.40% / 16.64% / 16.70% / 16.98% | 0.58 pp |
+
+## 5. Starting-player advantage
 
 D-25's estimand, on the two calibration cells.
 
@@ -522,7 +686,7 @@ D-25's estimand, on the two calibration cells.
 | `ex1b/6s6p/random/baseline` | +4 | 16.545% | [16.430, 16.660] |
 | `ex1b/6s6p/random/baseline` | +5 | 16.578% | [16.463, 16.694] |
 
-## 5. Full metric battery (descriptive)
+## 6. Full metric battery (descriptive)
 
 Every §6.2 metric for every cell, per §14.4. Per-seat fields are summed to a game total, which is the k-comparable form; the per-seat profiles are what the gates in section 3 read. `conf` marks a cell carrying a confirmatory contrast; `desc` marks everything else. **Nominal 95% intervals apply to this section and it is not error-controlled** — no claim in it has survived a multiplicity correction.
 
