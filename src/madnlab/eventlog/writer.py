@@ -107,6 +107,13 @@ class SummaryRow(NamedTuple):
     players: int
     seat_pattern: str
     starting_seat: int
+    #: §7.3 counterbalancing, recorded per row so a seat effect can never
+    #: be averaged away without the arrangement it came from (D-39).
+    n_requested: int
+    n_effective: int
+    balance_block: int
+    rotation_index: int
+    starting_seat_index: int
     winner: int
     ranks: tuple[int, ...]
     turns: int

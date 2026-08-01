@@ -77,10 +77,18 @@ def test_shard_plan_covers_every_index_exactly_once():
 
 
 def test_game_identity_does_not_depend_on_the_shard_layout():
-    """The invariant the sharding rests on: index determines the game."""
-    solo = {index: play_indexed_game(SPEC, index).summary for index in range(12)}
+    """The invariant the sharding rests on: index determines the game.
+
+    ``n_requested`` is passed explicitly so the comparison is like for like:
+    it is cell metadata echoed into each row (D-39), not a property of the
+    game, and a solo call has no cell to take it from.
+    """
+    solo = {
+        index: play_indexed_game(SPEC, index, n_requested=12).summary
+        for index in range(12)
+    }
     for workers in (1, 5, 12):
-        for row in run_cell(SPEC, games=12, workers=workers):
+        for row in run_cell(SPEC, games=12, workers=workers, n_requested=12):
             assert row == solo[row.game_index]
 
 

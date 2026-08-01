@@ -30,9 +30,12 @@ class Shard(NamedTuple):
     number: int
     start: int
     stop: int
+    #: Echoed into every row so ``n_requested`` and ``n_effective`` travel
+    #: with the data rather than only with the campaign manifest (D-39).
+    n_requested: int = 0
 
 
-def plan_shards(games: int, workers: int) -> list[Shard]:
+def plan_shards(games: int, workers: int, n_requested: int = 0) -> list[Shard]:
     """Contiguous, gap-free ranges covering ``0..games``.
 
     Deliberately not round-robin: contiguous ranges make a shard's identity a
@@ -49,7 +52,14 @@ def plan_shards(games: int, workers: int) -> list[Shard]:
     cursor = 0
     for index in range(workers):
         length = size + (1 if index < remainder else 0)
-        shards.append(Shard(number=index, start=cursor, stop=cursor + length))
+        shards.append(
+            Shard(
+                number=index,
+                start=cursor,
+                stop=cursor + length,
+                n_requested=n_requested or games,
+            )
+        )
         cursor += length
     assert cursor == games
     return shards
@@ -58,18 +68,22 @@ def plan_shards(games: int, workers: int) -> list[Shard]:
 def run_shard(spec: GameSpec, shard: Shard) -> list[SummaryRow]:
     """Play one shard. Module-level so it survives ``spawn`` on Windows."""
     return [
-        play_indexed_game(spec, index, record_events=False).summary
+        play_indexed_game(
+            spec, index, record_events=False, n_requested=shard.n_requested
+        ).summary
         for index in range(shard.start, shard.stop)
     ]
 
 
-def run_cell(spec: GameSpec, games: int, workers: int = 1) -> list[SummaryRow]:
+def run_cell(
+    spec: GameSpec, games: int, workers: int = 1, n_requested: int = 0
+) -> list[SummaryRow]:
     """Run ``games`` games of ``spec`` and return the sealed rows.
 
     Sealed means ascending global game index, whatever order the shards
     finished in.
     """
-    shards = plan_shards(games, workers)
+    shards = plan_shards(games, workers, n_requested)
     if workers == 1 or len(shards) == 1:
         results = [run_shard(spec, shard) for shard in shards]
     else:

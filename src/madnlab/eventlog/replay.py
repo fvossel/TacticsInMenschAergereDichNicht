@@ -74,6 +74,12 @@ def spec_from_header(header: LogHeader, agent_ids: Sequence[str] | None = None) 
     ``agent_ids`` exists only so a caller can replay a game with different
     policies for debugging; the default takes them from the header, which is
     what AK-3 does.
+
+    ``counterbalanced=False`` is load-bearing. The header records the
+    **resolved** assignment and starting seat, so re-deriving them from the
+    game index would apply §7.3's rotation a second time on top of an already
+    rotated tuple and replay a different game. AK-3 caught exactly that when
+    counterbalancing landed.
     """
     recorded = tuple(name for _seat, name in header.agents)
     return GameSpec(
@@ -84,6 +90,7 @@ def spec_from_header(header: LogHeader, agent_ids: Sequence[str] | None = None) 
         rules=rules_from_header(header),
         agent_ids=tuple(agent_ids) if agent_ids is not None else recorded,
         master_seed=header.master_seed,
+        counterbalanced=False,
     )
 
 

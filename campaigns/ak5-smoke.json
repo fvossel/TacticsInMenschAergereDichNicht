@@ -1,0 +1,22 @@
+{
+  "name": "AK-5 smoke",
+  "description": "A small mandatory-capture cell so AK-5 has data before EX-2 (C-21). Checks the capture_forcing counters over a whole cell rather than over unit tests.",
+  "master_seed": 20260803,
+  "log_events": {"mode": "sample", "k": 100},
+  "cells": [
+    {
+      "key": "ak5/4s4p/random/mandatory",
+      "seats": 4, "players": 4, "seat_pattern": "adjacent",
+      "agents": ["RANDOM", "RANDOM", "RANDOM", "RANDOM"],
+      "games": 20000,
+      "rules": {"capture_mode": "mandatory"}
+    },
+    {
+      "key": "ak5/4s4p/greedy/extended",
+      "seats": 4, "players": 4, "seat_pattern": "adjacent",
+      "agents": ["GREEDY_CAPTURE", "GREEDY_CAPTURE", "GREEDY_CAPTURE", "GREEDY_CAPTURE"],
+      "games": 20000,
+      "rules": {"capture_mode": "mandatory_extended"}
+    }
+  ]
+}

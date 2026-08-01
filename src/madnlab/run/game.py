@@ -20,7 +20,7 @@ from madnlab.engine.rules import RuleSet
 from madnlab.engine.state import initial_state
 from madnlab.eventlog.events import SCHEMA_VERSION, Event, LogHeader
 from madnlab.eventlog.writer import SummaryRow
-from madnlab.run import seeds
+from madnlab.run import counterbalance, seeds
 
 #: The pre-registration tag a run was executed under (§14). Recorded in every
 #: header and every summary row; ``unfrozen`` until the tag exists.
@@ -35,15 +35,27 @@ class GameSpec(NamedTuple):
     players: int
     seat_pattern: SeatPattern
     rules: RuleSet
-    #: Agent id per occupied seat, in seat order.
+    #: Agent id per occupied seat, in seat order. Under counterbalancing this
+    #: is the *canonical* assignment; the arrangement actually played is
+    #: derived per game index (§7.3) and recorded in the header.
     agent_ids: tuple[str, ...]
     master_seed: int
+    #: §7.3 counterbalancing. Off only for one-off games and for replay, which
+    #: takes the resolved assignment from the header instead.
+    counterbalanced: bool = True
+    #: Override D-39's permutation trigger. ``None`` uses the rule.
+    force_full_permutations: bool | None = None
 
     def occupied(self) -> tuple[int, ...]:
         return occupied_seats(self.seats, self.players, self.seat_pattern)
 
     def agent_map(self) -> dict[int, str]:
         return dict(zip(self.occupied(), self.agent_ids, strict=True))
+
+    def balance(self) -> counterbalance.Balance:
+        return counterbalance.plan(
+            self.agent_ids, self.occupied(), force_full=self.force_full_permutations
+        )
 
 
 class GameRun(NamedTuple):
@@ -58,8 +70,14 @@ def _rules_wire(rules: RuleSet) -> tuple[tuple[str, str], ...]:
     return tuple((field, str(getattr(rules, field))) for field in rules._fields)
 
 
-def build_header(spec: GameSpec, game_index: int, starting_seat: int) -> LogHeader:
+def build_header(
+    spec: GameSpec,
+    game_index: int,
+    starting_seat: int,
+    agent_map: dict[int, str] | None = None,
+) -> LogHeader:
     seed = seeds.game_seed(spec.master_seed, spec.cell_key, game_index)
+    resolved_agents = agent_map if agent_map is not None else spec.agent_map()
     return LogHeader(
         schema_version=SCHEMA_VERSION,
         engine_version=ENGINE_VERSION,
@@ -72,7 +90,7 @@ def build_header(spec: GameSpec, game_index: int, starting_seat: int) -> LogHead
         seat_pattern=str(spec.seat_pattern),
         occupied_seats=spec.occupied(),
         starting_seat=starting_seat,
-        agents=tuple(sorted(spec.agent_map().items())),
+        agents=tuple(sorted(resolved_agents.items())),
         rules=_rules_wire(spec.rules),
     )
 
@@ -82,6 +100,7 @@ def play_indexed_game(
     game_index: int,
     record_events: bool = True,
     starting_seat: int | None = None,
+    n_requested: int = 0,
 ) -> GameRun:
     """Play game ``game_index`` of ``spec``.
 
@@ -93,11 +112,27 @@ def play_indexed_game(
     seats: Sequence[int] = spec.occupied()
     seed = seeds.game_seed(spec.master_seed, spec.cell_key, game_index)
     streams = seeds.derive(seed, seats)
-    resolved_start = (
-        starting_seat if starting_seat is not None else seeds.draw_start_seat(streams, seats)
-    )
 
-    agents = {seat: REGISTRY[name] for seat, name in spec.agent_map().items()}
+    # §7.3: the arrangement and the starting seat come from the game index, so
+    # a complete block covers every combination exactly once. The seeded draw
+    # (D-6) is the uncounterbalanced fallback, and an explicit override is what
+    # replay uses — it reads the resolved value back out of the header rather
+    # than re-deriving it.
+    if spec.counterbalanced:
+        balance = spec.balance()
+        balance_block = balance.block
+        assignment, balanced_start, rotation_index, start_index = balance.assign(
+            game_index
+        )
+    else:
+        balance_block = 1
+        assignment = spec.agent_ids
+        balanced_start = seeds.draw_start_seat(streams, seats)
+        rotation_index = start_index = 0
+    resolved_start = starting_seat if starting_seat is not None else balanced_start
+    agent_names = dict(zip(seats, assignment, strict=True))
+
+    agents = {seat: REGISTRY[name] for seat, name in agent_names.items()}
     events: list[Event] | None = [] if record_events else None
     outcome = play_game(
         board,
@@ -110,7 +145,7 @@ def play_indexed_game(
         resolved_start,
         record=events,
     )
-    header = build_header(spec, game_index, resolved_start)
+    header = build_header(spec, game_index, resolved_start, agent_names)
     summary = SummaryRow(
         cell_key=spec.cell_key,
         game_index=game_index,
@@ -121,6 +156,13 @@ def play_indexed_game(
         players=spec.players,
         seat_pattern=str(spec.seat_pattern),
         starting_seat=resolved_start,
+        n_requested=n_requested,
+        n_effective=(
+            -(-n_requested // balance_block) * balance_block if n_requested else 0
+        ),
+        balance_block=balance_block,
+        rotation_index=rotation_index,
+        starting_seat_index=start_index,
         winner=outcome.winner,
         ranks=outcome.ranks,
         turns=outcome.turns,

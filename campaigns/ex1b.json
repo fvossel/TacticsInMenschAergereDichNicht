@@ -1,0 +1,17 @@
+{
+  "name": "EX-1b",
+  "description": "Six-seat calibration (D-29). The 48-ring board carries EX-5's spread arm and every 6-player cell, and AK-4 had no criterion for it.",
+  "master_seed": 20260802,
+  "log_events": {"mode": "sample", "k": 100},
+  "cells": [
+    {
+      "key": "ex1b/6s6p/random/baseline",
+      "seats": 6,
+      "players": 6,
+      "seat_pattern": "adjacent",
+      "agents": ["RANDOM", "RANDOM", "RANDOM", "RANDOM", "RANDOM", "RANDOM"],
+      "games": 400000,
+      "rules": {}
+    }
+  ]
+}

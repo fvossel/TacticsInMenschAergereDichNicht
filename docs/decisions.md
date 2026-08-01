@@ -1741,6 +1741,31 @@ is the one place that rule is broken on purpose, and the first thing it did was
 find a real definitional divergence.
 **Affects.** §4.1, §6.2, `analysis/reference.py`, AK-9.
 
+### D-72 — AK-4 reports *inconclusive* separately from *failed*
+**Status:** `pinned` · *found by the AK-5 smoke run, 2026-08-01*
+**Decision.** The AK-4 equivalence test returns three verdicts, not two:
+**PASS**, **FAIL**, and **INCONCLUSIVE**. It is inconclusive when the CI
+half-width is not smaller than the margin δ, in which case the test cannot pass
+on *any* data. An inconclusive cell does not fail the campaign, and the report
+says what n would resolve it.
+**How it surfaced.** The AK-5 smoke cells run at n = 20,000, where the 99%
+half-width is 0.784 pp against δ = 0.5 pp. Every seat was reported FAIL and the
+campaign verdict was FAIL — on data whose largest deviation was 0.53 pp, well
+inside anything the test could have distinguished.
+**Why this is the same error as the one D-29 fixed, pointed the other way.**
+D-29 replaced the original AK-4 because it passed on a *failure to reject*, so
+a cell too small to reject anything passed automatically — "no evidence of
+asymmetry" read as "evidence of symmetry". The equivalence form removes that,
+and introduces the mirror: a cell too small to *establish* equivalence fails
+automatically — "cannot conclude" read as "concluded negative". Both conflate
+the power of the instrument with the state of the world, and a gate that does
+either is worse than no gate, because its verdict looks like evidence.
+**Scope.** AK-4 is a calibration gate (D-29) and belongs to the calibration
+cells. Running it on every cell of every campaign is harmless once inconclusive
+is distinguished, and is worth keeping: a large non-calibration cell that
+*does* show asymmetry beyond δ is something the project wants to hear about.
+**Affects.** AK-4, D-29, `analysis/aggregate.py`.
+
 ---
 
 ## Open items
