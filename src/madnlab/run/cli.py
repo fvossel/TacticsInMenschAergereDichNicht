@@ -156,6 +156,12 @@ def analyse(campaign_dir: Path, analysis_seed: int) -> int:
                 "passed": ak5.passed,
                 "offered": ak5.offered,
                 "violations": ak5.violations,
+                # Both halves of §11's invariant are persisted, not just the
+                # one that existed first: a manifest recording half a verdict
+                # is what let AK-5 pass on half a check for four milestones
+                # (D-75).
+                "lap_offered": ak5.lap_offered,
+                "lap_violations": ak5.lap_violations,
             }
 
         offsets = aggregate.starting_player_advantage(cell)
