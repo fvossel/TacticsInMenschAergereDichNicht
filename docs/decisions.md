@@ -1718,6 +1718,29 @@ with a non-negligible abandonment rate without stating it, since abandoned
 games have no winner and their ranks come from a different rule.
 **Affects.** GM-3.11, §6.1, LG-2, EX-4, the analysis layer.
 
+### D-71 — `pass` events are per roll; `passes_by_seat` counts turns
+**Status:** `pinned` · *found by AK-9, 2026-08-01*
+**Decision.** §4.1's `pass` event is emitted **once per unusable roll**;
+§6.2's `passes_by_seat` counts **turns in which no legal move existed**. A turn
+of three attempts that never moves is *one* pass and *three* events. Any
+analysis deriving pass counts from an event log must group by turn — a turn
+boundary being a `roll` event with `attempt == 1`.
+**How it surfaced.** The two implementations disagreed the first time AK-9 ran
+them against each other: the game loop counted turns, the event-log
+re-derivation counted events, and the gap was exactly the number of extra rolls
+inside pass turns. Neither number is wrong; they answer different questions,
+and nothing in §4.1 or §6.2 said so.
+**Why it matters beyond this field.** `passes_by_seat` and
+`entry_waits_by_seat` are the two §6.2 counters most exposed to the
+`dreimal_wuerfeln` axis, which multiplies rolls per turn. Counting events would
+have made an EX-4 axis look like it changed pass behaviour when it had only
+changed how many dice were thrown.
+**This is what AK-9 is for.** §4.1 forbids analyses from re-deriving a field
+the summary row already carries, which removes the only redundant path. AK-9
+is the one place that rule is broken on purpose, and the first thing it did was
+find a real definitional divergence.
+**Affects.** §4.1, §6.2, `analysis/reference.py`, AK-9.
+
 ---
 
 ## Open items
