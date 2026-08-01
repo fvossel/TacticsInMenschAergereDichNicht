@@ -101,10 +101,24 @@ FAMILIES: dict[str, tuple[tuple[str, ...], tuple[str, ...]]] = {
             "6s3p adjacent-minus-spread x random",
         ),
     ),
+    "RQ-6": (
+        ("turn_order_and_play",),
+        (
+            "starter advantage, 4 players",
+            "starter advantage, 6 players",
+            "starter advantage, 2p minus 6p",
+            "GREEDY_CAPTURE vs 1/k, optional",
+            "GREEDY_CAPTURE vs 1/k, mandatory",
+            "GREEDY_CAPTURE edge, optional minus mandatory",
+            "middle seat, 3p on 4 seats, RANDOM",
+            "middle seat, 3p on 4 seats, SPREAD",
+            "manipulation check: captures under mandatory",
+        ),
+    ),
 }
 
-#: The total §6.4 and §15 declare together.
-CONFIRMATORY_TOTAL = 48
+#: The total §6.4, §15 and §16 declare together.
+CONFIRMATORY_TOTAL = 57
 
 
 

@@ -29,7 +29,7 @@ OUT = ROOT / "campaigns"
 #: D-59's two tiers.
 DESCRIPTIVE = 20_000
 CONFIRMATORY = {"ex2": 250_000, "ex3": 200_000, "ex5": 250_000, "ex6": 400_000,
-                "ex7": 200_000}
+                "ex7": 200_000, "ex8": 250_000}
 
 AGENTS = ("RANDOM", "SPREAD", "FOCUS_FRONT", "FOCUS_REAR", "GREEDY_CAPTURE")
 #: RQ-3's four agents. GREEDY_CAPTURE is a control for RQ-1/RQ-2, not a
@@ -290,6 +290,35 @@ def ex7() -> list[dict[str, Any]]:
     return cells
 
 
+def ex8() -> list[dict[str, Any]]:
+    """RQ-6 (§16): the questions the earlier plan measured but never tested.
+
+    Two things the existing cells cannot answer at a useful n. The
+    starting-player advantage as a function of player count needs the board
+    held fixed (D-12), so all four counts run on the 6-seat board. And
+    GREEDY_CAPTURE never appears as a deviant against a RANDOM field outside
+    the 20k descriptive cells, which is too small to resolve 0.5 pp.
+    """
+    cells = []
+    for players in (2, 3, 4, 6):
+        cells.append(
+            cell(
+                f"ex8/6s{players}p/random/baseline",
+                6, players, ("RANDOM",) * players, CONFIRMATORY["ex8"],
+            )
+        )
+    for mode in ("optional", "mandatory"):
+        cells.append(
+            cell(
+                f"ex8/4s4p/greedy_capture-vs-random/{mode}",
+                4, 4, ("GREEDY_CAPTURE", "RANDOM", "RANDOM", "RANDOM"),
+                CONFIRMATORY["ex8"],
+                {"capture_mode": mode} if mode != "optional" else {},
+            )
+        )
+    return cells
+
+
 CAMPAIGNS = {
     "ex2": ("RQ-1 Schlagzwang", 20261010, ex2),
     "ex3": ("RQ-3 movement strategies", 20261011, ex3),
@@ -298,11 +327,12 @@ CAMPAIGNS = {
     "ex6": ("RQ-4 interactions", 20261014, ex6),
     # A fresh seed, and its own pre-registration (§15, D-78).
     "ex7": ("RQ-5 seat exposure", 20261015, ex7),
+    "ex8": ("RQ-6 turn order, capture play, middle seat", 20261016, ex8),
 }
 
 #: D-59's cell counts. Asserted, so the plan and the files cannot drift.
 EXPECTED_CELLS = {"ex2": 36, "ex3": 64, "ex4": 168, "ex5": 10, "ex6": 105,
-                  "ex7": 14}
+                  "ex7": 14, "ex8": 6}
 
 
 def main() -> int:

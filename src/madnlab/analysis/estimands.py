@@ -366,3 +366,86 @@ def mean_difference_in_differences(
     p_value = _two_sided_p(estimate / se) if se > 0 else 1.0
     total = sum(len(arm) for arm in arms)
     return Estimate(label, estimate, interval, p_value, total, total)
+
+
+def multinomial_contrast(
+    counts: Sequence[int],
+    weights: Sequence[float],
+    games: int,
+    *,
+    label: str,
+    level: float = 0.95,
+) -> Estimate:
+    """A weighted contrast of seat win rates **within one cell**.
+
+    Generalizes :func:`seat_difference`: exactly one seat wins each game, so
+    the per-seat counts are multinomial and a linear combination ``a'p`` has
+
+        Var(a'p) = [ sum a_i^2 p_i - (sum a_i p_i)^2 ] / n
+
+    Two independent Wilson intervals get this wrong in both directions
+    depending on the weights, which is why §6.3 SQ-6 fixes the multinomial
+    form. The middle-seat question needs weights (-1/2, +1, -1/2), which is
+    not expressible as a difference of two seats.
+    """
+    if games == 0:
+        return Estimate(label, 0.0, Interval(0.0, 0.0, 0.0, level), 1.0, 0, 0,
+                        note="empty cell")
+    rates = [count / games for count in counts]
+    estimate = sum(w * p for w, p in zip(weights, rates, strict=True))
+    variance = (
+        sum(w * w * p for w, p in zip(weights, rates, strict=True)) - estimate**2
+    ) / games
+    se = math.sqrt(variance) if variance > 0 else 0.0
+    z_crit = z_for(level)
+    interval = Interval(estimate, estimate - z_crit * se, estimate + z_crit * se, level)
+    p_value = two_sided_p(estimate / se) if se > 0 else 1.0
+    return Estimate(label, estimate, interval, p_value, games, games)
+
+
+def independent_difference(
+    left: Estimate, right: Estimate, *, label: str, level: float = 0.95
+) -> Estimate:
+    """Difference of two estimates from separate cells, so the variances add.
+
+    Takes the standard errors back out of the two intervals rather than
+    recomputing them, so this stays correct whatever estimator produced them.
+    """
+    z_crit = z_for(level)
+    se_left = (left.interval.high - left.interval.low) / (2 * z_crit)
+    se_right = (right.interval.high - right.interval.low) / (2 * z_crit)
+    estimate = left.estimate - right.estimate
+    se = math.sqrt(se_left**2 + se_right**2)
+    interval = Interval(estimate, estimate - z_crit * se, estimate + z_crit * se, level)
+    p_value = two_sided_p(estimate / se) if se > 0 else 1.0
+    return Estimate(label, estimate, interval, p_value, left.n_a, right.n_a)
+
+
+def mean_difference_from_moments(
+    mean_a: float,
+    var_a: float,
+    n_a: int,
+    mean_b: float,
+    var_b: float,
+    n_b: int,
+    *,
+    label: str,
+    level: float = 0.95,
+) -> Estimate:
+    """Difference of means when only the moments were kept, not the samples.
+
+    Welch's form. Used for the battery metrics, where storing a 400k-element
+    vector per cell to recover a number two accumulators already contain would
+    be a poor trade. No bootstrap here for the same reason SQ-2 permits it
+    elsewhere: at these n the difference of two means is normal well past the
+    reported precision.
+    """
+    if n_a < 2 or n_b < 2:
+        return Estimate(label, 0.0, Interval(0.0, 0.0, 0.0, level), 1.0, n_a, n_b,
+                        note="arm too small")
+    estimate = mean_a - mean_b
+    se = math.sqrt(var_a / n_a + var_b / n_b)
+    z_crit = z_for(level)
+    interval = Interval(estimate, estimate - z_crit * se, estimate + z_crit * se, level)
+    p_value = two_sided_p(estimate / se) if se > 0 else 1.0
+    return Estimate(label, estimate, interval, p_value, n_a, n_b)

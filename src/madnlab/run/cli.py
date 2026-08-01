@@ -210,6 +210,7 @@ def build_report(
         ("RQ-3", families.rq3),
         ("RQ-4", families.rq4),
         ("RQ-5", families.rq5),
+        ("RQ-6", families.rq6),
     ):
         family_started = time.perf_counter()
         kwargs = {"workers": workers} if name == "RQ-2" else {}

@@ -877,3 +877,52 @@ is 0.44 pp, which resolves both the 5 pp threshold of hypothesis 1 and the
 ±1 pp equivalence margin of hypothesis 3. The three non-headline fields
 (FOCUS_FRONT, FOCUS_REAR, GREEDY_CAPTURE) carry no confirmatory hypothesis and
 are descriptive: they say whether the effect is specific to SPREAD.
+
+---
+
+## 16. EX-8 — turn order, capture play, and the middle seat (family RQ-6)
+
+Four questions the plan already had the machinery for and never asked. Nine
+hypotheses, Holm within the family.
+
+**Does going first help?** The starting-player advantage has been measured
+since M3, has its own ledger row (D-25) and its own report section — and no
+hypothesis. It is probably the first thing a reader of this project wants to
+know. Tested against the fixed 1/k reference on both calibration cells, and as
+a function of player count with the board held fixed at 6 seats (D-12), since
+a naive count contrast would mix player count with geometry.
+
+**Does playing *toward a rule* help?** RQ-3's three strategies are pure
+movement heuristics and none of them worked. `GREEDY_CAPTURE` is the one agent
+that plays toward a rule, and outside the 20k descriptive cells it is never
+tested against a `RANDOM` field. Under `mandatory` the capture obligation
+applies to everyone, so its edge should disappear — which makes the
+interaction the interesting half.
+
+**Is the middle seat disadvantaged?** §1 asks this in so many words and §2.2
+gives the reason: an opponent directly behind, the other's start area directly
+ahead. Nothing in the plan tested it. The estimand is seat 1 against the mean
+of its neighbours, weights (−1/2, +1, −1/2), which is a multinomial contrast
+rather than a difference of two seats.
+
+**Did the mandatory arm do anything?** §6.4 names `captures_total` as a
+manipulation check with a pre-fixed direction and no code ran it. Mandatory
+capture must raise the capture count; if it does not, the arm is inert and
+every RQ-1 result above it is meaningless.
+
+| # | Contrast | Prediction |
+|---|---|---|
+| 1 | starter advantage, 4 players | **> 0** |
+| 2 | starter advantage, 6 players | **> 0** |
+| 3 | starter advantage, 2p − 6p (6 seats) | **> 0** (fewer players, bigger edge) |
+| 4 | `GREEDY_CAPTURE` vs 1/k, `optional` | **> 0** |
+| 5 | `GREEDY_CAPTURE` vs 1/k, `mandatory` | ≈ 0 |
+| 6 | its edge, `optional` − `mandatory` | **> 0** |
+| 7 | middle seat, 3p on 4 seats, RANDOM | §1 predicts **< 0** |
+| 8 | middle seat, 3p on 4 seats, SPREAD | §1 predicts **< 0** |
+| 9 | captures per game, `mandatory` − `optional` | **> 0** (manipulation check) |
+
+**Arms.** EX-8 adds six cells at n = 250,000: the 6-seat board at 2, 3, 4 and
+6 players all-`RANDOM`, and `GREEDY_CAPTURE` against a `RANDOM` field at 4
+players under `optional` and `mandatory`. 1.5M games. Hypotheses 1, 2, 7, 8
+and 9 read cells that already exist.

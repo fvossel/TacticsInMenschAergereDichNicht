@@ -525,6 +525,7 @@ def run_all(
         rq3(data, seed=seed, resamples=resamples),
         rq4(data, seed=seed, resamples=resamples),
         rq5(data),
+        rq6(data),
     ]
 
 
@@ -686,3 +687,140 @@ def rq5_verdict(result: FamilyResult) -> RQ5Verdict:
         )
 
     return RQ5Verdict(all(conditions), detail)
+
+
+# -- §16: turn order, capture play, and the middle seat ----------------------
+
+
+def _starter_advantage(cell: CellSummary, label: str) -> Estimate:
+    """P(win | seat is the starter) against the fixed 1/k reference.
+
+    Measured since M3 and reported in every campaign, but never tested: it had
+    a ledger row, a function and a report section, and no hypothesis (§16).
+    """
+    return estimands.proportion_vs_reference(
+        cell.wins_by_turn_offset.get(0, 0),
+        cell.games,
+        1.0 / cell.players,
+        label=label,
+    )
+
+
+def _deviant_edge(cell: CellSummary, label: str) -> Estimate:
+    """The seat-0 deviant's win rate against 1/k."""
+    return estimands.proportion_vs_reference(
+        cell.wins_by_seat.get(0, 0), cell.games, 1.0 / cell.players, label=label
+    )
+
+
+def _middle_seat(cell: CellSummary, label: str) -> Estimate:
+    """Seat 1 against the mean of its two neighbours, three players on four seats.
+
+    §1's own question — "is the middle seat measurably disadvantaged" — with
+    §2.2's stated reason: an opponent directly behind and the other's start
+    area directly ahead. Weights (-1/2, +1, -1/2), which is not a difference
+    of two seats and needs the multinomial contrast.
+    """
+    counts = [cell.wins_by_seat.get(seat, 0) for seat in cell.occupied]
+    return estimands.multinomial_contrast(
+        counts, [-0.5, 1.0, -0.5], cell.games, label=label
+    )
+
+
+def rq6(data: Dataset, *, seed: int = 0, resamples: int = 0) -> FamilyResult:
+    """§16's family. Nine hypotheses; every contrast has a closed-form variance."""
+    del seed, resamples
+    estimates: list[Estimate] = []
+    hypotheses: list[Hypothesis] = []
+    unavailable: list[str] = []
+    contrasts = FAMILIES["RQ-6"][1]
+
+    def add(name: str, estimate: Estimate | None) -> None:
+        if estimate is None:
+            unavailable.append(f"turn_order_and_play @ {name}")
+            return
+        estimates.append(estimate)
+        hypotheses.append(Hypothesis("RQ-6", "turn_order_and_play", name))
+
+    # 1-2: does going first help, on each board?
+    four = data.cells.get("ex1/4s4p/random/baseline")
+    six = data.cells.get("ex1b/6s6p/random/baseline")
+    add(contrasts[0], _starter_advantage(four, f"starter advantage :: {contrasts[0]}")
+        if four else None)
+    add(contrasts[1], _starter_advantage(six, f"starter advantage :: {contrasts[1]}")
+        if six else None)
+
+    # 3: and does it shrink as the table grows? Board held fixed (D-12).
+    two_p = data.cells.get("ex8/6s2p/random/baseline")
+    six_p = data.cells.get("ex8/6s6p/random/baseline")
+    if two_p and six_p:
+        add(
+            contrasts[2],
+            estimands.independent_difference(
+                _starter_advantage(two_p, "2p"),
+                _starter_advantage(six_p, "6p"),
+                label=f"starter advantage :: {contrasts[2]}",
+            ),
+        )
+    else:
+        add(contrasts[2], None)
+
+    # 4-6: the one agent that plays toward a rule. Under mandatory capture the
+    # rule applies to everyone, so its edge should go away.
+    greedy = {
+        mode: data.cells.get(f"ex8/4s4p/greedy_capture-vs-random/{mode}")
+        for mode in ("optional", "mandatory")
+    }
+    add(
+        contrasts[3],
+        _deviant_edge(greedy["optional"], f"GREEDY edge :: {contrasts[3]}")
+        if greedy["optional"] else None,
+    )
+    add(
+        contrasts[4],
+        _deviant_edge(greedy["mandatory"], f"GREEDY edge :: {contrasts[4]}")
+        if greedy["mandatory"] else None,
+    )
+    if greedy["optional"] and greedy["mandatory"]:
+        add(
+            contrasts[5],
+            estimands.independent_difference(
+                _deviant_edge(greedy["optional"], "optional"),
+                _deviant_edge(greedy["mandatory"], "mandatory"),
+                label=f"GREEDY edge shift :: {contrasts[5]}",
+            ),
+        )
+    else:
+        add(contrasts[5], None)
+
+    # 7-8: §1's middle-seat question, finally asked.
+    for index, field in ((6, "random"), (7, "spread")):
+        middle = data.cells.get(f"ex5/3p/4s-adjacent/{field}")
+        add(
+            contrasts[index],
+            _middle_seat(middle, f"middle seat :: {contrasts[index]}")
+            if middle else None,
+        )
+
+    # 9: the manipulation check §6.4 names and no code ran. Mandatory capture
+    # must raise the capture count, or the arm did not do anything.
+    optional = data.cells.get("ex2/4s4p/random/optional")
+    mandatory = data.cells.get("ex2/4s4p/random/mandatory")
+    if optional and mandatory:
+        add(
+            contrasts[8],
+            estimands.mean_difference_from_moments(
+                mandatory.metric_means["captures_total"],
+                mandatory.metric_vars["captures_total"],
+                mandatory.games,
+                optional.metric_means["captures_total"],
+                optional.metric_vars["captures_total"],
+                optional.games,
+                label=f"captures per game :: {contrasts[8]}",
+            ),
+        )
+    else:
+        add(contrasts[8], None)
+
+    results = holm([e.p_value for e in estimates], hypotheses) if estimates else []
+    return FamilyResult("RQ-6", estimates, results, unavailable)

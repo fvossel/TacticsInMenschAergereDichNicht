@@ -51,6 +51,7 @@ def cell(
         comebacks=0,
         leader_at_50_won=0,
         metric_means={},
+        metric_vars={},
     )
 
 

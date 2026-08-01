@@ -68,6 +68,10 @@ class CellSummary(NamedTuple):
     #: Mean of every numeric §6.2 field, for the §14.4 all-results table. A
     #: cell publishes its whole battery whether or not a hypothesis reads it.
     metric_means: dict[str, float]
+    #: Sample variance of the same fields, from accumulated squares. Two
+    #: floats per metric instead of a 400k-element vector, which is the whole
+    #: reason a battery metric can carry a confidence interval at all.
+    metric_vars: dict[str, float]
 
 
 def summarize_cell(rows: Sequence[dict[str, Any]]) -> CellSummary:
@@ -122,6 +126,7 @@ def summarize_cell(rows: Sequence[dict[str, Any]]) -> CellSummary:
         "barrier_turns_by_seat",
     )
     totals: dict[str, float] = dict.fromkeys(scalar_fields + vector_fields, 0.0)
+    squares: dict[str, float] = dict.fromkeys(scalar_fields + vector_fields, 0.0)
 
     for row in rows:
         winner = row["winner"]
@@ -152,9 +157,13 @@ def summarize_cell(rows: Sequence[dict[str, Any]]) -> CellSummary:
             leader_won += row["winner_rank_at_50"] == 1
 
         for field in scalar_fields:
-            totals[field] += row[field]
+            value = float(row[field])
+            totals[field] += value
+            squares[field] += value * value
         for field in vector_fields:
-            totals[field] += sum(row[field])
+            value = float(sum(row[field]))
+            totals[field] += value
+            squares[field] += value * value
 
     games = len(rows)
     return CellSummary(
@@ -179,6 +188,15 @@ def summarize_cell(rows: Sequence[dict[str, Any]]) -> CellSummary:
         comebacks=comebacks,
         leader_at_50_won=leader_won,
         metric_means={field: value / games for field, value in totals.items()},
+        metric_vars={
+            field: max(
+                0.0,
+                (squares[field] - totals[field] ** 2 / games) / (games - 1),
+            )
+            if games > 1
+            else 0.0
+            for field in totals
+        },
     )
 
 
