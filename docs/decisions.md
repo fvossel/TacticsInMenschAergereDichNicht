@@ -1982,6 +1982,65 @@ checking a published interval needs to know which BCa produced it.
 
 ---
 
+### D-77 — Two wrong estimator bindings, found by reading the first real report
+**Status:** `pinned` · *2026-08-01* · *no hypothesis or metric changed*
+
+The first full report ran clean and produced 40 numbers. Two of them were
+wrong in ways that only reading the output reveals.
+
+**1. RQ-4's player-count rows were not interactions.** `capture_mode × players`
+was bound to `ex6e/6s2p/random/mandatory` against `ex6e/6s6p/random/mandatory`
+— two player counts at *one* rule level. The starter's win rate is ≈1/2 at two
+players and ≈1/6 at six, so the contrast returned **0.3375** with p < 1e-300.
+It was arithmetic reported as a finding, and it was one of only two RQ-4 rows
+that "rejected".
+
+An interaction is a difference of *differences*. The binding is now the four
+cells (mandatory − optional) at two players minus the same at six, through
+`mean_difference_in_differences`. The new test that pins it: when both inner
+differences agree the estimate is exactly zero.
+
+**The metric was wrong too.** §8.1 gives EX-6e's primary metric as "battery
+metrics", with the parenthetical that win rate is 1/k by symmetry; the binding
+used the starter's win rate. Both player-count rows and both EX-5 rows now use
+`rounds_to_first_win`, which is what §8 names.
+
+**2. RQ-3 tested against a fixed reference with a two-sample estimator.**
+`proportion_difference(wins, n, round(n/k), n)` treats 1/k as an observed
+proportion with its own sampling error. 1/k is arithmetic. The interval came
+out **√2 = 1.414 times too wide** — verified exactly against the corrected
+`proportion_vs_reference`, which is the Wilson form §6.3 SQ-1 names for
+precisely this case. All four RQ-3 verdicts were "not rejected" before and
+after, so no conclusion moves; every published RQ-3 interval was 41% too
+conservative.
+
+**Neither is a change to the pre-registration.** No hypothesis, contrast name,
+family membership or metric assignment moved: §6.4 and §8 already said what
+these should be, and the code said something else. This is the D-74 situation
+again — the code moving to the frozen spec.
+
+**A defect in the frozen spec, recorded not fixed.** §6.4's RQ-4 row names six
+contrasts in prose (`capture_mode × strategy` (2), `barriers × strategy` (1),
+`capture_mode × players` (1), the two EX-5 rows) and declares **10** tests in
+its own count column. The operative definition is
+`multiplicity.FAMILIES["RQ-4"]`, which carries ten and was committed in M2
+(`6732869`) — **inside** `prereg-v1`. The four extra are three-way extensions
+of the named rows. The count is what makes the family total 40. The ten are
+kept because they are what was frozen; the prose is the thing that is
+incomplete, and amending frozen prose after seeing results is exactly what a
+freeze forbids.
+
+**Deviation from §6.3, stated.** The two interaction contrasts use an analytic
+normal interval rather than BCa. A difference of differences is a linear
+combination of four independent sample means, normal well past the precision
+published, and SQ-2 names BCa for a "difference between arms" rather than for
+a difference between differences. The two-arm contrasts remain BCa throughout.
+
+**Affects.** §6.3 SQ-1, SQ-2, §6.4 RQ-3, RQ-4, §8.1, `analysis/estimands.py`,
+`analysis/families.py`.
+
+---
+
 ## Open items
 
 | Id | Item | Blocks |

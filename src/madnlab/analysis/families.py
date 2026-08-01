@@ -289,13 +289,11 @@ def rq3(data: Dataset, *, seed: int, resamples: int) -> FamilyResult:
             unavailable.append(f"deviant_win_rate @ {agent}-reference")
 
     for agent, cell in deviant_cells.items():
-        wins = cell.wins_by_seat.get(0, 0)
-        reference = cell.games / cell.players
-        # Against a *fixed* reference, so a one-sample proportion test.
+        # Against a *fixed* reference: 1/k is arithmetic, not an estimate, so
+        # it carries no sampling variance and the test is one-sample (SQ-1).
         estimates.append(
-            estimands.proportion_difference(
-                wins, cell.games,
-                round(reference), cell.games,
+            estimands.proportion_vs_reference(
+                cell.wins_by_seat.get(0, 0), cell.games, 1.0 / cell.players,
                 label=f"deviant win rate vs 1/k :: {agent}",
             )
         )
@@ -356,19 +354,34 @@ RQ4_INTERACTIONS = (
     ),
 )
 
-#: The player-count and geometry rows, which contrast whole cells rather than
-#: a deviant's edge.
-RQ4_CELL_CONTRASTS = (
-    ("capture_mode x players", "ex6e/6s2p/random/mandatory", "ex6e/6s6p/random/mandatory"),
-    ("capture_mode x players x board", "ex6e/6s2p/random/optional", "ex6e/6s6p/random/optional"),
+#: The player-count and geometry rows. §8.1 gives EX-6e's primary metric as
+#: "battery metrics" — the homogeneous field makes win rate uninformative —
+#: and each is a genuine 2x2 interaction, given as four cells: (a1, a0, b1, b0)
+#: for (a1 - a0) - (b1 - b0).
+RQ4_BATTERY_INTERACTIONS = (
+    (
+        "capture_mode x players",
+        "ex6e/6s2p/random/mandatory", "ex6e/6s2p/random/optional",
+        "ex6e/6s6p/random/mandatory", "ex6e/6s6p/random/optional",
+    ),
+    (
+        "capture_mode x players x board",
+        "ex6e/6s4p/random/mandatory", "ex6e/6s4p/random/optional",
+        "ex2/4s4p/random/mandatory", "ex2/4s4p/random/optional",
+    ),
+)
+
+#: EX-5's pre-registered decomposition (§8). Two-arm battery contrasts, not
+#: interactions: the naive comparison is their *sum* and §8 forbids publishing
+#: it as a pattern effect.
+RQ4_EX5_ROWS = (
     ("EX-5 pattern effect", "ex5/3p/6s-adjacent/random", "ex5/3p/6s-spread/random"),
     ("EX-5 geometry effect", "ex5/3p/4s-adjacent/random", "ex5/3p/6s-adjacent/random"),
 )
 
 
 def rq4(data: Dataset, *, seed: int, resamples: int) -> FamilyResult:
-    """Named interaction contrasts (§6.4, D-28, D-46)."""
-    del seed, resamples
+    """Named interaction contrasts (§6.4, D-28, D-46, D-77)."""
     estimates: list[Estimate] = []
     hypotheses: list[Hypothesis] = []
     unavailable: list[str] = []
@@ -389,19 +402,33 @@ def rq4(data: Dataset, *, seed: int, resamples: int) -> FamilyResult:
         )
         hypotheses.append(Hypothesis("RQ-4", "primary_per_row", name))
 
-    for name, key_a, key_b in RQ4_CELL_CONTRASTS:
+    for name, key_a1, key_a0, key_b1, key_b0 in RQ4_BATTERY_INTERACTIONS:
+        keys = (key_a1, key_a0, key_b1, key_b0)
+        if any(k not in data.cells for k in keys):
+            unavailable.append(f"primary_per_row @ {name}")
+            continue
+        arms = [
+            [float(v) for v in data.cells[k].rounds_to_first_win] for k in keys
+        ]
+        estimates.append(
+            estimands.mean_difference_in_differences(
+                *arms, label=f"rounds to first win, interaction :: {name}"
+            )
+        )
+        hypotheses.append(Hypothesis("RQ-4", "primary_per_row", name))
+
+    for name, key_a, key_b in RQ4_EX5_ROWS:
         if key_a not in data.cells or key_b not in data.cells:
             unavailable.append(f"primary_per_row @ {name}")
             continue
         arm, base = data.cells[key_a], data.cells[key_b]
-        # Starter's win rate: the one win-rate estimand that carries
-        # information in a homogeneous field (§6.3).
-        wins_a, games_a = _win_rate_by_starting_seat([arm])
-        wins_b, games_b = _win_rate_by_starting_seat([base])
         estimates.append(
-            estimands.proportion_difference(
-                wins_a, games_a, wins_b, games_b,
-                label=f"starter win rate :: {name}",
+            estimands.mean_difference(
+                [float(v) for v in arm.rounds_to_first_win],
+                [float(v) for v in base.rounds_to_first_win],
+                label=f"rounds to first win :: {name}",
+                seed=seed + 900 + len(estimates),
+                resamples=resamples,
             )
         )
         hypotheses.append(Hypothesis("RQ-4", "primary_per_row", name))

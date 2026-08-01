@@ -258,3 +258,107 @@ def predictability_skill(leader_wins: int, checkpointed: int, players: int) -> f
     accuracy = leader_wins / checkpointed
     chance = 1.0 / players
     return (accuracy - chance) / (1.0 - chance)
+
+
+def proportion_vs_reference(
+    successes: int,
+    trials: int,
+    reference: float,
+    *,
+    label: str,
+    level: float = 0.95,
+) -> Estimate:
+    """A single proportion against a **fixed** reference (SQ-1).
+
+    The reference is a constant — 1/k is arithmetic, not an estimate — so it
+    contributes no sampling variance. Routing this through
+    :func:`proportion_difference` by passing the reference as a second sample
+    of the same size treats it as if it did, and inflates the interval by a
+    factor of sqrt(2). §6.3 names Wilson for exactly this case, and the
+    interval is reported on the difference scale by shifting Wilson's.
+    """
+    if trials == 0:
+        return Estimate(label, 0.0, Interval(0.0, 0.0, 0.0, level), 1.0, 0, 0,
+                        note="empty cell")
+    observed = successes / trials
+    difference = observed - reference
+    bounds = wilson(successes, trials, level=level)
+    interval = Interval(
+        difference, bounds.low - reference, bounds.high - reference, level
+    )
+    # The test is one-sample: the SE is evaluated under the null, where the
+    # proportion is the reference itself.
+    se_null = math.sqrt(reference * (1 - reference) / trials)
+    p_value = _two_sided_p(difference / se_null) if se_null > 0 else 1.0
+    return Estimate(label, difference, interval, p_value, trials, 0)
+
+
+def difference_in_differences(
+    a1: tuple[int, int],
+    a0: tuple[int, int],
+    b1: tuple[int, int],
+    b0: tuple[int, int],
+    *,
+    label: str,
+    level: float = 0.95,
+) -> Estimate:
+    """A 2x2 interaction on proportions: (a1 - a0) - (b1 - b0).
+
+    Each argument is ``(successes, trials)``. The four cells are separate
+    games, so the variances add.
+
+    This is what an interaction contrast means, and getting it wrong is not
+    subtle in its consequences but is invisible in its output: comparing two
+    player counts at one rule level answers "does k change the win rate",
+    whose answer is 1/2 against 1/6 and is arithmetic rather than a finding
+    (D-77).
+    """
+    counts = (a1, a0, b1, b0)
+    if any(trials == 0 for _, trials in counts):
+        return Estimate(label, 0.0, Interval(0.0, 0.0, 0.0, level), 1.0, 0, 0,
+                        note="empty arm")
+    rates = [successes / trials for successes, trials in counts]
+    estimate = (rates[0] - rates[1]) - (rates[2] - rates[3])
+    variance = sum(
+        rate * (1 - rate) / trials
+        for rate, (_, trials) in zip(rates, counts, strict=True)
+    )
+    se = math.sqrt(variance)
+    z_crit = z_for(level)
+    interval = Interval(estimate, estimate - z_crit * se, estimate + z_crit * se, level)
+    p_value = _two_sided_p(estimate / se) if se > 0 else 1.0
+    total = sum(trials for _, trials in counts)
+    return Estimate(label, estimate, interval, p_value, total, total)
+
+
+def mean_difference_in_differences(
+    a1: Sequence[float],
+    a0: Sequence[float],
+    b1: Sequence[float],
+    b0: Sequence[float],
+    *,
+    label: str,
+    level: float = 0.95,
+) -> Estimate:
+    """The same interaction on a battery metric, from four independent samples.
+
+    Analytic rather than bootstrapped, unlike the two-arm contrasts. A
+    difference of differences is a linear combination of four independent
+    sample means; at §8's cell sizes its sampling distribution is normal well
+    past the precision published here, and a four-arm BCa would cost four
+    resample passes per replicate to reproduce the same interval. §6.3's SQ-2
+    names BCa for a "difference between arms"; this is a difference between
+    differences, and the deviation is recorded rather than assumed (D-77).
+    """
+    arms = (a1, a0, b1, b0)
+    if any(len(arm) < 2 for arm in arms):
+        return Estimate(label, 0.0, Interval(0.0, 0.0, 0.0, level), 1.0, 0, 0,
+                        note="arm too small")
+    means = [mean(arm) for arm in arms]
+    estimate = (means[0] - means[1]) - (means[2] - means[3])
+    se = math.sqrt(sum(_variance(arm) / len(arm) for arm in arms))
+    z_crit = z_for(level)
+    interval = Interval(estimate, estimate - z_crit * se, estimate + z_crit * se, level)
+    p_value = _two_sided_p(estimate / se) if se > 0 else 1.0
+    total = sum(len(arm) for arm in arms)
+    return Estimate(label, estimate, interval, p_value, total, total)

@@ -18,10 +18,13 @@ from madnlab.analysis.estimands import (
     Estimate,
     cv,
     cv_ratio,
+    difference_in_differences,
     mean_difference,
+    mean_difference_in_differences,
     mean_ratio,
     predictability_skill,
     proportion_difference,
+    proportion_vs_reference,
     seat_difference,
     variance_ratio,
 )
@@ -151,3 +154,59 @@ def test_mean_difference_recovers_a_known_shift() -> None:
     estimate = mean_difference(shifted, base, label="m", seed=9, resamples=400)
     assert estimate.estimate == pytest.approx(2.0, abs=0.01)
     assert estimate.excludes_zero
+
+
+# -- the two estimators D-77 corrects ---------------------------------------
+
+
+def test_a_fixed_reference_carries_no_sampling_variance() -> None:
+    """SQ-1's case, and the factor the wrong estimator gets wrong.
+
+    1/k is arithmetic. Passing it as a second sample of the same size makes
+    the interval sqrt(2) times too wide — a plausible-looking number, and
+    every RQ-3 interval built on it is conservative by 41%.
+    """
+    fixed = proportion_vs_reference(50_000, 200_000, 0.25, label="fixed")
+    two_sample = proportion_difference(
+        50_000, 200_000, 50_000, 200_000, label="two-sample"
+    )
+    assert half_width_pp(two_sample) / half_width_pp(fixed) == pytest.approx(
+        2 ** 0.5, abs=0.001
+    )
+
+
+def test_reference_test_recovers_a_known_deviation() -> None:
+    estimate = proportion_vs_reference(52_000, 200_000, 0.25, label="fixed")
+    assert estimate.estimate == pytest.approx(0.01, abs=1e-9)
+    assert estimate.excludes_zero
+
+
+def test_interaction_is_zero_when_both_differences_agree() -> None:
+    """What makes a difference-in-differences an interaction.
+
+    The binding D-77 replaced compared two player counts at one rule level,
+    which measures 1/2 against 1/6 — arithmetic, reported as a finding.
+    """
+    equal = difference_in_differences(
+        (5_200, 10_000), (5_000, 10_000), (2_600, 10_000), (2_400, 10_000), label="x"
+    )
+    assert equal.estimate == pytest.approx(0.0, abs=1e-12)
+    assert not equal.excludes_zero
+
+
+def test_interaction_detects_a_real_difference_of_differences() -> None:
+    unequal = difference_in_differences(
+        (5_500, 10_000), (5_000, 10_000), (2_500, 10_000), (2_400, 10_000), label="y"
+    )
+    assert unequal.estimate == pytest.approx(0.04, abs=1e-9)
+    assert unequal.excludes_zero
+
+
+def test_mean_interaction_matches_its_definition() -> None:
+    a1 = [10.0] * 500
+    a0 = [6.0] * 500
+    b1 = [20.0] * 500
+    b0 = [19.0] * 500
+    estimate = mean_difference_in_differences(a1, a0, b1, b0, label="m")
+    # (10 - 6) - (20 - 19) = 3
+    assert estimate.estimate == pytest.approx(3.0)
