@@ -33,7 +33,7 @@ src = ["src", "tests"]
 # claims.
 [tool.mypy]
 python_version = "3.13"
-files = ["src", "tests", "benchmarks"]
+files = ["src", "tests"]
 strict = true
 warn_unreachable = true
 
