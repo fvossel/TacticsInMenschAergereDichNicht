@@ -9,46 +9,74 @@ are a by-product.
 
 ## Status
 
-Complete. **16,430,642 games** across 387 cells, all 40 pre-registered
-hypotheses evaluated, results in [docs/results.md](docs/results.md).
+Complete. **99,690,710 games** across 533 cells. 582 pre-registered hypotheses,
+577 evaluable, **316 rejected** after Holm correction within eleven families.
+Full report in [docs/results.md](docs/results.md).
 
 ## Headline results
 
+**The largest measured effect was not a hypothesis: where you sit.** Two
+adjacent players, both playing SPREAD, win **35.40 % against 64.60 %**. That is
+a **29.20 pp** seat advantage on a symmetric board with a fair die. Seat the
+same two opposite each other and it drops to 0.62 pp. The mechanism is the
+board geometry: entry fields sit ten fields apart on the 40-field track, so two
+adjacent seats leave cyclic gaps of 10 and 30, and the player with the 30-gap
+spends three quarters of the lap inside the stretch where the other one's fresh
+pieces enter. The effect needs the strategy as well: with RANDOM play the same
+seating gives 4.01 pp, because SPREAD is what keeps pieces distributed along
+the exposed stretch.
+
 **RQ-1 — mandatory capture does not make games more dynamic: not supported.**
-It does raise the dispersion of game length (CV ratio 1.169, 95% CI lower
-bound 1.164), but only one of the three required dynamism conjuncts holds.
+It does raise the dispersion of game length (CV ratio 1.1641, 95% CI lower
+bound 1.1595), but only one of the three required dynamism conjuncts holds.
 Lead changes per turn move *significantly in the opposite direction*: with
 mandatory capture the lead changes less often. Games get longer and more
-variable in length, not more eventful.
+variable in length, not more eventful. 7 of 8 tests reject; the criterion does
+not.
 
-**RQ-2 — the rule variants move length, almost never win rate.** 11 of 18
-tests reject. `free_entry` shortens the game by 208 rounds, mandatory capture
-lengthens it by 64, `dreimal würfeln` shortens it by 70. Of nine win-rate
-contrasts, two survive.
+**RQ-2 — the rule variants move length, almost never win rate.** 10 of 18
+tests reject. `free_entry` shortens the game by 207.6 rounds, mandatory capture
+lengthens it by 64.3, `dreimal würfeln` shortens it by 69.9. Of nine win-rate
+contrasts exactly one survives, `free_entry` at −0.25 pp.
 
 **RQ-3 — no movement strategy beats random: 0 of 4.** SPREAD, FOCUS_FRONT and
 FOCUS_REAR all sit within ±0.3 pp of 1/k at 200,000 games per cell, against a
-resolution of 0.19 pp. That is a result, not a power failure.
+resolution of 0.19 pp. That is a result, not a power failure. RQ-6 adds
+GREEDY_CAPTURE under both capture modes, with the same outcome.
 
 **RQ-4 — 4 of 10.** EX-5's pre-registered decomposition holds: the pattern
-effect is −2.05 rounds and the geometry effect −11.7, which is why §8 forbids
+effect is −2.01 rounds and the geometry effect −11.7, which is why §8 forbids
 publishing their sum as a pattern effect.
 
-**The largest measured effect was not a hypothesis.** Two adjacent SPREAD
-players win 35.3% against 64.7% — a **29.5 pp** seat advantage. The same
-seating with RANDOM play gives 3.5 pp. The effect needs both the geometry and
-the strategy, and it is two orders of magnitude larger than anything the study
-asked about. It is reported as descriptive, uncorrected, and in need of its own
-pre-registered replication.
+**RQ-5 — the seating family: 7 of 8 tests reject, the criterion does not.**
+The support criterion is a conjunction that includes the `opposite` negative
+control being equivalent to zero within ±1 pp. It came back at +0.62 pp with CI
+[+0.18, +1.06], missing the margin by 0.056 pp of interval. Re-running that one
+cell with a fresh seed and three times the games gave −0.11 pp, CI
+[−0.36, +0.14], p = 0.39, which is the opposite sign and entirely consistent
+with zero. The replication is reported beside the pre-registered verdict and is
+not used to overturn it.
+
+**RQ-6 — 6 of 9.** The starter advantage is real and small, +0.52 pp at four
+players and +0.25 pp at six. The middle seat of three players on a four-player
+board is an *advantage*, +0.82 pp under RANDOM and +5.73 pp under SPREAD, which
+is the opposite of what the pre-registration predicted.
+
+**RQ-7 to RQ-11 — the interactions carry most of the signal.** 282 of the 316
+rejections are interaction terms: rule × rule, rule × strategy, rule × player
+count, strategy × player count, rule × seating.
 
 ## Documents
 
 | File | What it is |
 |---|---|
-| [docs/results.md](docs/results.md) | The consolidated report. Four confirmatory families with Holm correction, the calibration gates, seat profiles, and every §6.2 metric of all 387 cells — significant or not, as §14.4 requires. |
-| [docs/requirements.md](docs/requirements.md) | The specification and pre-registration (version 2). Board and rule model, agents, logging, metric battery, the 40 confirmatory hypotheses, the experiment plan, acceptance criteria. |
-| [docs/decisions.md](docs/decisions.md) | The decision ledger — 80 rows. Every rule-ambiguity resolution, measurement-relevant choice and defect found during implementation, each with its status: verified against the official rulebook, explicit project choice where the rulebook is silent, or implementation decision. |
-| [docs/spec-review.md](docs/spec-review.md) | The clause-by-clause review that version 2 answers. Kept because the pre-registration claim rests on what was found and fixed before any data existed. |
+| [docs/results.md](docs/results.md) | The generated report. All 582 hypotheses family by family with estimate, interval, p-value and Holm threshold, the per-cell calibration gates, the seat profiles, and every §6.2 metric of all 533 cells, significant or not, as §14.4 requires. |
+
+The specification and pre-registration, the 80-row decision ledger and the
+clause-by-clause spec review are internal working documents and are not part of
+this repository. What they constrain is visible here instead: the frozen
+`prereg-v1` tag, the `prereg_version` field carried by every campaign config
+and summary row, and the acceptance tests in `tests/`.
 
 ## Layout
 
@@ -62,6 +90,7 @@ pre-registered replication.
 | `campaigns/` | The §8 plan as data, generated by `generate.py`, which asserts its cell counts against the ledger. |
 | `ui/` | TypeScript replay viewer, built to one self-contained HTML file that works from `file://` (D-43). |
 | `tests/` | 137 tests: AK-1 rule conformance, AK-2 determinism, AK-3 replay, AK-4 gate scope, AK-8/8b/8c estimators, AK-9 metric cross-validation. |
+| `docs/results.md` | The generated report for the campaign set above. |
 
 ## Reproducing
 
@@ -104,8 +133,8 @@ EX-1 and the first campaign submissions had already run under a placeholder.
 All of that data was discarded and regenerated under the tag rather than
 relabelled — runs are deterministic from the master seed, so regeneration costs
 wall-clock only. No §6.4 hypothesis had been evaluated at any point before the
-freeze, so the freeze still precedes the analysis. D-73 carries the full
-record; D-74 to D-77 record the defects found after it, including two in the
+freeze, so the freeze still precedes the analysis. Rows D-73 to D-77 of the
+decision ledger carry the full record, including two defects in the
 analysis code that the first real report exposed.
 
 ## Scope note
