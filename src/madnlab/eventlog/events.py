@@ -1,30 +1,28 @@
 """Event records (LG-1).
 
-Every event is a NamedTuple whose **field order is the serialization order**
-(D-33): the canonical writer emits the fields in declaration order, so a
-reordering here is a log-schema change and must bump
-:data:`SCHEMA_VERSION`.
+Every event is a NamedTuple whose field order is the serialization order (D-33): the canonical
+writer emits the fields in declaration order, so reordering them is a log-schema change and must
+bump :data:`SCHEMA_VERSION`.
 
-The event stream is what AK-3's replay validator compares. It therefore has to
-capture every decision the engine made, not merely the resulting state — in
-particular the full offered legal-move set and the chosen index, so a sampled
-log can be audited for AK-5 without re-simulating (§4.1).
+The event stream is what AK-3's replay validator compares, so an event carries every decision the
+engine made rather than only the resulting state. Recording the full offered legal-move set and the
+chosen index lets a sampled log be audited for AK-5 without re-simulating (§4.1).
 """
 
 from __future__ import annotations
 
 from typing import NamedTuple
 
-#: Bumped whenever the event schema, the field order, or the canonical
-#: serialization changes. Recorded in the header and checked on replay.
+#: Bumped whenever the event schema, the field order, or the canonical serialization changes.
+#: Recorded in the header and checked on replay.
 SCHEMA_VERSION = "1"
 
 
 class RollEvent(NamedTuple):
     seat: int
     value: int
-    #: 1-based index within the turn's roll sequence: the attempt phase first,
-    #: then any extra rolls (D-10).
+    #: 1-based index within the turn's roll sequence: the attempt phase first, then any extra
+    #: rolls (D-10).
     attempt: int
 
 
@@ -34,9 +32,10 @@ class MoveEvent(NamedTuple):
     from_pos: int
     to_pos: int
     kind: str
-    #: The full offered set, as ``(piece, from_pos, to_pos, kind, captures)``
-    #: per entry. ``captures`` lets AK-5 be audited from the log alone.
+    #: The full offered set, one ``(piece, from_pos, to_pos, kind, captures)`` per entry.
+    #: ``captures`` lets AK-5 be audited from the log alone.
     legal: tuple[tuple[int, int, int, str, int | None], ...]
+    #: Index into :attr:`legal` of the move that was played.
     chosen: int
     #: Which clause of the GM-5.1 lattice narrowed the set, if any.
     restriction: str
@@ -80,8 +79,8 @@ Event = (
     | GameEndEvent
 )
 
-#: Wire tag per event type. Explicit rather than derived from the class name,
-#: so renaming a class is not silently a schema change.
+#: Wire tag per event type. Explicit rather than derived from the class name, so renaming a class
+#: is not silently a schema change.
 KIND: dict[type, str] = {
     RollEvent: "roll",
     MoveEvent: "move",
@@ -96,9 +95,8 @@ KIND: dict[type, str] = {
 class LogHeader(NamedTuple):
     """The header record (§4.1).
 
-    §4.3 requires a game to be reproducible from ``header + engine version``
-    alone, so everything the runner resolved rather than derived — the drawn
-    starting seat above all — has to be in here.
+    §4.3 requires a game to be reproducible from ``header + engine version`` alone, so every value
+    the runner resolved rather than derived — the drawn starting seat above all — is recorded here.
     """
 
     schema_version: str

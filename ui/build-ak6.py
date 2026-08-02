@@ -1,15 +1,14 @@
 """Build the AK-6 harness page.
 
-AK-6 requires the UI to render a golden reference game — fixed seed, checked-in
-log — correctly end to end from the built artifact opened off disk, with every
-event steppable and the final state matching the summary row.
+AK-6 requires the UI to render a golden reference game — fixed seed, checked-in log — end to end
+from the built artifact opened off disk, with every event steppable and the final state matching
+the summary row.
 
-A `fetch` cannot be used to load the log: over `file://` the origin is opaque
-and the request is blocked, which is the same constraint that makes D-43
-require a single self-contained file. So the harness embeds the log the same
-way the build embeds the script, and asserts inside the page.
+The log cannot be fetched: over ``file://`` the origin is opaque and the request is blocked, the
+same constraint that makes D-43 require a single self-contained file. The harness therefore embeds
+the log the way the build embeds the script, and asserts inside the page.
 
-Run from the repository root, after `npm run build`::
+Run from the repository root, after ``npm run build``::
 
     .venv/Scripts/python.exe ui/build-ak6.py
 """
@@ -42,10 +41,9 @@ GOLDEN = {
     ),
 }
 
-#: ``type="module"`` is required, not cosmetic. The built app script is a
-#: module and therefore deferred, so a classic checker runs *before* it and
-#: finds ``window.madnlabLoad`` undefined. Modules execute in document order,
-#: which puts this after the app.
+#: ``type="module"`` is load-bearing: the built app script is a module and therefore deferred, so
+#: only another module is guaranteed to run after it and see ``window.madnlabLoad`` defined.
+#: Modules execute in document order, which puts this checker after the app.
 CHECKER = """
 <script type="module">
 (function () {
@@ -63,9 +61,8 @@ CHECKER = """
     check(label + ": frame count == events + 1", state0.frames, golden.events + 1);
     check(label + ": opens at the first frame", state0.cursor, 0);
 
-    // Every event must be steppable: walk the whole stream one frame at a
-    // time through the same control the user clicks, not through an internal
-    // shortcut.
+    // Every event must be steppable: walk the whole stream one frame at a time through the
+    // control the user clicks, not through an internal shortcut.
     const next = document.getElementById("next");
     let steps = 0;
     while (window.madnlabState().cursor < golden.events) {
@@ -132,9 +129,8 @@ def main() -> int:
             for seat in spec.occupied():
                 opening[seat * 4] = 1
 
-        # The final positions the viewer must arrive at, taken from the engine
-        # rather than from the viewer's own fold — otherwise the check would
-        # compare the viewer against itself.
+        # The final positions the viewer must arrive at, folded here from the engine's events so
+        # the check compares two independent computations rather than the viewer against itself.
         final = list(opening)
         for event in run.events:
             kind = type(event).__name__

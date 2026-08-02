@@ -1,11 +1,9 @@
 /**
- * Replaying an event stream into board states (UI-4), and the running §6
+ * Replaying an event stream into board states (UI-4) and the running §6
  * metrics the info panel shows (UI-5).
  *
- * The viewer never re-derives legality — GM-7 says one function owns that, and
- * it lives in the engine. Everything here is a fold over recorded events, so
- * what is displayed is what happened rather than what this code thinks should
- * have happened.
+ * The viewer never re-derives legality: under GM-7 that belongs to a single
+ * engine function. Everything here is a fold over recorded events.
  */
 
 import type { Event, GameLog } from "./log";
@@ -37,6 +35,7 @@ export function ringField(geometry: Geometry, seat: number, pos: number): number
     geometry.ringLength;
 }
 
+/** Progress of a seat with all four pieces home: the sum of the top GOAL_FIELDS positions. */
 export function maxProgressPerSeat(geometry: Geometry): number {
   const top = geometry.ringLength + GOAL_FIELDS;
   let total = 0;
@@ -111,7 +110,7 @@ function seatTotal(positions: number[], seat: number): number {
 }
 
 /**
- * Recompute leader(t) exactly as §6.1 defines it: unique argmax; on ties the
+ * Recompute leader(t) as §6.1 defines it: unique argmax; on ties the
  * previous leader if it is still tied for the maximum, else the lowest tied
  * seat index; null until a strict maximum exists.
  */
@@ -141,9 +140,9 @@ function updateLeader(frame: Frame, occupied: number[]): void {
 /**
  * Fold the whole stream into one frame per event, plus the opening position.
  *
- * Materialised rather than recomputed on demand: stepping backwards is as
- * common as stepping forwards in a replay viewer, and a 2,400-event game is a
- * few hundred kilobytes of frames.
+ * Frames are materialised rather than recomputed on demand: stepping backwards
+ * is as common as stepping forwards in a replay viewer, and a 2,400-event game
+ * costs a few hundred kilobytes.
  */
 export function buildFrames(log: GameLog): Frame[] {
   const geometry = geometryFor(log.header.seats);

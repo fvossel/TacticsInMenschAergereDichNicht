@@ -2,9 +2,8 @@
 
 Implemented from the regularized upper incomplete gamma rather than pulled in
 from SciPy, for the reason NF-7 gives: the analysis layer avoids BLAS-backed
-dependencies so a published threshold verdict cannot flip between machines.
-The implementation is verified against tabulated critical values in the test
-suite rather than trusted.
+dependencies, so a published threshold verdict reads the same on every machine.
+The test suite pins the implementation against tabulated critical values.
 """
 
 from __future__ import annotations
@@ -77,8 +76,7 @@ class GoodnessOfFit(NamedTuple):
     statistic: float
     df: int
     p_value: float
-    #: Bins whose standardized residual exceeds 3, so a failure names where it
-    #: failed instead of only that it did.
+    #: Bins whose standardized residual exceeds 3, so a failure names where it failed.
     outlier_bins: tuple[int, ...]
 
 
@@ -89,8 +87,8 @@ def chi_square_test(
 
     ``estimated_parameters`` is 0 for AK-8b: the geometric distribution's ``p``
     comes from the rule set, not from the data, so no degree of freedom is
-    spent on it. Getting that wrong would make the test conservative and hide
-    exactly the dice or entry-logic bias the gate exists to catch.
+    spent on it and the gate keeps its full sensitivity to dice or entry-logic
+    bias.
     """
     if len(observed) != len(expected):
         raise ValueError(f"{len(observed)} bins against {len(expected)} expectations")
@@ -127,9 +125,8 @@ def geometric_pmf(p: float, k: int) -> float:
 def geometric_expectations(p: float, bins: int, trials: int) -> list[float]:
     """Expected counts for turn counts ``1..bins``, with the tail folded in.
 
-    The last bin absorbs ``P(X > bins)`` so the expectations sum to ``trials``
-    exactly; leaving the tail out would make the statistic depend on where the
-    binning stopped.
+    The last bin absorbs ``P(X > bins)``, so the expectations sum to ``trials``
+    exactly and the statistic stays independent of where the binning stopped.
     """
     head = [geometric_pmf(p, k) * trials for k in range(1, bins)]
     return [*head, trials - sum(head)]

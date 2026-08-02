@@ -1,11 +1,9 @@
 /**
  * Parsing MadnLab event logs (LG-1).
  *
- * The wire format is one canonical JSON object per line, header first, with an
- * `e` tag naming the record kind (D-33). The field order in the file is the
- * declaration order of the Python NamedTuples, but nothing here depends on
- * order — only on names — so a schema addition is additive rather than
- * breaking.
+ * The wire format is one canonical JSON object per line, header first, with an `e` tag naming
+ * the record kind (D-33). Records are read by field name and never by position, so adding a
+ * field to the schema is additive rather than breaking.
  */
 
 export const SUPPORTED_SCHEMA = "1";
@@ -63,6 +61,7 @@ export interface GameLog {
   events: Event[];
 }
 
+/** Thrown when the input is not a readable log of the supported schema. */
 export class LogParseError extends Error {}
 
 /** Parse a JSONL event log. Blank lines are tolerated; anything else is not. */
@@ -88,8 +87,8 @@ export function parseLog(text: string): GameLog {
     if (header === null) {
       throw new LogParseError("the first record must be the header (§4.1)");
     }
-    // The final record of a self-contained log is the summary row, which has
-    // no `e` tag. It is not an event and is skipped rather than rejected.
+    // The final record of a self-contained log is the summary row, which carries no `e` tag.
+    // It is not an event, so it is skipped rather than rejected.
     if (typeof record["e"] !== "string") continue;
     events.push(record as unknown as Event);
   }
@@ -109,6 +108,7 @@ export function ruleMap(header: Header): Map<string, string> {
   return new Map(header.rules);
 }
 
+/** Agent name registered for `seat`, or `-` when the seat carries none. */
 export function agentFor(header: Header, seat: number): string {
   return header.agents.find(([s]) => s === seat)?.[1] ?? "-";
 }

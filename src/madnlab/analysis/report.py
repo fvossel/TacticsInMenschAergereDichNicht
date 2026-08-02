@@ -1,14 +1,10 @@
-"""Rendering ``docs/results.md`` — the §8 consolidated report.
+"""Rendering of ``docs/results.md`` — the §8 consolidated report.
 
-§14.4 is the constraint that shapes this file: *every* §6.2 metric for *every*
-campaign cell is reported, significant or not, with its confirmatory or
-descriptive label attached. That, together with the `prereg-v1` freeze, is what
-prevents cherry-picking — not the size of the multiplicity correction. So the
-battery table here is deliberately exhaustive and deliberately boring.
-
-The confirmatory sections come first because they are the pre-registered
-claims; everything after them is labelled as not error-controlled, in the
-document rather than in a footnote a reader can miss.
+§14.4 shapes this file: every §6.2 metric of every campaign cell is reported,
+significant or not, carrying its confirmatory or descriptive label. That, with the
+``prereg-v1`` freeze, is what constrains selection, so the battery table is exhaustive
+by design. Confirmatory sections come first because they are the pre-registered claims;
+everything after them is labelled as not error-controlled in the body of the document.
 """
 
 from __future__ import annotations
@@ -61,17 +57,16 @@ def _fmt(value: float) -> str:
         return f"{value:,.0f}"
     if abs(value) >= 10:
         return f"{value:.1f}"
-    # Four decimals below 10: a CV ratio of 1.1450 and one of 1.1499 are
-    # different findings, and two decimals hides the difference.
+    # Four decimals below 10: a CV ratio of 1.1450 and one of 1.1499 are different
+    # findings, and two decimals hides the difference.
     return f"{value:.4f}"
 
 
 def _p(value: float) -> str:
-    """A p-value that underflowed to zero is not zero, and must not print as it.
+    """Format a p-value, rendering underflow as a bound rather than as zero.
 
-    Double precision bottoms out around 1e-308 and the normal tail reaches it
-    easily at these sample sizes. Printing "0.000e+00" would claim an exact
-    zero, which no finite sample can produce.
+    Double precision bottoms out near 1e-308 and the normal tail reaches it at these
+    sample sizes. An exact zero is a claim no finite sample can support.
     """
     if value <= 0.0:
         return "&lt;1e-300"
@@ -92,10 +87,9 @@ def _estimate_row(estimate: Estimate, rejected: bool | None, alpha: float | None
 
 
 def family_section(result: FamilyResult) -> list[str]:
-    """One family, with its Holm step-down shown rather than summarized."""
-    # holm() writes its verdicts back into the original order, so index i of
-    # result.holm is the verdict for estimate i. The step-down reordering is
-    # internal to it and is reported per row as the adjusted alpha.
+    """One family, with its Holm step-down shown per row rather than summarized."""
+    # holm() writes its verdicts back into the original order, so result.holm[i] is the
+    # verdict for estimate i; the step-down reordering surfaces only as the adjusted alpha.
     lines = [
         f"### {result.family}",
         "",
@@ -136,7 +130,7 @@ def family_section(result: FamilyResult) -> list[str]:
 
 
 def rq1_section(verdict: RQ1Verdict) -> list[str]:
-    """§6.4's biconditional, with both conjuncts shown."""
+    """§6.4's support criterion, rendered as the biconditional with both conjuncts."""
     lines = [
         "### RQ-1 support criterion",
         "",
@@ -233,12 +227,11 @@ def seat_profile_table(
 ) -> list[str]:
     """Per-seat win rates for the cells where they carry information.
 
-    §6.3's symmetry identity fixes every seat at 1/k wherever the field is
-    homogeneous *and* the seats are exchangeable, so a per-seat rate there is
-    a statement about arithmetic. Where exchangeability fails — an uneven
-    seating gap, or one seat playing a different policy — the profile is the
-    measurement, and it is the one AK-4 is deliberately not allowed to gate on
-    (D-74). This table is exactly those cells.
+    §6.3's symmetry identity fixes every seat at 1/k wherever the field is homogeneous
+    and the seats are exchangeable, so a per-seat rate there restates arithmetic. Where
+    exchangeability fails — an uneven seating gap, or one seat playing a different
+    policy — the profile is the measurement, and AK-4 does not gate on it (D-74). This
+    table holds exactly those cells.
     """
     profiles: list[tuple[float, str, int, str]] = []
     for key in sorted(cells):

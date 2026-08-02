@@ -1,10 +1,9 @@
 """Generate the §8 campaign configurations from the D-59 plan.
 
-The plan is data, not prose: 385 cells across seven campaigns, with the
-confirmatory cells at their derived sample sizes and everything else at the
-descriptive n = 20,000. Generating them rather than hand-writing them is the
-only way the counts in D-59 and the files on disk can be checked against each
-other — and this script asserts them.
+The plan is data, not prose: 529 cells across eleven campaigns. Each cell's sample size comes
+from its tier: confirmatory cells at their derived n (D-59), interaction cells at the §17 n,
+EX-4's factorial at 40,000, and everything else at the descriptive n = 20,000. Generating the
+files keeps the cell counts checkable against D-59, and main() asserts them.
 
 Run from the repository root::
 
@@ -26,17 +25,17 @@ from madnlab.engine.rules import RuleSet  # noqa: E402
 
 OUT = ROOT / "campaigns"
 
-#: D-59's two tiers.
+#: Games per cell in D-59's descriptive tier.
 DESCRIPTIVE = 20_000
-#: EX-4 alone: its 168 cells are the pooled arms of RQ-7's 21 rule-pair
-#: interactions, 42 cells per arm (§17).
+#: EX-4 alone: its 168 cells are the pooled arms of RQ-7's 21 rule-pair interactions,
+#: 42 cells per arm (§17).
 EX4_N = 40_000
 CONFIRMATORY = {"ex2": 250_000, "ex3": 200_000, "ex5": 250_000, "ex6": 400_000,
                 "ex7": 200_000, "ex8": 250_000}
 
 AGENTS = ("RANDOM", "SPREAD", "FOCUS_FRONT", "FOCUS_REAR", "GREEDY_CAPTURE")
-#: RQ-3's four agents. GREEDY_CAPTURE is a control for RQ-1/RQ-2, not a
-#: strategy under study, so it stays out of EX-3 (D-44, D-45).
+#: RQ-3's four agents. GREEDY_CAPTURE is a control for RQ-1/RQ-2, not a strategy under
+#: study, so it stays out of EX-3 (D-44, D-45).
 RQ3_AGENTS = ("RANDOM", "SPREAD", "FOCUS_FRONT", "FOCUS_REAR")
 CAPTURE_MODES = ("optional", "mandatory", "mandatory_extended")
 
@@ -55,6 +54,7 @@ def cell(
     rules: dict[str, Any] | None = None,
     pattern: str = "adjacent",
 ) -> dict[str, Any]:
+    """Build one campaign cell in the on-disk JSON shape."""
     return {
         "key": key,
         "seats": seats,
@@ -73,8 +73,8 @@ def ex2() -> list[dict[str, Any]]:
         CAPTURE_MODES, (2, 3, 4, 6), ("RANDOM", "SPREAD", "GREEDY_CAPTURE")
     ):
         seats = board_for_players(players)
-        # The RQ-1 confirmatory family lives in one headline cell set: 4
-        # players, seats 4, all-RANDOM (§6.4).
+        # The RQ-1 confirmatory family lives in one cell set: 4 players, seats 4,
+        # all-RANDOM (§6.4).
         confirmatory = players == 4 and field == "RANDOM"
         cells.append(
             cell(
@@ -107,8 +107,8 @@ def ex3() -> list[dict[str, Any]]:
         if deviant == field:
             continue
         seats = board_for_players(players)
-        # RQ-3's confirmatory contrasts are the three non-RANDOM deviants
-        # against a RANDOM field at 4 players (§6.4).
+        # RQ-3's confirmatory contrasts are the three non-RANDOM deviants against a
+        # RANDOM field at 4 players (§6.4).
         confirmatory = field == "RANDOM" and players == 4 and deviant != "RANDOM"
         cells.append(
             cell(
@@ -137,10 +137,10 @@ def ex4() -> list[dict[str, Any]]:
         # Nested axis: the quick-entry bonus needs the three-attempts variant.
         if bonus and not dreimal:
             continue
-        # Under free_entry both entry axes are provably inert, so the 72
-        # admissible cells there collapse to 24 distinct behaviours. Pinning
-        # them to their defaults is what makes the collapse explicit rather
-        # than a counting argument (D-13).
+        # Under free_entry both entry axes are provably inert, so the 72 admissible cells there
+        # collapse to 24 distinct behaviours. Skipping the non-default levels makes the
+        # collapse explicit in the generated files rather than only in a counting
+        # argument (D-13).
         if cold == "free_entry" and (dreimal or bonus):
             continue
         rules: dict[str, Any] = {}
@@ -164,7 +164,7 @@ def ex4() -> list[dict[str, Any]]:
 
 
 def ex5() -> list[dict[str, Any]]:
-    """Seating geometry, with the D-27 control that separates the two effects."""
+    """Seating geometry. The D-27 control separates seat count from seat pattern."""
     cells = []
     arms = [
         ("4s-adjacent", 4, "adjacent"),
@@ -200,7 +200,7 @@ def ex6() -> list[dict[str, Any]]:
     """RQ-4 interactions, six explicitly typed rows (D-28, D-46)."""
     cells = []
     deviants = ("SPREAD", "FOCUS_FRONT", "FOCUS_REAR", "GREEDY_CAPTURE")
-    #: The cells carrying the RQ-4 confirmatory contrasts (§6.4).
+    #: Deviants whose cells carry the RQ-4 confirmatory contrasts (§6.4).
     confirmatory_deviants = ("SPREAD", "FOCUS_FRONT")
 
     for mode, field in itertools.product(CAPTURE_MODES, AGENTS):  # 6a
@@ -242,8 +242,8 @@ def ex6() -> list[dict[str, Any]]:
             )
         )
     for mode, players in itertools.product(CAPTURE_MODES, (2, 3, 4, 6)):  # 6e
-        # D-12: every player-count contrast is estimated at a fixed seats
-        # level, so this whole row runs on the 6-seat board.
+        # D-12: every player-count contrast is estimated at a fixed seats level, so this
+        # whole row runs on the 6-seat board.
         games = (
             CONFIRMATORY["ex6"]
             if mode in ("optional", "mandatory") and players in (2, 6)
@@ -270,10 +270,10 @@ def ex6() -> list[dict[str, Any]]:
 def ex7() -> list[dict[str, Any]]:
     """RQ-5, seat exposure (§15).
 
-    Two players on the 4-seat board sit either `adjacent` (cyclic entry-field
-    gaps of 10 and 30) or `opposite` (20 and 20). A piece is exposed to an
-    opponent over the stretch it occupies downstream of that opponent's entry,
-    so `adjacent` should be lopsided and `opposite` should not.
+    Two players on the 4-seat board sit either `adjacent` (cyclic entry-field gaps of 10 and
+    30) or `opposite` (20 and 20). A piece is exposed to an opponent over the stretch it
+    occupies downstream of that opponent's entry, which makes the exposure asymmetric under
+    `adjacent` and symmetric under `opposite`.
     """
     cells = []
     for pattern, field in itertools.product(("adjacent", "opposite"), AGENTS):
@@ -294,13 +294,11 @@ def ex7() -> list[dict[str, Any]]:
 
 
 def ex8() -> list[dict[str, Any]]:
-    """RQ-6 (§16): the questions the earlier plan measured but never tested.
+    """RQ-6 (§16): starting-player advantage, and GREEDY_CAPTURE against a RANDOM field.
 
-    Two things the existing cells cannot answer at a useful n. The
-    starting-player advantage as a function of player count needs the board
-    held fixed (D-12), so all four counts run on the 6-seat board. And
-    GREEDY_CAPTURE never appears as a deviant against a RANDOM field outside
-    the 20k descriptive cells, which is too small to resolve 0.5 pp.
+    Both contrasts are sized to resolve 0.5 pp, which the descriptive n does not reach. Reading
+    the starting-player advantage against player count requires the board held fixed (D-12), so
+    all four counts run on the 6-seat board.
     """
     cells = []
     for players in (2, 3, 4, 6):
@@ -322,11 +320,10 @@ def ex8() -> list[dict[str, Any]]:
     return cells
 
 
-#: The ten rule configurations the interaction campaigns cross against
-#: everything else: the baseline plus each §2.4 axis moved one level. Named
-#: here once because four campaigns and five families all index into them.
-#: ``bonus_quick`` carries ``dreimal_wuerfeln`` with it — the flag is nested
-#: (§2.4) and its contrast is against ``dreimal`` rather than the baseline.
+#: The ten rule configurations the interaction campaigns cross against everything else:
+#: the baseline plus each §2.4 axis moved one level. Defined once because four campaigns
+#: and five families index into them. ``bonus_quick`` carries ``dreimal_wuerfeln`` with it,
+#: since the flag is nested (§2.4); its contrast is against ``dreimal``, not the baseline.
 RULE_CONFIGS: tuple[tuple[str, dict[str, Any]], ...] = (
     ("baseline", {}),
     ("cold_start=strict", {"cold_start": "strict"}),
@@ -340,8 +337,8 @@ RULE_CONFIGS: tuple[tuple[str, dict[str, Any]], ...] = (
     ("bonus_forfeited", {"bonus_roll_forfeited": True}),
 )
 
-#: n per interaction cell. A 0.5 pp interaction in a family of 180 needs
-#: 601,249 games per arm (§17), and here every arm is a single cell.
+#: Games per interaction cell. A 0.5 pp interaction in a family of 180 needs 601,249 games
+#: per arm (§17), and here every arm is a single cell.
 INTERACTION_N = 600_000
 
 
@@ -368,8 +365,8 @@ def ex9() -> list[dict[str, Any]]:
 def ex10() -> list[dict[str, Any]]:
     """RQ-9: does a rule's effect depend on how many people are playing?
 
-    All on the 6-seat board (D-12): a player-count contrast at mixed board
-    sizes measures the board as much as the count.
+    All on the 6-seat board (D-12): a player-count contrast at mixed board sizes measures the
+    board as much as the count.
     """
     return [
         cell(
@@ -383,8 +380,8 @@ def ex10() -> list[dict[str, Any]]:
 def ex11() -> list[dict[str, Any]]:
     """RQ-10: does a strategy's worth depend on the number of opponents?
 
-    The RANDOM arm of every contrast is EX-10's baseline cell at the same
-    player count, so it is not duplicated here.
+    The RANDOM arm of every contrast is EX-10's baseline cell at the same player count, so it
+    is not duplicated here.
     """
     return [
         cell(
@@ -416,7 +413,7 @@ CAMPAIGNS = {
     "ex4": ("RQ-2 rule main effects", 20261012, ex4),
     "ex5": ("Seating geometry", 20261013, ex5),
     "ex6": ("RQ-4 interactions", 20261014, ex6),
-    # A fresh seed, and its own pre-registration (§15, D-78).
+    # Own seed and own pre-registration (§15, D-78).
     "ex7": ("RQ-5 seat exposure", 20261015, ex7),
     "ex8": ("RQ-6 turn order, capture play, middle seat", 20261016, ex8),
     "ex9": ("RQ-8 rule x strategy", 20261020, ex9),
@@ -425,13 +422,18 @@ CAMPAIGNS = {
     "ex12": ("RQ-11 rule x seating", 20261023, ex12),
 }
 
-#: D-59's cell counts. Asserted, so the plan and the files cannot drift.
+#: D-59's cell counts. main() checks every builder against them, so the plan and the files
+#: on disk state the same thing.
 EXPECTED_CELLS = {"ex2": 36, "ex3": 64, "ex4": 168, "ex5": 10, "ex6": 105,
                   "ex7": 14, "ex8": 6, "ex9": 50, "ex10": 40, "ex11": 16,
                   "ex12": 20}
 
 
 def main() -> int:
+    """Write one JSON file per campaign.
+
+    Returns 1 if a builder's cell count disagrees with D-59 or a campaign repeats a cell key.
+    """
     total_cells = total_games = 0
     for name, (description, seed, builder) in CAMPAIGNS.items():
         cells = builder()
@@ -464,7 +466,9 @@ def main() -> int:
         total_games += games
         print(f"{name}: {len(cells):>4} cells  {games:>12,} games  -> {path.name}")
 
-    # EX-1 and EX-1b are already written by hand and already run.
+    # EX-1 and EX-1b are hand-written rather than generated here. Their two cells complete the
+    # plan's 531, and their 800,000 games plus the AK-5 smoke cell's two complete its
+    # 99,650,002.
     print(f"\n{total_cells + 2:>4} cells total (with EX-1 and EX-1b)")
     print(f"{total_games + 800_002:>12,} games total")
     return 0

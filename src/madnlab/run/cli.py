@@ -33,15 +33,13 @@ def run_campaign(
 ) -> int:
     """Play a campaign, streaming each cell's rows to disk as it finishes.
 
-    **Streaming, not accumulating.** A summary row costs ~16.7 KB as live
-    Python objects — measured, not estimated: EX-6's 7.42M rows peaked at
-    124 GB. Holding a 50M-row campaign would need 800 GB. Each cell is written
-    and dropped instead, so peak memory is one cell rather than one campaign.
+    A summary row costs ~16.7 KB as live Python objects, so holding a 50M-row campaign in
+    memory would take ~800 GB. Each cell is written and dropped instead, which keeps peak
+    memory at one cell rather than one campaign.
 
-    **Sharding by cell.** ``--shard i/n`` runs only the cells with
-    ``index % n == i``. Game seeds come from ``(master_seed, cell_key,
-    game_index)`` and never from the shard, so which node ran a cell cannot
-    reach the numbers — the same property D-33 gives worker count, extended to
+    ``--shard i/n`` runs only the cells with ``index % n == i``. Game seeds come from
+    ``(master_seed, cell_key, game_index)`` and never from the shard, so which node ran a
+    cell cannot reach the numbers — the same property D-33 gives worker count, extended to
     machines. Each shard writes its own summary; the analysis reads them all.
     """
     config = load(config_path)
@@ -104,18 +102,17 @@ def run_campaign(
 def analyse(campaign_dir: Path, analysis_seed: int) -> int:
     """Report the gates that run over whole cells: AK-4 and AK-5.
 
-    Writes ``analysis.json`` beside the campaign (NF-7) so the verdict carries
-    its seed, its resample count and the digest of the rows it was computed
-    from — §6.4's rules are threshold rules, and a threshold verdict without a
-    reproducible provenance is an opinion.
+    Writes ``analysis.json`` beside the campaign (NF-7) so the verdict carries its seed, its
+    resample count and the digest of the rows it was computed from. §6.4's rules are
+    threshold rules, so that provenance is what makes a borderline verdict reproducible.
     """
     summary_path = campaign_dir / "summary.jsonl.gz"
     if not summary_path.exists():
         summary_path = campaign_dir / "summary.jsonl"
     cells = aggregate.load_cells(summary_path)
 
-    # The agent assignment is not in the summary rows (D-22 fixes their key
-    # set), so the gate's scope comes from the campaign config beside them.
+    # The agent assignment is not in the summary rows (D-22 fixes their key set), so the
+    # gate's scope comes from the campaign config beside them.
     agents_by_cell: dict[str, list[str]] = {}
     config_path = campaign_dir / "campaign.json"
     if config_path.exists():
@@ -135,17 +132,13 @@ def analyse(campaign_dir: Path, analysis_seed: int) -> int:
 
         ak4 = aggregate.ak4(cell)
         print(ak4.report())
-        # Two things keep a cell out of the gate, and neither suppresses its
-        # numbers -- the report above is printed either way (D-72's descriptive
-        # value stands).
-        #
-        # An inconclusive cell is not a failure: a cell too small to resolve
-        # the margin says nothing about symmetry either way (D-72).
-        #
-        # A cell whose seats are not exchangeable by construction is not a
-        # failure either: §11 scopes AK-4 to the calibration cells, and a
-        # deviant policy or an uneven seating gap makes 1/k the wrong
-        # reference rather than the engine wrong (D-74).
+        # Two conditions keep a cell out of the gate, and neither suppresses its numbers:
+        # the report above is printed either way. Inconclusive means the cell is too small
+        # to resolve the margin, which leaves symmetry undecided in both directions (D-72).
+        # Not exchangeable means the cell sits outside §11's scope for AK-4, the calibration
+        # cells: under a deviant policy or an uneven seating gap, 1/k is not the reference
+        # the seat rates are read against, so a deviation there describes the cell's
+        # construction rather than the engine (D-74).
         exchangeable = aggregate.seats_exchangeable(
             cell.occupied, cell.seats, agents_by_cell.get(key, [])
         )
@@ -175,10 +168,8 @@ def analyse(campaign_dir: Path, analysis_seed: int) -> int:
                 "passed": ak5.passed,
                 "offered": ak5.offered,
                 "violations": ak5.violations,
-                # Both halves of §11's invariant are persisted, not just the
-                # one that existed first: a manifest recording half a verdict
-                # is what let AK-5 pass on half a check for four milestones
-                # (D-75).
+                # Both halves of §11's invariant are persisted, so the manifest
+                # carries the whole AK-5 verdict rather than half of it (D-75).
                 "lap_offered": ak5.lap_offered,
                 "lap_violations": ak5.lap_violations,
             }
@@ -212,7 +203,11 @@ def build_report(
     run_dirs: list[Path], out: Path, analysis_seed: int,
     resamples: int, workers: int = 1,
 ) -> int:
-    """Run §6.4's four families over every campaign and write the §8 report."""
+    """Run every pre-registered family over the campaigns and write the §8 report.
+
+    §6.4's four confirmatory families are RQ-1 to RQ-4; RQ-5 is §15's replication, RQ-6 is
+    §16's, and RQ-7 to RQ-11 are §17's interaction matrix.
+    """
     from madnlab.analysis import families, report
 
     data = families.load_dataset(run_dirs)
@@ -261,9 +256,8 @@ def build_report(
         for line in replication_verdict.detail:
             print(f"  {line}")
 
-    # A cell is confirmatory when a §6.4 contrast reads it. Derived from the
-    # sample sizes §8 assigned rather than re-listed here, so the label cannot
-    # drift from the plan that produced it.
+    # A cell is confirmatory when a §6.4 contrast reads it. Derived from the sample sizes
+    # §8 assigned rather than re-listed here, so the label follows the plan that produced it.
     confirmatory = {
         key for key, cell in data.cells.items() if cell.games > 20_100
     }

@@ -1,15 +1,13 @@
 """Campaign configuration as data (§7.1).
 
-A campaign is one declarative JSON file. Nothing statistical is decided in code
-at run time: the arms, the sample sizes, the agent assignment and the master
-seed all come from the file, and the resolved form is written back out beside
-the results so a published number can be traced to the configuration that
-produced it.
+A campaign is one declarative JSON file. Nothing statistical is decided in code at run time: the
+arms, the sample sizes, the agent assignment and the master seed all come from the file, and the
+resolved form is written back out beside the results so a published number can be traced to the
+configuration that produced it.
 
-The resolver is deliberately strict. An unknown key is an error rather than a
-silently ignored typo — a misspelled ``capture_mode`` that falls back to the
-default would run the baseline arm under a name claiming otherwise, and
-nothing downstream would notice.
+An unknown key is an error rather than an ignorable typo. The strictness is the only check that an
+arm's rules match the name it is published under — a misspelled ``capture_mode`` silently taking the
+default value is caught nowhere else.
 """
 
 from __future__ import annotations
@@ -78,13 +76,12 @@ class CampaignConfig(NamedTuple):
     master_seed: int
     cells: tuple[CellConfig, ...]
     log_events: dict[str, Any]
-    #: Which pre-registration this campaign runs under (§14). Per campaign
-    #: rather than global: a later study gets its own freeze, and stamping its
-    #: tag on rows produced under the earlier one would misdate them (D-78).
+    #: Which pre-registration this campaign runs under (§14). Per campaign rather than global: a
+    #: later study gets its own freeze, and each row carries the tag it was produced under (D-78).
     prereg_version: str = "prereg-v1"
 
     def specs(self) -> Iterator[tuple[GameSpec, int]]:
-        """Each cell's spec with its **effective** game count (D-39)."""
+        """Each cell's spec with its game count rounded up to a whole balance block (D-39)."""
         for cell in self.cells:
             spec = cell.to_spec(self.master_seed, self.prereg_version)
             yield spec, spec.balance().effective_games(cell.games)

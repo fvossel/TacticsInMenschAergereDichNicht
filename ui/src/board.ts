@@ -1,16 +1,14 @@
 /**
  * Board rendering (UI-3).
  *
- * The 4-seat board is drawn as the board people actually own: the cross on an
- * 11×11 grid, 40 fields around its outer edge, four yards in the corners and
- * four goal columns running into the middle. It is *constructed* rather than
- * tabulated — one quadrant of ten fields, rotated three times — so §2.1's
- * property that positions are a pure function of (seats, seat index) survives
- * into the drawing instead of being re-entered by hand.
+ * The 4-seat board is the cross on an 11×11 grid: 40 fields around its outer edge, four yards
+ * in the corners, and four goal columns running into the middle. It is built from one quadrant
+ * of ten fields rotated three times, so §2.1's property that positions are a pure function of
+ * (seats, seat index) carries into the drawing.
  *
- * The 6-seat board has no canonical printing, so it is the same idea
- * generalised: six arms, radius following the V the cross makes (5.1 → 1.41 →
- * 5.1 grid units per quadrant). Both read as a board with corners.
+ * The 6-seat board has no canonical printing, so it is the same construction generalised: six
+ * arms, with the radius following the V the cross makes (5.1 → 1.41 → 5.1 grid units per
+ * quadrant).
  */
 
 import type { Frame, Geometry } from "./replay";
@@ -29,10 +27,10 @@ const SIZE = 620;
 const CENTER = SIZE / 2;
 const FIELD_RADIUS = 12;
 /**
- * Breathing room in the viewBox rather than shrunk content. The outermost
- * things on the board are the yards, and on the 6-seat star they sit at
- * radius 0.56·SIZE from a centre at 0.5·SIZE, so they run past the edge of
- * the track's own square. The stroke on the outline adds another 13 a side.
+ * Breathing room in the viewBox rather than shrunk content. The outermost things on the board
+ * are the yards, and on the 6-seat star they sit at radius 0.56·SIZE from a centre at 0.5·SIZE,
+ * so they run past the edge of the track's own square. The stroke on the outline adds another
+ * 13 a side.
  */
 const PAD = 66;
 
@@ -46,7 +44,7 @@ function cellPoint([gx, gy]: Point): Point {
   return [(gx + 0.5) * CELL, (gy + 0.5) * CELL];
 }
 
-/** Quarter turn about the board centre — the symmetry the whole board has. */
+/** Quarter turn about the board centre. */
 function rotate([gx, gy]: Point): Point {
   return [GRID - 1 - gy, gx];
 }
@@ -58,10 +56,9 @@ function rotateTimes(point: Point, times: number): Point {
 }
 
 /**
- * One quadrant of the ring: five fields inward along an arm's edge, four back
- * out along the next arm's edge, then the field at the tip. Field 0 is seat
- * 0's entry, and rotating the quadrant puts every other entry exactly
- * `spacing` fields later — which is what §2.1 asserts, here as geometry.
+ * One quadrant of the ring: five fields inward along an arm's edge, four back out along the next
+ * arm's edge, then the field at the tip. Field 0 is seat 0's entry, and rotating the quadrant
+ * puts every other entry exactly `spacing` fields later, as §2.1 requires.
  */
 const QUADRANT: Point[] = [
   [0, 4], [1, 4], [2, 4], [3, 4], [4, 4],
@@ -118,10 +115,9 @@ function yardPoint(geometry: Geometry, seat: number, index: number): Point {
   }
   const [x, y] = starPoint(geometry, ringField(geometry, seat, 1));
   const angle = Math.atan2(y - CENTER, x - CENTER);
-  // Set well clear of the track. On the star the entry field sits at an arm
-  // tip, so a yard placed just beyond it lands on the board rather than
-  // beside it — the 4-seat cross gets this for free by putting yards in the
-  // corners, and the star has to buy it with radius.
+  // Set well clear of the track. On the star the entry field sits at an arm tip, so the yard
+  // radius has to exceed the track's outer radius for a yard to land on the board rather than
+  // beside it.
   const radius = SIZE * 0.51 + (index % 2) * (SIZE * 0.05);
   const spread = (index < 2 ? -1 : 1) * 0.058;
   return [
@@ -155,8 +151,7 @@ export function renderBoard(frame: Frame, options: BoardOptions): SVGSVGElement 
     "aria-label": `${geometry.seats}-seat board`,
   });
 
-  // The printed outline of the track, which is what gives the board its
-  // corners: the ring fields in order are exactly the cross's perimeter.
+  // The printed outline of the track: the ring fields in order are exactly the cross's perimeter.
   const outline: Point[] = [];
   for (let field = 0; field < geometry.ringLength; field += 1) {
     outline.push(fieldPoint(geometry, field));
@@ -184,10 +179,9 @@ export function renderBoard(frame: Frame, options: BoardOptions): SVGSVGElement 
     svg.append(circle);
   }
 
-  // Goals and yards are drawn for **every** seat the board has, occupied or
-  // not: a real board keeps all four arms whether or not four people are
-  // playing, and the empty seat is the whole point of every cell where
-  // players < seats.
+  // Goals and yards are drawn for every seat the board has, occupied or not: the seat count is a
+  // property of the geometry rather than of the player count, and cells with players < seats
+  // always leave some of them vacant.
   for (let seat = 0; seat < geometry.seats; seat += 1) {
     const color = SEAT_COLORS[seat % 6] ?? "#888";
     const vacant = occupied.includes(seat) ? "" : " vacant";
@@ -209,8 +203,8 @@ export function renderBoard(frame: Frame, options: BoardOptions): SVGSVGElement 
     }
   }
 
-  // Pieces last, so they sit above the fields, and offset per field so a
-  // barrier's two pieces are visible rather than one hiding the other.
+  // Pieces last, so they sit above the fields, and offset per field so both of a barrier's two
+  // pieces stay visible.
   const perField = new Map<string, number>();
   for (const seat of occupied) {
     for (let piece = 0; piece < PIECES_PER_SEAT; piece += 1) {

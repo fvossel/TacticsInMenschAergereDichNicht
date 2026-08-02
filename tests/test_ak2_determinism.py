@@ -1,12 +1,11 @@
 """AK-2 — determinism.
 
-Same master seed twice gives byte-identical logs and summaries; 1 worker
-against 8 against the maximum gives byte-identical ``summary.jsonl``.
+The same master seed twice gives byte-identical logs and summaries; 1 worker against 8
+against the maximum gives byte-identical ``summary.jsonl``.
 
-The worker clause is deliberately stated on **bytes**, not on row sets. The
-original criterion said "identical row sets", which passes while row order —
-and therefore byte identity, and any position-dependent bootstrap — varies
-with scheduling (D-33).
+The worker clause is stated on bytes rather than on row sets, because row order is what
+scheduling can perturb, and row order carries byte identity and any position-dependent
+bootstrap with it (D-33).
 """
 
 from __future__ import annotations
@@ -77,11 +76,11 @@ def test_shard_plan_covers_every_index_exactly_once():
 
 
 def test_game_identity_does_not_depend_on_the_shard_layout():
-    """The invariant the sharding rests on: index determines the game.
+    """The invariant the sharding rests on: the index determines the game.
 
-    ``n_requested`` is passed explicitly so the comparison is like for like:
-    it is cell metadata echoed into each row (D-39), not a property of the
-    game, and a solo call has no cell to take it from.
+    ``n_requested`` is passed explicitly so the comparison is like for like: it is cell
+    metadata echoed into each row (D-39), not a property of the game, and a solo call has
+    no cell to take it from.
     """
     solo = {
         index: play_indexed_game(SPEC, index, n_requested=12).summary
@@ -95,8 +94,7 @@ def test_game_identity_does_not_depend_on_the_shard_layout():
 def test_output_is_independent_of_pythonhashseed():
     """NF-1: results must not depend on ``PYTHONHASHSEED``.
 
-    Run in subprocesses because the interpreter fixes the hash seed at start;
-    setting the variable in-process would prove nothing.
+    The interpreter fixes the hash seed at startup, so each setting needs its own subprocess.
     """
     script = (
         "from madnlab.engine.geometry import SeatPattern;"

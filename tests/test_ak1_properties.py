@@ -1,9 +1,8 @@
-"""AK-1 property sweeps — invariants that must hold in every arm.
+"""AK-1 property sweeps — invariants that hold in every rule arm.
 
-Scenario tests pin the clause they were written for. These pin properties that
-have to survive every rule combination, which is where the class of bug D-61
-belongs: it produced no wrong *move*, only a wrong *multiplicity*, so no
-per-clause assertion could have caught it.
+Scenario tests pin the single clause they were written for. These sweep the whole arm lattice
+and assert properties of the legal-move set as a whole, including its multiplicity, which no
+per-clause assertion can express.
 """
 
 from __future__ import annotations
@@ -18,9 +17,9 @@ from madnlab.engine.moves import legal_moves, legal_moves_with_restriction
 from madnlab.engine.rules import CaptureMode, ColdStart, RuleSet
 from madnlab.engine.state import GameState
 
-#: Every combination of the axes that can affect legality. The entry-phase
-#: axes (``dreimal_wuerfeln``, ``bonus_roll_*``) belong to the turn structure,
-#: not to the legal-move set, so they are not swept here.
+#: Every combination of the axes that can affect legality. The entry-phase axes
+#: (``dreimal_wuerfeln``, ``bonus_roll_*``) belong to the turn structure, not to the
+#: legal-move set, so they are not swept here.
 ARMS = [
     RuleSet(cold_start=cs, capture_mode=cm, barriers=b, goal_no_jump=g)
     for cs in ColdStart
@@ -33,8 +32,8 @@ ARMS = [
 def _reachable_state(board: Board, rng: random.Random) -> GameState:
     """A random state respecting the invariants a real game maintains.
 
-    Goal columns hold at most one piece per field (D-34) and no more than two
-    pieces share a ring field, which is the most a barrier can hold (GM-6.1).
+    Goal columns hold at most one piece per field (D-34), and at most two pieces share a ring
+    field, which is the most a barrier can hold (GM-6.1).
     """
     n = board.seats * PIECES_PER_SEAT
     positions = [0] * n
@@ -76,10 +75,9 @@ def _reachable_state(board: Board, rng: random.Random) -> GameState:
 def _successor_key(state: GameState, seat: int, move) -> tuple[int, ...]:
     """The moving seat's own position multiset after ``move``.
 
-    Two moves that produce the same key are the same decision as far as the
-    engine and §6 can observe: progress is a sum, and the ranking key is a
-    function of position, so a transposition of two of a seat's own slots is
-    invisible everywhere.
+    Two moves with the same key are the same decision as far as the engine and §6 can observe:
+    progress is a sum and the ranking key is a function of position, so transposing two of a
+    seat's own slots changes nothing downstream.
     """
     positions = list(state.positions)
     positions[move.piece] = move.to_pos
@@ -91,10 +89,11 @@ def _successor_key(state: GameState, seat: int, move) -> tuple[int, ...]:
 
 @pytest.mark.parametrize("seats", [4, 6])
 def test_every_legal_move_leads_to_a_distinct_successor(seats):
-    """D-61, stated as the invariant rather than as the rule.
+    """No two legal moves may lead to the same successor state (D-61).
 
-    Checkable in every arm rather than only under barriers, so it guards
-    against the next variant of the bug rather than the one already fixed.
+    Stronger than the rule move generation implements — one move per distinct origin position —
+    and swept over every arm rather than only the barrier arms, since the property follows from
+    the legal-move set being a set of decisions, not from any single clause.
     """
     board = board_for(seats)
     rng = random.Random(20260801 + seats)
@@ -137,7 +136,7 @@ def test_legal_moves_is_total_and_pure(seats):
 
 @pytest.mark.parametrize("seats", [4, 6])
 def test_canonical_order_is_deterministic_and_goal_first(seats):
-    """D-3, and NF-1's requirement that the order depend on inputs only."""
+    """Goal moves precede ring moves (D-3) and the order depends on the inputs alone (NF-1)."""
     board = board_for(seats)
     rng = random.Random(99 + seats)
     for _ in range(1500):
@@ -159,10 +158,9 @@ def test_canonical_order_is_deterministic_and_goal_first(seats):
 def test_forcing_never_widens_the_legal_set(seats):
     """GM-5.1: each lattice clause is a filter, so it can only narrow.
 
-    Compared against ``capture_mode = optional`` with the other axes held
-    fixed, which is the only comparison where the candidate sets coincide —
-    ``mandatory_extended`` generates the extra-lap move that ``optional`` does
-    not, so it is excluded here and covered by its own scenario test.
+    The comparison is against ``capture_mode = optional`` with the other axes held constant, the
+    only pairing whose candidate sets coincide. ``mandatory_extended`` generates the extra-lap
+    move that ``optional`` does not, so it is excluded here and covered by a scenario test.
     """
     board = board_for(seats)
     rng = random.Random(7 + seats)

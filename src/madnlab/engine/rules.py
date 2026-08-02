@@ -2,17 +2,14 @@
 
 Defaults are the baseline rule set of requirements §2.3: the official Schmidt
 Spiele rules, pinned to Art. 49020/49021 (2006) for structure and Art. 51204
-(2023) for mechanical clauses absent from it (D-50).
+(2023) for mechanical clauses absent from it (D-50). Two of those defaults are
+worth stating explicitly:
 
-Two corrections against the version 1 draft are baked into the defaults here,
-both verified against the official text:
-
-* ``cold_start`` defaults to :attr:`ColdStart.ONE_PIECE_OUT` — one piece on the
-  entry field, three in the yard. The draft had ``strict`` (all four in the
-  yard) as "the Schmidt baseline"; the two were inverted (D-55).
-* ``dreimal_wuerfeln`` defaults to off. The three-attempts rule is an optional
-  *Spielvariante*, and a post-capture recovery rule at that — not the popular
-  "three tries to get your first piece out" house rule (D-51).
+* ``cold_start`` is :attr:`ColdStart.ONE_PIECE_OUT` — one piece on the entry
+  field and three in the yard, not all four in the yard (D-55).
+* ``dreimal_wuerfeln`` is off. The three-attempts rule is an optional variant,
+  and a post-capture recovery rule at that — not the popular "three tries to
+  get your first piece out" house rule (D-51).
 """
 
 from __future__ import annotations
@@ -46,8 +43,8 @@ class ColdStart(enum.StrEnum):
 class CaptureMode(enum.StrEnum):
     """Schlagzwang axis (GM-5)."""
 
-    #: Baseline. The official base rules say expressly "Es herrscht aber kein
-    #: Schlagzwang."
+    #: Baseline. The official base rules state expressly that there is no
+    #: Schlagzwang.
     OPTIONAL = "optional"
 
     #: If the roll admits a capture, the legal set is restricted to capturing
@@ -67,12 +64,12 @@ class CaptureMode(enum.StrEnum):
 class CaptureEnforcement(enum.StrEnum):
     """How a violated capture obligation is handled (GM-5.2)."""
 
-    #: v1: illegal moves are filtered out of the legal-move set, so agents
-    #: cannot violate the rule at all.
+    #: Illegal moves are filtered out of the legal-move set, so an agent cannot
+    #: violate the obligation at all.
     ENFORCE = "enforce"
 
-    #: The "pusten" penalty branch. Out of scope for v1 (§12); the value
-    #: exists from day one so logs and configs never need a schema break.
+    #: The "pusten" penalty branch. Out of scope for v1 (§12); the value exists
+    #: so logs and configs can name the mode without a schema change.
     PENALIZE = "penalize"
 
 
@@ -134,9 +131,7 @@ class RuleSet(NamedTuple):
         free roll after a 6, and ``bonus_roll_after_quick_entry``, are added on
         top by the game loop, and ``bonus_roll_forfeited`` (D-56) can subtract
         the GM-3.3 grant again. D-10 tabulates the resulting maximum rolls per
-        turn as **1 / 4 / 5** for attempts of 1 / 3 / 3-with-bonus — reading
-        this property as a roll count drops the free follow-up in exactly the
-        arm D-10 exists to pin, and neither AK-2 nor AK-4 would notice.
+        turn as **1 / 4 / 5** for attempts of 1 / 3 / 3-with-bonus.
 
         This is also the quantity D-30's analytic gate is stated over:
         ``p = 1 - (5/6)^attempts``.
@@ -153,8 +148,7 @@ class RuleSet(NamedTuple):
         """Whether both entry-phase axes have no behavioural effect.
 
         True under ``free_entry``. This is what collapses 72 of EX-4's
-        admissible cells to 24 distinct behaviours (D-13), and AK-1 asserts it
-        directly rather than leaving it as a counting argument.
+        admissible cells to 24 distinct behaviours (D-13).
         """
         return not self.cold_start.requires_six_to_enter
 

@@ -4,17 +4,16 @@ Stdlib only. The engine has no dependencies and the analysis layer keeps that
 property: NF-7 pins the environment because BLAS reduction order differs across
 architectures, and the cheapest way to honour that is not to link BLAS at all.
 
-Two rules from §6.3 are enforced by the shapes here rather than by discipline:
+Two rules from §6.3 are enforced by the shapes here:
 
 * **Wilson is for a single proportion against a fixed reference.** A
   seat-to-seat or strategy-to-strategy difference inside one cell is
   multinomial — exactly one seat wins each game — so two independent Wilson
   intervals understate the SE of their difference (0.194 pp against the correct
-  0.224 pp at p = 0.25, n = 100k). :func:`multinomial_difference_ci` is the one
-  to use there.
+  0.224 pp at p = 0.25, n = 100k). :func:`multinomial_difference_ci` carries
+  the covariance term those intervals omit.
 * **The game is the independent unit.** Every bootstrap resamples whole rows,
-  never seat records, so the resampler takes a sequence of per-game values and
-  there is no way to hand it seat-level data by accident.
+  never seat records; the resamplers take a sequence of per-game values.
 """
 
 from __future__ import annotations
@@ -60,9 +59,9 @@ def z_for(level: float) -> float:
 def wilson(successes: int, trials: int, level: float = 0.95) -> Interval:
     """Wilson score interval for a single proportion (SQ-1).
 
-    Used for a proportion against a **fixed reference** — AK-4's 1/k identity,
-    a deviant's win rate against 1/k — and not for the difference of two
-    proportions observed in the same games.
+    Valid against a **fixed reference** — AK-4's 1/k identity, a deviant's win
+    rate against 1/k — and not for the difference of two proportions observed
+    in the same games.
     """
     if trials <= 0:
         raise ValueError(f"trials must be positive, got {trials}")
@@ -86,9 +85,10 @@ def multinomial_difference_ci(
 
         Var(p_a - p_b) = (p_a(1-p_a) + p_b(1-p_b) + 2 p_a p_b) / n
 
-    The final term is the covariance that two independent Wilson intervals
-    would drop, and dropping it makes the interval too narrow — the direction
-    that produces false positives.
+    The final term is the covariance contribution, positive because the
+    correlation is negative. Two independent Wilson intervals omit it and so
+    give an interval that is too narrow — the direction that produces false
+    positives.
     """
     if games <= 0:
         raise ValueError(f"games must be positive, got {games}")
@@ -130,13 +130,12 @@ def bca_bootstrap(
 ) -> Interval:
     """Bias-corrected and accelerated bootstrap CI (SQ-2, SQ-3).
 
-    ``seed`` is required, not optional. NF-7 makes every published interval
-    reproducible from ``analysis_seed`` and ``bootstrap_B``, and a default seed
-    is how that quietly stops being true.
+    ``seed`` is required, not optional: NF-7 makes every published interval
+    reproducible from ``analysis_seed`` and ``bootstrap_B``, which holds only
+    when the caller states the seed it used.
 
-    The acceleration comes from the jackknife, which is O(n) statistic
-    evaluations; for the per-game samples this is applied to that is the
-    cheaper half of the computation.
+    The acceleration comes from the jackknife — O(n) statistic evaluations, the
+    cheaper half of the computation at the per-game sample sizes here.
     """
     values = list(sample)
     n = len(values)
@@ -203,20 +202,20 @@ def bca_two_sample(
 ) -> Interval:
     """BCa for a two-sample contrast — a difference or a ratio between arms.
 
-    Not expressible through :func:`bca_bootstrap`. Concatenating the arms and
-    resampling the result mixes them in every draw, which produces the
-    *permutation null* rather than a confidence interval: the point estimate
-    lands outside its own interval, which is how this was caught. Each arm has
-    to be resampled independently, because each arm is its own population.
+    Not expressible through :func:`bca_bootstrap`: each arm is its own
+    population, so each is resampled independently. Concatenating the arms and
+    resampling the result mixes them in every draw, which yields the
+    *permutation null* rather than a confidence interval and can place the
+    point estimate outside its own interval.
 
     **Grouped jackknife.** Textbook BCa jackknifes one observation at a time —
     O(n) statistic evaluations, each O(n). At the confirmatory sample sizes
-    (250k games per arm) that is 10^11 operations and simply cannot be run.
-    The acceleration is therefore estimated by deleting *groups* of
-    consecutive observations, the standard delete-d construction. With
-    ``jackknife_groups`` at 100 the cost drops to 100 evaluations while the
-    skewness it measures is unchanged — the grouping is a variance-reduction
-    device, not an approximation of a different quantity.
+    (250k games per arm) that is 10^11 operations. The acceleration is
+    therefore estimated by deleting *groups* of consecutive observations, the
+    standard delete-d construction. With ``jackknife_groups`` at 100 the cost
+    drops to 100 evaluations while the skewness it measures is unchanged — the
+    grouping is a variance-reduction device, not an approximation of a
+    different quantity.
     """
     values_a, values_b = list(sample_a), list(sample_b)
     n_a, n_b = len(values_a), len(values_b)
@@ -302,9 +301,9 @@ def coefficient_of_variation(values: Sequence[float]) -> float:
 def cv_ratio(treatment: Sequence[float], control: Sequence[float]) -> float:
     """The RQ-1 primary estimand (SQ-3, D-16).
 
-    Deliberately not the raw variance ratio: a pure +10% location shift at
-    constant CV produces a raw variance ratio of 1.21, whose CI excludes 1 with
-    near-certainty at the pre-registered n — a length effect published as a
-    dynamics effect.
+    The ratio of coefficients of variation, not of raw variances: a pure +10%
+    location shift at constant CV produces a raw variance ratio of 1.21, whose
+    CI excludes 1 with near-certainty at the pre-registered n, turning a length
+    effect into an apparent dynamics effect.
     """
     return coefficient_of_variation(treatment) / coefficient_of_variation(control)

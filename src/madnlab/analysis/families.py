@@ -1,15 +1,13 @@
-"""Resolving §6.4's four confirmatory families against the campaign data.
+"""Binding §6.4's confirmatory families to the campaign cells that answer them.
 
-§6.4 fixes the hypotheses; :mod:`multiplicity` carries them as data; this
-module is where each one is bound to the cells that answer it and turned into
-an :class:`~madnlab.analysis.estimands.Estimate`. Holm then runs **within**
-each family, over metrics x contrasts jointly, exactly as §6.4 specifies.
+§6.4 fixes the hypotheses; :mod:`multiplicity` carries them as data; this module binds each
+one to its cells and turns it into an :class:`~madnlab.analysis.estimands.Estimate`. Holm then
+runs **within** each family, over metrics x contrasts jointly, as §6.4 specifies.
 
-The binding is the part that has to be explicit. A contrast named
-"capture_mode:mandatory-optional" means nothing until someone says which cells
-are the mandatory arm and which are the optional one, and for RQ-2 the answer
-is "all 84 EX-4 cells at that level, pooled" while for RQ-1 it is one named
-headline cell. Both live here, in code, rather than in a reader's head.
+The binding is stated in code rather than left implicit. A contrast named
+"capture_mode:mandatory-optional" means nothing until the mandatory arm and the optional one
+are tied to cells: for RQ-2 that is all 84 EX-4 cells at the given level, pooled; for RQ-1 it
+is one named headline cell.
 """
 
 from __future__ import annotations
@@ -64,18 +62,17 @@ class FamilyResult(NamedTuple):
     family: str
     estimates: list[Estimate]
     holm: list[HolmResult]
-    #: Contrasts §6.4 declares that no cell in the dataset could answer. Named
-    #: rather than dropped: a family reported as "3 of 4 rejected" when the
-    #: fourth never ran is a different claim from "3 of 4 rejected".
+    #: Contrasts §6.4 declares that no cell in the dataset could answer. Named rather than
+    #: dropped, so a family's rejection count is read against the contrasts that actually ran.
     unavailable: list[str]
 
 
 def _win_rate_by_starting_seat(cells: Sequence[CellSummary]) -> tuple[int, int]:
     """P(win | seat is the starter), pooled. Returns (wins, games).
 
-    §6.3's symmetry identity makes this the win-rate estimand for RQ-2: in a
-    homogeneous field every seat wins exactly 1/k whatever the rules, so a
-    per-seat rate carries no rule information at all. The starter's rate does.
+    §6.3's symmetry identity makes this the win-rate estimand for RQ-2: in a homogeneous field
+    every seat wins exactly 1/k whatever the rules, so a per-seat rate carries no rule
+    information. The starter's rate does.
     """
     wins = sum(cell.wins_by_turn_offset.get(0, 0) for cell in cells)
     games = sum(cell.games for cell in cells)
@@ -143,9 +140,9 @@ def rq1(data: Dataset, *, seed: int, resamples: int) -> FamilyResult:
         )
         hypotheses.append(Hypothesis("RQ-1", "comeback_rate", contrast))
 
-        # Predictability enters the family as the *leader-wins* proportion.
-        # The skill score is a monotone affine rescaling of it at fixed k, so
-        # the test is identical and the proportion keeps an exact variance.
+        # Predictability enters the family as the *leader-wins* proportion. The skill score is
+        # a monotone affine rescaling of it at fixed k, so the test is identical and the
+        # proportion keeps an exact variance.
         estimates.append(
             estimands.proportion_difference(
                 arm.leader_at_50_won, arm.checkpointed,
@@ -159,9 +156,8 @@ def rq1(data: Dataset, *, seed: int, resamples: int) -> FamilyResult:
     return FamilyResult("RQ-1", estimates, results, unavailable)
 
 
-#: RQ-2's nine axis contrasts, as (contrast name, rule key, level a, level b).
-#: The defaults matter: a cell that does not carry a flag is at its baseline
-#: level, which is how §8's configs are written.
+#: RQ-2's nine axis contrasts, as (contrast name, rule key, level a, level b). A cell that does
+#: not carry a flag is at that axis's baseline level, which is how §8's configs are written.
 RQ2_AXES = (
     ("cold_start:strict-one_piece_out", "cold_start", "strict", "one_piece_out"),
     ("cold_start:free_entry-one_piece_out", "cold_start", "free_entry", "one_piece_out"),
@@ -200,15 +196,13 @@ def rq2(
 ) -> FamilyResult:
     """Main effects, pooled over the EX-4 factorial.
 
-    Pooling is what makes n = 20,000 per cell enough: a two-level axis is
-    estimated from all 84 cells at each level, so the contrast rests on 1.68M
-    games and resolves to 0.18 pp. Nothing here is a per-cell claim.
+    Pooling is what makes n = 20,000 per cell enough: a two-level axis is estimated from all 84
+    cells at each level, so the contrast rests on 1.68M games and resolves to 0.18 pp. Nothing
+    here is a per-cell claim.
 
-    The nine bootstrap contrasts are independent of each other, so ``workers``
-    runs them in parallel. That is a scheduling decision and nothing else — the
-    seed of each contrast is fixed by its index, so the numbers do not depend
-    on how many workers ran them, which is the property AK-2 asserts for the
-    engine and which an analysis has no more right to give up than a run does.
+    The nine bootstrap contrasts are independent, so ``workers`` runs them in parallel. Each
+    contrast's seed is fixed by its index, so the numbers do not depend on how many workers ran
+    them — the same reproducibility property AK-2 states for the engine.
     """
     keys = data.matching("ex4/")
     estimates: list[Estimate | None] = []
@@ -271,10 +265,9 @@ def rq2(
 def rq3(data: Dataset, *, seed: int, resamples: int) -> FamilyResult:
     """Deviant win rate against a RANDOM field at 4 players.
 
-    The deviant occupies seat 0 of the 1-deviant cells, so its win rate is
-    tested against the 1/k reference directly. §6.3 forbids reading this off a
-    homogeneous field, where the symmetry identity fixes every seat at 1/k
-    whatever the policy does.
+    The deviant occupies seat 0 of the 1-deviant cells, so its win rate is tested against the
+    1/k reference directly. §6.3 forbids reading this off a homogeneous field, where the
+    symmetry identity fixes every seat at 1/k whatever the policy does.
     """
     del seed, resamples
     estimates: list[Estimate] = []
@@ -290,8 +283,8 @@ def rq3(data: Dataset, *, seed: int, resamples: int) -> FamilyResult:
             unavailable.append(f"deviant_win_rate @ {agent}-reference")
 
     for agent, cell in deviant_cells.items():
-        # Against a *fixed* reference: 1/k is arithmetic, not an estimate, so
-        # it carries no sampling variance and the test is one-sample (SQ-1).
+        # Against a *fixed* reference: 1/k is arithmetic, not an estimate, so it carries no
+        # sampling variance and the test is one-sample (SQ-1).
         estimates.append(
             estimands.proportion_vs_reference(
                 cell.wins_by_seat.get(0, 0), cell.games, 1.0 / cell.players,
@@ -319,9 +312,9 @@ def rq3(data: Dataset, *, seed: int, resamples: int) -> FamilyResult:
     return FamilyResult("RQ-3", estimates, results, unavailable)
 
 
-#: RQ-4's named interaction contrasts. Each is a difference of differences:
-#: how much the deviant's edge changes when the rule changes. A 2x2
-#: interaction does **not** pool, which is why these cells run at 400k.
+#: RQ-4's named interaction contrasts. Each is a difference of differences: how much the
+#: deviant's edge changes when the rule changes. A 2x2 interaction does **not** pool, which is
+#: why these cells run at 400k.
 RQ4_INTERACTIONS = (
     (
         "capture_mode:mandatory x strategy",
@@ -355,10 +348,9 @@ RQ4_INTERACTIONS = (
     ),
 )
 
-#: The player-count and geometry rows. §8.1 gives EX-6e's primary metric as
-#: "battery metrics" — the homogeneous field makes win rate uninformative —
-#: and each is a genuine 2x2 interaction, given as four cells: (a1, a0, b1, b0)
-#: for (a1 - a0) - (b1 - b0).
+#: The player-count and geometry rows. §8.1 gives EX-6e's primary metric as "battery metrics"
+#: — the homogeneous field makes win rate uninformative — and each row is a 2x2 interaction,
+#: given as four cells (a1, a0, b1, b0) for (a1 - a0) - (b1 - b0).
 RQ4_BATTERY_INTERACTIONS = (
     (
         "capture_mode x players",
@@ -372,9 +364,8 @@ RQ4_BATTERY_INTERACTIONS = (
     ),
 )
 
-#: EX-5's pre-registered decomposition (§8). Two-arm battery contrasts, not
-#: interactions: the naive comparison is their *sum* and §8 forbids publishing
-#: it as a pattern effect.
+#: EX-5's pre-registered decomposition (§8). Two-arm battery contrasts, not interactions: the
+#: naive comparison is their *sum*, and §8 forbids publishing that as a pattern effect.
 RQ4_EX5_ROWS = (
     ("EX-5 pattern effect", "ex5/3p/6s-adjacent/random", "ex5/3p/6s-spread/random"),
     ("EX-5 geometry effect", "ex5/3p/4s-adjacent/random", "ex5/3p/6s-adjacent/random"),
@@ -392,8 +383,8 @@ def rq4(data: Dataset, *, seed: int, resamples: int) -> FamilyResult:
             unavailable.append(f"primary_per_row @ {name}")
             continue
         arm, base = data.cells[key_a], data.cells[key_b]
-        # The deviant sits at seat 0; the interaction is how much its edge
-        # over 1/k moves when the rule flips.
+        # The deviant sits at seat 0; the interaction is how much its edge over 1/k moves when
+        # the rule flips.
         estimates.append(
             estimands.proportion_difference(
                 arm.wins_by_seat.get(0, 0), arm.games,
@@ -439,7 +430,7 @@ def rq4(data: Dataset, *, seed: int, resamples: int) -> FamilyResult:
 
 
 class RQ1Verdict(NamedTuple):
-    """§6.4's decidable biconditional, evaluated rather than argued."""
+    """§6.4's decidable biconditional and the quantities it is decided on."""
 
     supported: bool
     cv_lower_bound: float
@@ -451,10 +442,10 @@ class RQ1Verdict(NamedTuple):
 def rq1_verdict(result: FamilyResult) -> RQ1Verdict:
     """RQ-1 is supported iff the CV lower bound exceeds 1 **and** 2 of 3.
 
-    The three dynamism conjuncts are ``lead_changes_per_turn``, the comeback
-    rate and ``1 - predictability``, each Holm-adjusted and each required to
-    exclude zero *in the dynamism direction* — a significant move the wrong
-    way is not support, which a bare "CI excludes zero" test would count.
+    The three dynamism conjuncts are ``lead_changes_per_turn``, the comeback rate and
+    ``1 - predictability``, each Holm-adjusted and each required to exclude zero *in the
+    dynamism direction*; a bare "CI excludes zero" test would count a significant move the
+    wrong way as support.
     """
     by_key = {
         (r.hypothesis.metric, r.hypothesis.contrast): r for r in result.holm
@@ -483,8 +474,8 @@ def rq1_verdict(result: FamilyResult) -> RQ1Verdict:
     )
 
     conjuncts = 0
-    # Direction is fixed per conjunct: more lead changes, more comebacks and
-    # *less* predictability all mean more dynamic.
+    # Direction is fixed per conjunct: more lead changes, more comebacks and *less*
+    # predictability all mean more dynamic.
     directions = (
         ("lead_changes_per_turn", "lead changes per turn", +1),
         ("comeback_rate", "comeback rate", +1),
@@ -549,8 +540,8 @@ RQ5_CELLS = {
     "3p-spread-random": "ex7/3p/6s-spread/random",
 }
 
-#: §15.2's equivalence margin for the negative controls, and the magnitude
-#: threshold hypothesis 1 has to clear.
+#: §15.2's equivalence margin for the negative controls, and the magnitude threshold that
+#: hypothesis 1 has to clear.
 RQ5_EQUIVALENCE_PP = 1.0
 RQ5_MAGNITUDE_PP = 5.0
 
@@ -558,9 +549,8 @@ RQ5_MAGNITUDE_PP = 5.0
 def _seat_asymmetry(cell: CellSummary, label: str) -> Estimate:
     """p(second occupied seat) − p(first), multinomial (§15.2).
 
-    The seats are named by position, not by which one happened to win more.
-    Selecting the extreme pair out of the data and then testing it is a
-    selection the interval knows nothing about.
+    The two seats are fixed by position, not by which of them won more: picking the extreme
+    pair out of the data is a selection the interval does not account for.
     """
     first, second = cell.occupied[0], cell.occupied[1]
     return estimands.seat_difference(
@@ -574,8 +564,7 @@ def _seat_asymmetry(cell: CellSummary, label: str) -> Estimate:
 def _asymmetry_difference(
     arm: CellSummary, base: CellSummary, label: str
 ) -> Estimate:
-    """Difference of two cells' seat asymmetries — separate games, so the
-    variances add."""
+    """Difference of two cells' seat asymmetries. Separate games, so the variances add."""
     left = _seat_asymmetry(arm, "left")
     right = _seat_asymmetry(base, "right")
     estimate = left.estimate - right.estimate
@@ -593,9 +582,9 @@ def _asymmetry_difference(
 def rq5(data: Dataset, *, seed: int = 0, resamples: int = 0) -> FamilyResult:
     """§15's family: does seating position decide the game? Eight hypotheses.
 
-    ``seed`` and ``resamples`` are accepted and unused — every contrast here is
-    a proportion with a closed-form variance, so nothing is bootstrapped. They
-    keep the signature uniform with the other families.
+    ``seed`` and ``resamples`` are accepted and unused — every contrast here is a proportion
+    with a closed-form variance, so nothing is bootstrapped. They keep the signature uniform
+    across families.
     """
     del seed, resamples
     estimates: list[Estimate] = []
@@ -635,7 +624,7 @@ def rq5(data: Dataset, *, seed: int = 0, resamples: int = 0) -> FamilyResult:
 
 
 class RQ5Verdict(NamedTuple):
-    """§15.2's biconditional, evaluated rather than argued."""
+    """§15.2's biconditional and the per-hypothesis detail behind it."""
 
     supported: bool
     detail: list[str]
@@ -644,10 +633,9 @@ class RQ5Verdict(NamedTuple):
 def rq5_verdict(result: FamilyResult) -> RQ5Verdict:
     """Supported iff 1, 5 and 6 reject in direction **and** 3 is equivalent.
 
-    The conjunction is what makes it an explanation rather than an
-    observation: (6) attributes the effect to the seating geometry, (5) shows
-    the strategy matters, and (3) is the negative control — `opposite` seating
-    has equal gaps and must show nothing.
+    The conjunction is what makes it an explanation rather than an observation: (6) attributes
+    the effect to the seating geometry, (5) shows the strategy matters, and (3) is the negative
+    control — `opposite` seating has equal gaps and must show nothing.
     """
     contrasts = FAMILIES["RQ-5"][1]
     by_contrast = {
@@ -699,11 +687,7 @@ def rq5_verdict(result: FamilyResult) -> RQ5Verdict:
 
 
 def _starter_advantage(cell: CellSummary, label: str) -> Estimate:
-    """P(win | seat is the starter) against the fixed 1/k reference.
-
-    Measured since M3 and reported in every campaign, but never tested: it had
-    a ledger row, a function and a report section, and no hypothesis (§16).
-    """
+    """P(win | seat is the starter) against the fixed 1/k reference (§16)."""
     return estimands.proportion_vs_reference(
         cell.wins_by_turn_offset.get(0, 0),
         cell.games,
@@ -722,10 +706,9 @@ def _deviant_edge(cell: CellSummary, label: str) -> Estimate:
 def _middle_seat(cell: CellSummary, label: str) -> Estimate:
     """Seat 1 against the mean of its two neighbours, three players on four seats.
 
-    §1's own question — "is the middle seat measurably disadvantaged" — with
-    §2.2's stated reason: an opponent directly behind and the other's start
-    area directly ahead. Weights (-1/2, +1, -1/2), which is not a difference
-    of two seats and needs the multinomial contrast.
+    §1's question — is the middle seat measurably disadvantaged — with §2.2's reason: an
+    opponent directly behind and the other's start area directly ahead. The weights
+    (-1/2, +1, -1/2) are not a difference of two seats, so this needs the multinomial contrast.
     """
     counts = [cell.wins_by_seat.get(seat, 0) for seat in cell.occupied]
     return estimands.multinomial_contrast(
@@ -771,8 +754,8 @@ def rq6(data: Dataset, *, seed: int = 0, resamples: int = 0) -> FamilyResult:
     else:
         add(contrasts[2], None)
 
-    # 4-6: the one agent that plays toward a rule. Under mandatory capture the
-    # rule applies to everyone, so its edge should go away.
+    # 4-6: the one agent that plays toward a rule. Under mandatory capture the rule applies to
+    # everyone, so its edge should go away.
     greedy = {
         mode: data.cells.get(f"ex8/4s4p/greedy_capture-vs-random/{mode}")
         for mode in ("optional", "mandatory")
@@ -799,7 +782,7 @@ def rq6(data: Dataset, *, seed: int = 0, resamples: int = 0) -> FamilyResult:
     else:
         add(contrasts[5], None)
 
-    # 7-8: §1's middle-seat question, finally asked.
+    # 7-8: §1's middle-seat question.
     for index, field in ((6, "random"), (7, "spread")):
         middle = data.cells.get(f"ex5/3p/4s-adjacent/{field}")
         add(
@@ -808,8 +791,8 @@ def rq6(data: Dataset, *, seed: int = 0, resamples: int = 0) -> FamilyResult:
             if middle else None,
         )
 
-    # 9: the manipulation check §6.4 names and no code ran. Mandatory capture
-    # must raise the capture count, or the arm did not do anything.
+    # 9: §6.4's manipulation check. Mandatory capture must raise the capture count, or the arm
+    # changed nothing.
     optional = data.cells.get("ex2/4s4p/random/optional")
     mandatory = data.cells.get("ex2/4s4p/random/mandatory")
     if optional and mandatory:
@@ -834,9 +817,8 @@ def rq6(data: Dataset, *, seed: int = 0, resamples: int = 0) -> FamilyResult:
 
 # -- §17: the interaction matrix --------------------------------------------
 
-#: The five metrics every interaction family is measured on. Two proportions
-#: and three means; the accessor below hides the difference so an interaction
-#: is one function rather than five.
+#: The five metrics every interaction family is measured on. Two proportions and three means;
+#: :func:`cell_metric` hides the difference so an interaction is one function rather than five.
 INTERACTION_METRICS = (
     "win_rate_by_starting_seat",
     "rounds_to_first_win",
@@ -849,10 +831,10 @@ INTERACTION_METRICS = (
 def cell_metric(cell: CellSummary, metric: str) -> tuple[float, float, int]:
     """``(value, variance of the estimate, n)`` for one metric of one cell.
 
-    Proportions carry ``p(1-p)/n``; means carry the sample variance over ``n``
-    from the accumulated squares. Returning the variance *of the estimate*
-    rather than of the observations is what lets a difference-in-differences
-    add four of them without knowing which kind it got.
+    Proportions carry ``p(1-p)/n``; means carry the sample variance over ``n`` from the
+    accumulated squares. The variance returned is that *of the estimate*, not of the
+    observations, so a difference-in-differences can add four of them without knowing which
+    kind it got.
     """
     if metric == "win_rate_by_starting_seat":
         if cell.games == 0:
@@ -904,9 +886,8 @@ def pooled_interaction(
 ) -> Estimate:
     """The same, with each arm pooled over many cells.
 
-    This is what makes RQ-7 free: a two-way interaction among EX-4's seven
-    axes averages each arm over the other five, so every arm is 42 cells and
-    the contrast rests on far more games than any single cell holds.
+    A two-way interaction among EX-4's seven axes averages each arm over the other five, so
+    every arm is 42 cells and the contrast rests on far more games than any single cell holds.
     """
     def combine(cells: Sequence[CellSummary]) -> tuple[float, float, int]:
         parts = [cell_metric(c, metric) for c in cells]
@@ -934,11 +915,10 @@ def pooled_interaction(
     return Estimate(label, estimate, interval, p_value, total, total)
 
 
-#: RQ-7's seven EX-4 axes, as (name, rule key, on level, off level). The two
-#: three-level axes are pinned to one contrast each — a 2x2 interaction needs
-#: two levels, and choosing them from the data afterwards would be a
-#: selection. `free_entry` is therefore not an RQ-7 level: cells carrying it
-#: have both entry axes pinned off (D-13) and could not form the four arms.
+#: RQ-7's seven EX-4 axes, as (name, rule key, on level, off level). The two three-level axes
+#: are pinned to one contrast each: a 2x2 interaction needs two levels, and choosing them from
+#: the data afterwards would be a selection. `free_entry` is therefore not an RQ-7 level —
+#: cells carrying it have both entry axes pinned off (D-13) and cannot form the four arms.
 RQ7_AXES: tuple[tuple[str, str, str, str], ...] = (
     ("cold_start", "cold_start", "strict", "one_piece_out"),
     ("capture_mode", "capture_mode", "mandatory", "optional"),
@@ -949,11 +929,10 @@ RQ7_AXES: tuple[tuple[str, str, str, str], ...] = (
     ("bonus_forfeited", "bonus_roll_forfeited", "True", "False"),
 )
 
-#: The nine §2.4 axis contrasts as *named rule configurations*, which is how
-#: EX-9, EX-10 and EX-12 key their cells. ``bonus_quick`` is nested under
-#: ``dreimal`` (§2.4), so its off-level is the ``dreimal`` configuration and
-#: not the baseline — otherwise the contrast would move two flags at once and
-#: attribute the whole effect to one of them.
+#: The nine §2.4 axis contrasts as *named rule configurations*, which is how EX-9, EX-10 and
+#: EX-12 key their cells. ``bonus_quick`` is nested under ``dreimal`` (§2.4), so its off-level
+#: is the ``dreimal`` configuration and not the baseline; otherwise the contrast would move two
+#: flags at once and attribute the whole effect to one of them.
 CONFIG_AXES: tuple[tuple[str, str, str], ...] = (
     ("cold_start:strict", "cold_start=strict", "baseline"),
     ("cold_start:free_entry", "cold_start=free_entry", "baseline"),
@@ -966,8 +945,8 @@ CONFIG_AXES: tuple[tuple[str, str, str], ...] = (
     ("bonus_forfeited", "bonus_forfeited", "baseline"),
 )
 
-#: RQ-9 and RQ-10 contrast each player count against four, which is the count
-#: the rest of the plan uses as its reference.
+#: RQ-9 and RQ-10 contrast each player count against four, the count the rest of the plan uses
+#: as its reference.
 PLAYER_CONTRASTS = (2, 3, 6)
 REFERENCE_PLAYERS = 4
 
@@ -988,10 +967,10 @@ def _family(
 def rq7(data: Dataset, *, seed: int = 0, resamples: int = 0) -> FamilyResult:
     """Rule x rule, pooled over EX-4's factorial (§17).
 
-    Free: a two-way interaction among seven axes averages each of its four
-    arms over the other five, so every arm is 42 of EX-4's 168 cells. At
-    40,000 games per cell that is 1.68M games per arm against the 601,249 a
-    0.5 pp interaction needs. The factorial was already paid for by RQ-2.
+    A two-way interaction among the seven axes averages each of its four arms over the other
+    five, so every arm is 42 of EX-4's 168 cells. At 40,000 games per cell that is 1.68M games
+    per arm, against the 601,249 a 0.5 pp interaction needs. RQ-7 adds no games of its own:
+    EX-4's factorial is the one RQ-2 already reads.
     """
     del seed, resamples
     keys = data.matching("ex4/")
@@ -1010,10 +989,8 @@ def rq7(data: Dataset, *, seed: int = 0, resamples: int = 0) -> FamilyResult:
             _rule_a: str = rule_a,
             _rule_b: str = rule_b,
         ) -> list[CellSummary]:
-            # Bound as defaults, not captured: a closure over the loop
-            # variables would read whatever the last pair left behind if it
-            # ever outlived its iteration — the same trap the game loop's
-            # ``_take`` avoids the same way.
+            # Bound as defaults, not captured: a closure over the loop variables would read
+            # whatever the last pair left behind if it outlived its iteration.
             return [
                 data.cells[k]
                 for k in keys
@@ -1023,9 +1000,8 @@ def rq7(data: Dataset, *, seed: int = 0, resamples: int = 0) -> FamilyResult:
         arms = (arm(on_a, on_b), arm(on_a, off_b), arm(off_a, on_b), arm(off_a, off_b))
         contrast = f"{name_a} x {name_b}"
         if any(not group for group in arms):
-            # The nested axis has no (dreimal off, bonus on) cell by
-            # construction, so that pair genuinely has no interaction to
-            # estimate. Named rather than dropped.
+            # The nested axis has no (dreimal off, bonus on) cell by construction, so that pair
+            # has no interaction to estimate. Named rather than dropped.
             unavailable.extend(f"{metric} @ {contrast}" for metric in INTERACTION_METRICS)
             continue
         for metric in INTERACTION_METRICS:
@@ -1046,8 +1022,8 @@ def _config_interaction_family(
 ) -> FamilyResult:
     """Every §2.4 axis crossed with each entry of ``variants``.
 
-    ``key_for(variant, config)`` names the cell; ``variants`` supplies the
-    other factor and its baseline as ``(label, baseline_label)`` pairs.
+    ``key_for(variant, config)`` names the cell; ``variants`` supplies the other factor and its
+    baseline as ``(label, baseline_label)`` pairs.
     """
     rows: list[tuple[str, Estimate]] = []
     unavailable: list[str] = []

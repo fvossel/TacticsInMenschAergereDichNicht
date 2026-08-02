@@ -4,14 +4,13 @@ An independent implementation walks the event log and reproduces every §6.2
 summary field the log can support.
 
 §4.1 forbids analyses from re-deriving a number the summary row already
-carries, which removes the only redundant path: a wrong ``lead_changes`` or
+carries, so no redundant path exists elsewhere: a wrong ``lead_changes`` or
 ``winner_rank_at_50`` passes AK-1 through AK-7 unchanged and lands in
 ``docs/results.md``. This is the one place that rule is broken on purpose.
 
-The two routes are genuinely different. The loop accumulates counters while it
-plays; the reference reconstructs the board from the event stream and
-recomputes from positions. Two implementations agreeing is evidence; one
-implementation called twice is not.
+The two routes are independent by construction. The loop accumulates counters
+while it plays; the reference reconstructs the board from the event stream and
+recomputes from positions.
 """
 
 from __future__ import annotations
@@ -23,8 +22,8 @@ from madnlab.engine.geometry import SeatPattern
 from madnlab.engine.rules import CaptureMode, ColdStart, RuleSet
 from madnlab.run.game import GameSpec, play_indexed_game
 
-#: Fields the event log can support. The seeds and the config echo are not
-#: derivable from a stream of moves and are deliberately not claimed.
+#: Fields the event log can support. Seeds and the config echo are not derivable
+#: from a stream of moves and are deliberately not claimed.
 CROSS_CHECKED = (
     "turns",
     "dice_rolls",
@@ -117,15 +116,11 @@ def test_every_summary_field_is_reproduced_from_the_event_log(
 
 
 def test_cross_checked_covers_everything_the_walker_derives():
-    """The coverage list must not be maintainable by hand.
+    """``CROSS_CHECKED`` names every field the walker and the summary row share.
 
-    ``CROSS_CHECKED`` used to be a hand-written tuple, and every §6.2 field
-    added after it was written escaped AK-9 in silence — which is how
-    ``winner_rank_at_50`` came to be named in the module docstring as the
-    exact metric AK-9 exists to protect while not being checked at all
-    (D-75). This asserts the list is complete, so the next field cannot
-    repeat it: anything the walker derives that is also a summary field has
-    to be compared.
+    The coverage list is verified against the walker's output instead of being
+    maintained by hand: anything derived from the events that is also a §6.2
+    summary field has to be compared (D-75).
     """
     from madnlab.analysis.reference import derive_from_events as _derive
     from madnlab.eventlog.writer import SummaryRow
@@ -151,10 +146,11 @@ def test_cross_checked_covers_everything_the_walker_derives():
 
 
 def test_the_reference_reconstructs_the_final_board():
-    """Stronger than the counters: the whole position vector must match.
+    """The reconstructed board, not only the counters, has to agree.
 
-    A counter can agree by luck; sixteen positions reconstructed from moves and
-    captures cannot.
+    A counter can match by coincidence; a position vector rebuilt from moves and
+    captures cannot. Every seat the summary records as finished must sit past the
+    ring in the reconstruction.
     """
     spec = GameSpec(
         cell_key="ak9/positions",
@@ -179,7 +175,7 @@ def test_the_reference_reconstructs_the_final_board():
 
 
 def test_pass_events_are_per_roll_but_passes_are_per_turn():
-    """D-71, which AK-9 found by disagreeing.
+    """Pass events and pass counts are counted at different granularity (D-71).
 
     §4.1 emits one ``pass`` event per unusable roll; §6.2 counts turns with no
     legal move. A turn of three attempts that never moves is one pass and three

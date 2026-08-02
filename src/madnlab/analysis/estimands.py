@@ -12,8 +12,7 @@ choices become code:
 - means and the CV ratio use the BCa bootstrap over whole games (SQ-6's unit).
 
 Every function returns an :class:`Estimate`, which carries the p-value Holm
-needs alongside the interval a reader needs. Reporting one without the other
-is how a threshold verdict loses its provenance.
+needs alongside the interval a reader needs.
 """
 
 from __future__ import annotations
@@ -37,11 +36,12 @@ class Estimate(NamedTuple):
     estimate: float
     interval: Interval
     p_value: float
-    #: What the estimate counts, so a reader can see the sample behind it.
+    #: The sample sizes behind the estimate.
     n_a: int
     n_b: int
-    #: Set when the estimator could not run — an empty arm, a cell with no
-    #: checkpointed game. Never silently returned as zero.
+    #: Non-empty when the estimator could not run — an empty arm, a cell with
+    #: no checkpointed game. It distinguishes a degenerate result from a
+    #: genuine estimate of zero.
     note: str = ""
 
     @property
@@ -99,8 +99,8 @@ def proportion_difference(
 ) -> Estimate:
     """Difference of two proportions from **independent** cells.
 
-    Independent is the load-bearing word. Two arms of a factorial are separate
-    games and this is correct for them; two seats of one cell are not, and
+    Independence is a precondition. Two arms of a factorial are separate games
+    and this is correct for them; two seats of one cell are dependent, and
     :func:`seat_difference` is the estimator for that case (SQ-6).
     """
     if trials_a == 0 or trials_b == 0:
@@ -165,7 +165,8 @@ def mean_difference(
     The bootstrap resamples whole games, which is SQ-6's unit of analysis. The
     p-value is Welch's rather than a bootstrap inversion: the interval and the
     test then answer the same question at the same n without needing 10x the
-    resamples to resolve a tail.
+    resamples to resolve a tail. ``seed`` is required rather than defaulted, so
+    a reported interval is reproducible from the call alone.
     """
     if len(sample_a) < 2 or len(sample_b) < 2:
         return Estimate(label, 0.0, Interval(0.0, 0.0, 0.0, level), 1.0,
@@ -200,10 +201,9 @@ def cv_ratio(
     """CV ratio with a BCa interval — the RQ-1 primary estimand (SQ-3).
 
     The ratio, not the raw variance ratio: a pure +10% location shift at
-    constant CV produces a variance ratio of 1.21, which would read as a
-    dynamics effect when nothing about the dispersion changed. The caller
-    reports the mean ratio and variance ratio alongside so the two are
-    visibly separated.
+    constant CV produces a variance ratio of 1.21, which reads as a dispersion
+    effect. The caller reports the mean ratio and variance ratio alongside so
+    the two stay visibly separated.
 
     The null here is 1, not 0. The p-value is computed on log scale, where the
     ratio's sampling distribution is far closer to normal than on the raw
@@ -229,7 +229,7 @@ def cv_ratio(
     except (ValueError, ZeroDivisionError):
         interval = Interval(ratio, ratio, ratio, level)
     # Log-scale SE implied by the BCa interval, so the p-value and the
-    # interval cannot disagree about where the null sits.
+    # interval agree about where the null sits.
     if interval.low > 0 and interval.high > 0 and interval.high > interval.low:
         z_crit = z_for(level)
         se_log = (math.log(interval.high) - math.log(interval.low)) / (2 * z_crit)
@@ -275,11 +275,10 @@ def proportion_vs_reference(
     """A single proportion against a **fixed** reference (SQ-1).
 
     The reference is a constant — 1/k is arithmetic, not an estimate — so it
-    contributes no sampling variance. Routing this through
-    :func:`proportion_difference` by passing the reference as a second sample
-    of the same size treats it as if it did, and inflates the interval by a
-    factor of sqrt(2). §6.3 names Wilson for exactly this case, and the
-    interval is reported on the difference scale by shifting Wilson's.
+    contributes no sampling variance, and treating it as a second sample of
+    the same size would inflate the interval by a factor of sqrt(2). §6.3
+    names Wilson for exactly this case, and the interval is reported on the
+    difference scale by shifting Wilson's.
     """
     if trials == 0:
         return Estimate(label, 0.0, Interval(0.0, 0.0, 0.0, level), 1.0, 0, 0,
@@ -311,11 +310,9 @@ def difference_in_differences(
     Each argument is ``(successes, trials)``. The four cells are separate
     games, so the variances add.
 
-    This is what an interaction contrast means, and getting it wrong is not
-    subtle in its consequences but is invisible in its output: comparing two
-    player counts at one rule level answers "does k change the win rate",
-    whose answer is 1/2 against 1/6 and is arithmetic rather than a finding
-    (D-77).
+    The alternative contrast — two player counts at one rule level — answers
+    "does k change the win rate", whose answer is 1/2 against 1/6 and is
+    arithmetic rather than a finding (D-77).
     """
     counts = (a1, a0, b1, b0)
     if any(trials == 0 for _, trials in counts):
@@ -350,9 +347,9 @@ def mean_difference_in_differences(
     difference of differences is a linear combination of four independent
     sample means; at §8's cell sizes its sampling distribution is normal well
     past the precision published here, and a four-arm BCa would cost four
-    resample passes per replicate to reproduce the same interval. §6.3's SQ-2
-    names BCa for a "difference between arms"; this is a difference between
-    differences, and the deviation is recorded rather than assumed (D-77).
+    resample passes per replicate for the same interval. §6.3's SQ-2 names BCa
+    for a "difference between arms"; this is a difference between differences,
+    and the deviation is recorded as such (D-77).
     """
     arms = (a1, a0, b1, b0)
     if any(len(arm) < 2 for arm in arms):
@@ -383,10 +380,10 @@ def multinomial_contrast(
 
         Var(a'p) = [ sum a_i^2 p_i - (sum a_i p_i)^2 ] / n
 
-    Two independent Wilson intervals get this wrong in both directions
-    depending on the weights, which is why §6.3 SQ-6 fixes the multinomial
-    form. The middle-seat question needs weights (-1/2, +1, -1/2), which is
-    not expressible as a difference of two seats.
+    Two independent Wilson intervals err in either direction depending on the
+    weights, which is why §6.3 SQ-6 fixes the multinomial form. The middle-seat
+    question needs weights (-1/2, +1, -1/2), which is not expressible as a
+    difference of two seats.
     """
     if games == 0:
         return Estimate(label, 0.0, Interval(0.0, 0.0, 0.0, level), 1.0, 0, 0,
@@ -434,11 +431,11 @@ def mean_difference_from_moments(
 ) -> Estimate:
     """Difference of means when only the moments were kept, not the samples.
 
-    Welch's form. Used for the battery metrics, where storing a 400k-element
-    vector per cell to recover a number two accumulators already contain would
-    be a poor trade. No bootstrap here for the same reason SQ-2 permits it
-    elsewhere: at these n the difference of two means is normal well past the
-    reported precision.
+    Welch's form. Used for the battery metrics, where the aggregation keeps a
+    per-cell mean and variance from accumulated squares rather than the
+    400k-element vector those two numbers summarize. No bootstrap here for the
+    same reason SQ-2 permits it elsewhere: at these n the difference of two
+    means is normal well past the reported precision.
     """
     if n_a < 2 or n_b < 2:
         return Estimate(label, 0.0, Interval(0.0, 0.0, 0.0, level), 1.0, n_a, n_b,

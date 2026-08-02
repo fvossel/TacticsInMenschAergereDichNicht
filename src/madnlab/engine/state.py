@@ -1,13 +1,12 @@
 """Game state, held as a flat tuple of ints (NF-2).
 
-There is no per-piece object. A state is ``positions``, a tuple of
-``seats * 4`` integers using the encoding documented in
-:mod:`madnlab.engine.geometry`, plus the small amount of bookkeeping the game
-loop needs. Applying a move produces a new tuple; nothing is mutated.
+There is no per-piece object. A state is ``positions``, a tuple of ``seats * 4`` integers
+using the encoding documented in :mod:`madnlab.engine.geometry`, plus the bookkeeping the
+game loop needs. Applying a move produces a new tuple; nothing is mutated.
 
-The global index of seat ``s``'s piece ``p`` is ``s * 4 + p``. Piece indices
-are stable for the whole game, which is what lets the canonical move order
-(D-3) and the event log refer to pieces by number.
+The global index of seat ``s``'s piece ``p`` is ``s * 4 + p``. Piece indices are stable for
+the whole game, which is what lets the canonical move order (D-3) and the event log refer to
+pieces by number.
 """
 
 from __future__ import annotations
@@ -27,9 +26,9 @@ from madnlab.engine.rules import ColdStart, RuleSet
 class GameState(NamedTuple):
     """An immutable game state.
 
-    ``positions`` is indexed by global piece index. ``finished`` is the
-    realized finishing order, which is what GM-3.11's ``play_out`` ranks are
-    read from; a seat appears in it once all four of its pieces are home.
+    ``positions`` is indexed by global piece index. ``finished`` is the realized finishing
+    order, from which GM-3.11's ``play_out`` ranks are read; a seat is appended once all four
+    of its pieces are home.
     """
 
     positions: tuple[int, ...]
@@ -59,18 +58,16 @@ def seat_of(index: int) -> int:
 def initial_state(board: Board, seats_in_play: tuple[int, ...], rules: RuleSet) -> GameState:
     """Build the opening position for ``seats_in_play`` (GM-3.2).
 
-    Under the baseline ``one_piece_out`` each occupied seat starts with piece 0
-    on its own entry field and pieces 1..3 in the yard — the official setup,
-    verified against all three editions (D-55). ``strict`` and ``free_entry``
-    start with all four pieces in the yard.
+    Under the baseline ``one_piece_out`` each occupied seat starts with piece 0 on its own
+    entry field and pieces 1..3 in the yard, the setup printed in all three editions (D-55).
+    ``strict`` and ``free_entry`` start with all four pieces in the yard.
 
-    Unoccupied seats keep their pieces in the yard and never move; the game
-    loop skips them.
+    Unoccupied seats keep their pieces in the yard and never move; the game loop skips them.
     """
     positions = [POS_YARD] * (board.seats * PIECES_PER_SEAT)
     if rules.cold_start is ColdStart.ONE_PIECE_OUT:
         for seat in seats_in_play:
-            positions[piece_index(seat, 0)] = 1  # pos 1 == the own entry field
+            positions[piece_index(seat, 0)] = 1  # pos 1 is the seat's own entry field
     return GameState(positions=tuple(positions))
 
 
@@ -80,11 +77,10 @@ def initial_state(board: Board, seats_in_play: tuple[int, ...], rules: RuleSet) 
 def progress_of_piece(pos: int) -> int:
     """Progress of a single piece.
 
-    The position encoding *is* the progress value, so this is the identity —
-    it exists so call sites read as the specification does and so the one
-    definition has one name. See :mod:`madnlab.engine.geometry` for why a
-    lapped piece under ``mandatory_extended`` drops back rather than
-    overtaking goal pieces (D-8).
+    The position encoding *is* the progress value, so this is the identity. It exists so that
+    the definition has a single name and call sites read as §6.1 does. See
+    :mod:`madnlab.engine.geometry` for why a lapped piece under ``mandatory_extended`` drops
+    back rather than overtaking goal pieces (D-8).
     """
     return pos
 
@@ -103,11 +99,9 @@ def normalized_progress(board: Board, state: GameState, seat: int) -> float:
 def track_progress(board: Board, pos: int) -> int | None:
     """Ranking key for the movement agents (D-43a).
 
-    ``progress`` restricted to pieces **on the ring**; pieces in the yard and
-    in the goal column are excluded from the ranking entirely and yield
-    ``None``. Defined here rather than in the agents so that all of them
-    consume one definition, the way every consumer consumes one
-    ``legal_moves``.
+    ``progress`` restricted to pieces **on the ring**; pieces in the yard and in the goal
+    column are excluded from the ranking entirely and yield ``None``. Defined here rather
+    than in the agents so that all of them share one definition.
     """
     return pos if board.location(pos) is PieceLocation.RING else None
 
@@ -115,10 +109,10 @@ def track_progress(board: Board, pos: int) -> int | None:
 def seat_has_finished(board: Board, state: GameState, seat: int) -> bool:
     """Whether all four of ``seat``'s pieces stand in its goal column.
 
-    The goal column has exactly :data:`GOAL_FIELDS` fields and a seat has
-    exactly :data:`PIECES_PER_SEAT` pieces, both 4, and the column holds at
-    most one piece per field (D-34) — so "all four are in the column" is the
-    win condition and needs no per-field check.
+    The goal column has exactly :data:`GOAL_FIELDS` fields, a seat has exactly
+    :data:`PIECES_PER_SEAT` pieces, both are 4, and the column holds at most one piece per
+    field (D-34). Every piece being past the ring is therefore the win condition on its own,
+    and no per-field check is needed.
     """
     assert GOAL_FIELDS == PIECES_PER_SEAT  # the equality the argument rests on
     return all(pos > board.ring_length for pos in state.seat_positions(seat))

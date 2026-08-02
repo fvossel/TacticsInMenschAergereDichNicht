@@ -18,15 +18,15 @@ engine and the metric layer:
 ``R+1 .. R+4``       in the goal column, index ``pos - R - 1``
 ===================  ==========================================
 
-with ``R`` the ring length. ``pos == R`` is the seat's own goal-entry field —
+with ``R`` the ring length. ``pos == R`` is the seat's own goal-entry field,
 the last ring field before its goal column.
 
 Under ``capture_mode = mandatory_extended`` a piece can be forced past its own
 goal entry onto another lap (GM-5). Per D-8 the ring component is stored
 modulo the ring length, so such a piece drops back to a low ``pos`` rather
-than colliding with the goal encoding, progress is explicitly **not** monotone
-in time in that arm, and GM-3.8 re-applies on the next pass without any
-lap-count state being carried on the piece.
+than colliding with the goal encoding, progress is not monotone in time in
+that arm, and GM-3.8 re-applies on the next pass without any lap-count state
+being carried on the piece.
 """
 
 from __future__ import annotations
@@ -90,7 +90,7 @@ class Board(NamedTuple):
         A piece reaches it after ``ring_length - 1`` steps, i.e. at
         ``pos == ring_length``; the next step enters the goal column. Expressed
         through :meth:`ring_field` so the seat offset has exactly one
-        definition (D-3's "one function, one definition" applied to geometry).
+        definition (D-3).
         """
         return self.ring_field(seat, self.ring_length)
 
@@ -98,16 +98,12 @@ class Board(NamedTuple):
         """Absolute ring field of ``seat``'s piece standing at ``pos``.
 
         ``pos`` is normally a ring position (``1 <= pos <= ring_length``), but
-        the domain is deliberately wider: **``pos`` may exceed the ring length
-        and is reduced modulo it** (D-64). The modulo is load-bearing, not
-        defensive — ``mandatory_extended``'s extra-lap path scan walks
-        positions up to ``ring_length + 5`` and relies on them wrapping onto
-        the correct lap fields.
-
-        Anyone replacing this with a precomputed per-seat lookup table indexed
-        ``1..ring_length`` — the obvious shape of an NF-2 optimization pass —
-        must keep the wrap, or the barrier path checks silently break in the
-        one arm that carries the forced-extra-lap counters.
+        the domain is wider: ``pos`` may exceed the ring length and is reduced
+        modulo it (D-64). The wrap is load-bearing. ``mandatory_extended``'s
+        extra-lap path scan walks positions up to ``ring_length + 5``, and the
+        barrier checks along that path read the wrapped fields of the next lap,
+        so an NF-2 optimization pass has to reproduce the wrap rather than
+        bound the index at ``ring_length``.
         """
         return (seat * self.spacing + pos - 1) % self.ring_length
 
@@ -134,7 +130,7 @@ class Board(NamedTuple):
 
         170 on the 4-seat board, 202 on the 6-seat board (requirements §2.1).
         Used as the normalization denominator in §6.1; per D-8 it is the lap-0
-        maximum and is **not** raised by ``mandatory_extended``'s extra laps.
+        maximum and is not raised by ``mandatory_extended``'s extra laps.
         """
         top = self.max_progress_per_piece
         return sum(range(top - GOAL_FIELDS + 1, top + 1))
@@ -173,11 +169,10 @@ class SeatPattern(enum.StrEnum):
 def occupied_seats(seats: int, players: int, pattern: SeatPattern) -> tuple[int, ...]:
     """Seat indices occupied by ``players`` players under ``pattern``.
 
-    ``adjacent`` fills seats ``0..players-1``. ``spread`` means **maximally
-    even spacing**, ``step = seats // players``, which requires ``players`` to
-    divide ``seats`` (D-65) — even spacing rather than a literal "every second
-    seat" is the property EX-5 tests, and the two readings agree on the only
-    spread configuration §8 instantiates, 3 players on the 6-seat board.
+    ``adjacent`` fills seats ``0..players-1``. ``spread`` means maximally even
+    spacing, ``step = seats // players``, which requires ``players`` to divide
+    ``seats`` (D-65); even spacing rather than a literal "every second seat" is
+    the property EX-5 tests, and it is the reading §8's spread cells use.
     ``opposite`` is defined for two players only.
 
     The ``players >= 2`` floor is §2.4's measured-axis range, and the three

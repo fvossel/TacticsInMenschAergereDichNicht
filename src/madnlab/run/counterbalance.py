@@ -1,28 +1,23 @@
 """Seat and starting-player counterbalancing (§7.3, D-39).
 
-A cell's games are spread evenly over the strategy→seat arrangements and the
-starting seats, so a seat effect cannot be mistaken for a strategy effect.
-§7.3 also forbids averaging a seat effect away silently, which is why every
-row records the arrangement and starting seat it ran under rather than only
-the aggregate.
+A cell's games are spread evenly over the strategy→seat arrangements and the starting seats, so
+a seat effect cannot be mistaken for a strategy effect. §7.3 also forbids averaging a seat
+effect away silently, which is why every row records the arrangement and starting seat it ran
+under rather than only the aggregate.
 
 Balance block
 -------------
 ``B = (#arrangements) × (#starting seats)``. Game ``i`` takes arrangement
-``(i mod B) // #starting_seats`` and starting seat ``i mod #starting_seats``,
-so every complete block covers every combination exactly once. A cell's
-``n_effective`` is ``n_requested`` rounded **up** to a whole number of blocks
-(D-39) — 10,000 games over a block of 9 would otherwise leave one combination
-with one extra game, and "equal game counts" would be false in the document
-that claims it.
+``(i mod B) // #starting_seats`` and starting seat ``i mod #starting_seats``, so every complete
+block covers every combination exactly once. A cell's ``n_effective`` is ``n_requested`` rounded
+up to a whole number of blocks (D-39), so every arrangement-by-starting-seat combination runs
+the same number of games.
 
 Which arrangements
 ------------------
-Full permutations exactly when a cell contains **two or more distinct
-non-field strategies**; cyclic rotations otherwise (D-39). For a homogeneous
-cell every rotation is the same assignment, so there is one arrangement and
-only the starting seat is balanced — which is the case §7.3 originally scoped
-away and D-25 put back.
+Full permutations exactly when a cell contains two or more distinct non-field strategies;
+cyclic rotations otherwise (D-39). For a homogeneous cell every rotation is the same
+assignment, so there is one arrangement and only the starting seat is balanced (D-25).
 """
 
 from __future__ import annotations
@@ -87,11 +82,10 @@ def _permutations(agent_ids: Sequence[str]) -> list[tuple[str, ...]]:
 def needs_full_permutations(agent_ids: Sequence[str]) -> bool:
     """D-39's trigger: two or more distinct non-field strategies.
 
-    The *field* is the most common agent. A homogeneous cell has none besides
-    the field; a 1-deviant cell has exactly one, so rotations suffice and cover
-    every seat for the deviant. Two or more deviants need the full permutation
-    set, because rotations would keep them in a fixed relative order and their
-    adjacency is itself a seat effect.
+    The *field* is the most common agent. A homogeneous cell has none besides the field; a
+    1-deviant cell has exactly one, so rotations suffice and cover every seat for the deviant.
+    Two or more deviants need the full permutation set, because rotations keep them in a fixed
+    relative order and their adjacency is itself a seat effect.
     """
     if not agent_ids:
         return False
@@ -107,9 +101,8 @@ def plan(
 ) -> Balance:
     """Build the counterbalancing plan for one cell.
 
-    ``force_full`` overrides D-39's trigger; the campaign config exposes it so
-    an unusual cell can be balanced more strongly on purpose, and the choice
-    lands in the summary row rather than in someone's memory.
+    ``force_full`` overrides D-39's trigger; the campaign config exposes it so an unusual cell
+    can be balanced more strongly on purpose, and the choice is recorded in the summary row.
     """
     if len(agent_ids) != len(occupied_seats):
         raise ValueError(
@@ -132,9 +125,8 @@ def describe(balance: Balance) -> str:
     )
 
 
-#: Patterns whose occupied-seat tuple is rotation-symmetric, so rotating the
-#: agents through the seats really does visit every structural position.
-#: ``adjacent`` on a partly filled board is **not** — seat 1 of a 3-on-4-board
-#: block is the middle seat and rotating within the block keeps it middle,
-#: which is exactly what EX-5 measures rather than averages away.
+#: Patterns whose occupied-seat tuple is rotation-symmetric, so rotating the agents through the
+#: seats visits every structural position. ``adjacent`` on a partly filled board is not: seat 1
+#: of a 3-on-4-board block is the middle seat, and rotating within the block keeps it middle,
+#: which is what EX-5 measures.
 ROTATION_SYMMETRIC = (SeatPattern.SPREAD, SeatPattern.OPPOSITE)

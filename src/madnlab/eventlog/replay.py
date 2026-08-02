@@ -2,14 +2,11 @@
 
 ``header + engine version`` must reproduce a game byte-identically. The
 validator re-simulates from the header alone and asserts event-stream
-equality — *alone* being the operative word: if reproduction needed anything
-the runner kept to itself, the header would be incomplete and §4.3's claim
-would be false.
+equality, so the check passes only if the header carries everything the run
+depended on — the completeness §4.3 claims.
 
-Version skew is refused rather than reported as a mismatch (D-33). A log
-written by a different engine will differ for a legitimate reason, and letting
-that surface as "replay mismatch" invites someone to go looking for a bug that
-is not there.
+Version skew is refused rather than reported as a mismatch (D-33): a log
+written by a different engine differs for a legitimate reason.
 """
 
 from __future__ import annotations
@@ -71,15 +68,13 @@ def rules_from_header(header: LogHeader) -> RuleSet:
 def spec_from_header(header: LogHeader, agent_ids: Sequence[str] | None = None) -> GameSpec:
     """Rebuild the cell spec from the header.
 
-    ``agent_ids`` exists only so a caller can replay a game with different
-    policies for debugging; the default takes them from the header, which is
-    what AK-3 does.
+    ``agent_ids`` overrides the policies the header recorded; the default
+    replays the recorded ones, which is what AK-3 does.
 
     ``counterbalanced=False`` is load-bearing. The header records the
     **resolved** assignment and starting seat, so re-deriving them from the
     game index would apply §7.3's rotation a second time on top of an already
-    rotated tuple and replay a different game. AK-3 caught exactly that when
-    counterbalancing landed.
+    rotated tuple and replay a different game.
     """
     recorded = tuple(name for _seat, name in header.agents)
     return GameSpec(
@@ -119,8 +114,8 @@ def compare(recorded: Sequence[Event], replayed: Sequence[Event]) -> ReplayMisma
     """First divergence between two event streams, or ``None`` if identical.
 
     Compared on the canonical serialization rather than on the objects, so the
-    check is exactly the byte-identity LG-3 claims and not a looser structural
-    equality that could pass while the written logs differ.
+    check is the byte-identity LG-3 claims and not the weaker structural
+    equality of the objects.
     """
     for at in range(max(len(recorded), len(replayed))):
         left = (

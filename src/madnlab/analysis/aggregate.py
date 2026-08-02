@@ -1,9 +1,9 @@
 """Reading a campaign back, and the two gates that run over whole cells.
 
-AK-4 is a seat-symmetry **equivalence** test, not a failure to reject. AK-5 is
-a counter invariant summed over every row of every mandatory cell, which is
-what makes it independent of the GM-5.1 priority direction and of how many
-event logs were sampled (D-32).
+AK-4 is a seat-symmetry **equivalence** test. AK-5 is a counter invariant
+summed over every row of every mandatory cell, which is what makes it
+independent of the GM-5.1 priority direction and of how many event logs were
+sampled (D-32).
 
 Both are here rather than in the runner because they are analyses of a
 finished campaign, and NF-7 puts analyses under their own reproducibility
@@ -261,9 +261,9 @@ class AK4Result(NamedTuple):
                 f"[{verdict.interval.low * 100:8.4f}, {verdict.interval.high * 100:8.4f}]  "
                 f"dev {verdict.deviation_pp:+.4f} pp  {flag}"
             )
-        # Through ``verdict``, not ``passed``: an inconclusive cell printing
-        # "FAIL" here contradicts the UNDERPOWERED line three rows above it,
-        # and this is the line a reader trusts (D-74).
+        # Through ``verdict``, not ``passed``: ``passed`` is False whenever the
+        # test is inconclusive, and printing FAIL here would contradict the
+        # UNDERPOWERED line above (D-74).
         lines.append(f"      {self.verdict}")
         return "\n".join(lines)
 
@@ -303,15 +303,13 @@ def ak4(
     """Seat symmetry as an equivalence test (D-29).
 
     Passes when, for **every** seat, the two-sided CI for ``p_seat - 1/k`` lies
-    entirely inside ``+/- delta``. That is the opposite of the original
-    criterion, which passed on a failure to reject and therefore also passed on
-    a cell too small to reject anything.
+    entirely inside ``+/- delta``. Evidence of symmetry is what earns a PASS,
+    so a cell too small to resolve ``delta`` cannot earn one.
 
-    The mirror error is just as easy to make, and this guards against it: when
-    the half-width is not smaller than the margin the test cannot pass on *any*
-    data, so its result is **inconclusive** rather than a failure. Reporting
-    that as FAIL would confuse "n is too small" with "the seats are asymmetric"
-    — which is the same conflation, pointed the other way (D-72).
+    When the half-width is not smaller than the margin the test cannot pass on
+    *any* data, so its result is **inconclusive** rather than a failure:
+    reporting that as FAIL would confuse "n is too small" with "the seats are
+    asymmetric" (D-72).
     """
     reference = 1 / cell.players
     verdicts = []
@@ -352,9 +350,8 @@ class AK5Result(NamedTuple):
     games: int
     offered: int
     violations: int
-    #: §11's second half. It was specified from the start and never
-    #: implemented, so AK-5 reported PASS on one of its two invariants for
-    #: every cell of every campaign (D-75).
+    #: §11's second half: decisions where the extra-lap obligation was in
+    #: force, and so the denominator ``lap_violations`` is counted against.
     lap_offered: int
     lap_violations: int
     passed: bool
@@ -374,10 +371,9 @@ def ak5(cell: CellSummary) -> AK5Result:
 
     ``offered`` counts only decisions where the restriction actually applied —
     neither GM-5.1 exception in force — so the gate does not depend on which
-    way D-9's lattice was decided. A cell that offers nothing is reported as
-    such rather than passing quietly: a mandatory arm with zero obligations
-    would mean the restriction never fired, which is a defect wearing a green
-    badge.
+    way D-9's lattice was decided. A cell that offers nothing fails rather than
+    passing quietly: in a mandatory arm, zero obligations means the restriction
+    never fired.
     """
     return AK5Result(
         cell_key=cell.cell_key,
@@ -397,9 +393,9 @@ def ak5(cell: CellSummary) -> AK5Result:
 def starting_player_advantage(cell: CellSummary, level: float = 0.95) -> dict[int, Interval]:
     """Win rate by turn-order offset from the starting seat (D-25).
 
-    EX-1's headline deliverable, which §6.2 originally had no field for. The
-    marginal per-seat rate is 1/k by construction under balancing, so this is
-    the estimand that is not fixed by symmetry.
+    EX-1's headline deliverable. The marginal per-seat rate is 1/k by
+    construction under balancing, so this is the estimand that is not fixed by
+    symmetry.
     """
     return {
         offset: wilson(wins, cell.games, level=level)

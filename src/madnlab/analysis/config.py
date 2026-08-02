@@ -1,17 +1,14 @@
 """Analysis-run configuration and its manifest (NF-7).
 
-NF-1 makes the simulation reproducible from a master seed. NF-7 extends that
-to the half that actually gets published: §6.4's decision rules are threshold
-rules — "CI excludes 1", "CI excludes zero" — so a bootstrap without a
-recorded seed and resample count means a borderline verdict can flip between
-two runs on byte-identical input. That would leave the simulation
-byte-reproducible and the results not.
+NF-1 makes the simulation reproducible from a master seed. NF-7 extends that to the half
+that actually gets published: §6.4's decision rules are threshold rules — "CI excludes 1",
+"CI excludes zero" — so recording the bootstrap seed and the resample count is what fixes a
+borderline verdict to one value across every run on byte-identical input.
 
-The manifest records the environment as well as the seed, because BLAS
-reduction order differs across CPU architectures and library builds. Simulation
-may fan out across HPC nodes; analysis runs single-node under a pinned
-environment, and re-running it elsewhere is a *new* analysis rather than a
-reproduction.
+The manifest records the environment alongside the seed, because BLAS reduction order
+differs across CPU architectures and library builds. Simulation may fan out across HPC
+nodes; analysis runs single-node under a pinned environment, and re-running it elsewhere is
+a new analysis rather than a reproduction.
 """
 
 from __future__ import annotations
@@ -43,9 +40,9 @@ class AnalysisConfig(NamedTuple):
     def seed_for(self, *parts: object) -> int:
         """A distinct, derived seed per estimand.
 
-        One seed per run and a shared generator would make an estimand's
-        interval depend on how many estimands ran before it, so adding a
-        descriptive statistic would move a published confirmatory bound.
+        Hashing the analysis seed together with the estimand's own parts makes each
+        interval depend on that estimand alone, so the number and the order of the other
+        estimands in the run leave a published confirmatory bound untouched.
         """
         payload = "\x1f".join(str(part) for part in (self.analysis_seed, *parts))
         return int.from_bytes(
@@ -91,9 +88,8 @@ def manifest(
 def write_manifest(path: Path, payload: dict[str, Any]) -> None:
     """Write ``analysis.json`` with the same canonical rules as the logs.
 
-    AK-2 asserts that the same analysis config twice produces byte-identical
-    output, which needs the encoding pinned here exactly as D-33 pins it for
-    the event log.
+    The encoding is pinned here exactly as D-33 pins it for the event log, so that the
+    same analysis config run twice produces the byte-identical output AK-2 asserts.
     """
     text = json.dumps(payload, ensure_ascii=True, separators=(",", ":"), sort_keys=True)
     path.write_text(text + "\n", encoding="utf-8", newline="")

@@ -1,14 +1,11 @@
 """AK-8b — analytic calibration against ground truth outside the engine.
 
-Every other gate is a self-consistency check: rules against scenarios written
-by the engine's own author, replay against the same engine, symmetry against
-an identity that holds by construction. A uniform bias in the dice stream or
-an off-by-one in the entry logic would pass all of them — AK-4 is structurally
-blind to it because a uniform bias hits every seat equally.
-
-This gate compares against a distribution the rules imply and the engine has
-no say in: the number of turns until a seat brings out its first piece is
-geometric with ``p = 1 - (5/6)^attempts``.
+The other gates are self-consistency checks: rules against author-written scenarios, replay against
+the same engine, symmetry against an identity that holds by construction. None of them constrains
+the absolute shape of the dice stream, since a uniform bias hits every seat equally and so leaves
+AK-4's symmetry identity intact. This gate compares against a distribution the rules imply and the
+engine has no say in: the number of turns until a seat brings out its first piece is geometric with
+``p = 1 - (5/6)^attempts``.
 """
 
 from __future__ import annotations
@@ -23,16 +20,15 @@ from madnlab.engine.rules import ColdStart, RuleSet
 from madnlab.eventlog.events import MoveEvent, RollEvent
 from madnlab.run.game import GameSpec, play_indexed_game
 
-#: Enough for the chi-square to have power against a bias of a few tenths of a
-#: percent without making the suite slow.
+#: Enough power against a bias of a few tenths of a percent without making the suite slow.
 GAMES = 3000
 
 
 def _turns_to_first_entry(events, seat: int) -> int | None:
     """Turns the seat took before its first ``enter`` move.
 
-    A turn boundary is a roll with attempt number 1, so this reads the same
-    turn structure D-10 defines without re-implementing it.
+    A turn boundary is a roll with attempt number 1, so this reads D-10's turn structure off the
+    event log rather than re-implementing it.
     """
     turns = 0
     for event in events:
@@ -49,14 +45,12 @@ def _turns_to_first_entry(events, seat: int) -> int | None:
 def test_turns_to_first_entry_matches_the_geometric_distribution(dreimal, attempts):
     """The distribution the rules imply, with no free parameter.
 
-    ``p`` comes from the rule set, not from the data, so the chi-square spends
-    no degree of freedom estimating it — getting that wrong would make the test
-    conservative and hide the bias it exists to catch.
+    ``p`` comes from the rule set, not from the data, so the chi-square estimates nothing and keeps
+    the full ``bins - 1`` degrees of freedom.
 
-    Two players rather than one: ``occupied_seats`` keeps §2.4's floor of two
-    (D-66), and a seat's first entry cannot be blocked by an opponent anyway —
-    each seat has its own entry field, and an opponent standing on it is
-    captured rather than blocking.
+    Two players rather than one: ``occupied_seats`` keeps §2.4's floor of two (D-66), and a seat's
+    first entry cannot be blocked by an opponent — each seat has its own entry field, and an
+    opponent standing on it is captured rather than blocking.
     """
     spec = GameSpec(
         cell_key=f"ak8b/entry/{attempts}",
@@ -96,7 +90,7 @@ def test_turns_to_first_entry_matches_the_geometric_distribution(dreimal, attemp
 
 
 def test_the_die_is_uniform():
-    """A biased die would shift every metric and no other gate would notice."""
+    """The six faces are equally likely; no other gate constrains their absolute distribution."""
     spec = GameSpec(
         cell_key="ak8b/die",
         seats=4,
@@ -126,11 +120,10 @@ def test_the_die_is_uniform():
 
 
 def test_the_gate_would_catch_a_biased_die():
-    """A calibration gate that cannot fail is not a gate.
+    """Power check for the uniformity assertion above.
 
-    Perturbs the observed counts by 1% on one face and asserts the test
-    rejects, so the assertion above is known to have power at the sample size
-    it actually runs at.
+    Shifting 1% of the rolls from one face to another must be rejected at the sample size the
+    uniformity test actually runs at.
     """
     total = 120_000
     fair = [total // 6] * 6

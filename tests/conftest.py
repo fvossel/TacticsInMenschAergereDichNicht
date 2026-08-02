@@ -39,21 +39,20 @@ def state_for(board: Board, **seat_positions: Iterable[int]) -> GameState:
 def pos_on_field(board: Board, seat: int, field: int) -> int:
     """The position at which ``seat``'s piece stands on absolute ``field``.
 
-    The inverse of :meth:`Board.ring_field` over ``1..ring_length``. Scenarios
-    must go through this rather than solving the modulo by hand: an
-    out-of-range position happens to land on the right field because
-    ``ring_field`` reduces modulo the ring (D-64), so a hand-rolled offset can
-    place a piece at a position no game state can reach and still make the
-    assertion pass.
+    The inverse of :meth:`Board.ring_field` over ``1..ring_length``, the only
+    range a ring piece occupies. ``ring_field`` reduces its argument modulo
+    the ring (D-64), so ``pos + ring_length`` names the same field from
+    outside that range; scenarios go through this rather than solving the
+    modulo by hand.
     """
     pos = (field - seat * board.spacing) % board.ring_length + 1
     assert board.ring_field(seat, pos) == field
     return pos
 
 
-#: ``strict`` puts all four pieces in the yard, which keeps most scenarios free
-#: of the entry-clearing rule that the baseline triggers from turn one. Where
-#: clearing is the thing under test the baseline is used instead.
+#: ``strict`` starts all four pieces in the yard, which keeps scenarios clear
+#: of the entry-clearing rule that ``BASELINE``'s ``one_piece_out`` default
+#: triggers from turn one. Scenarios that exercise clearing use ``BASELINE``.
 STRICT = RuleSet(cold_start=ColdStart.STRICT)
 FREE = RuleSet(cold_start=ColdStart.FREE_ENTRY)
 

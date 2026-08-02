@@ -1,16 +1,16 @@
 """Canonical JSONL serialization (D-33).
 
-"Byte-identical" (LG-3, AK-2) is only a meaningful claim once the encoding is
-pinned, so it is pinned here and nowhere else:
+Byte-identical logs (LG-3, AK-2) require a pinned encoding, and this module is
+the only place that pins it:
 
 * UTF-8, with non-ASCII escaped so the bytes do not depend on the locale
 * an explicit ``\\n`` terminator, never the platform's
 * fixed key order — the declaration order of the event's fields, which is why
   reordering a field in :mod:`madnlab.eventlog.events` is a schema change
-* ``separators=(",", ":")``, so no whitespace can drift
-* shortest round-trip float representation, which is Python's ``repr`` — the
-  event stream carries no floats today, and this exists so that stays true by
-  construction rather than by luck
+* ``separators=(",", ":")``, which emits no whitespace
+* shortest round-trip float representation, which is Python's ``repr``; the
+  event stream carries no floats, and this keeps the encoding pinned if one is
+  added
 """
 
 from __future__ import annotations
@@ -33,7 +33,7 @@ def _plain(value: Any) -> Any:
     if isinstance(value, bool | int | str) or value is None:
         return value
     if isinstance(value, float):
-        # repr is the shortest string that round-trips (PEP 3141 / CPython).
+        # repr is the shortest string that round-trips (CPython 3.1+).
         return float(repr(value))
     return str(value)
 
@@ -58,6 +58,7 @@ def event_payload(event: Event) -> dict[str, Any]:
 
 
 def header_payload(header: LogHeader) -> dict[str, Any]:
+    """The header as an ordered mapping, tag first then declaration order."""
     payload: dict[str, Any] = {"e": "header"}
     for field in header._fields:
         payload[field] = _plain(getattr(header, field))
@@ -74,10 +75,9 @@ def iter_lines(header: LogHeader, events: Iterable[Event]) -> Iterator[str]:
 def write_log(stream: TextIO, header: LogHeader, events: Iterable[Event]) -> None:
     """Write a game log. ``stream`` must be opened with ``newline=""``.
 
-    The explicit ``\\n`` is the point: with the default newline translation
-    Windows would emit ``\\r\\n`` and the same seed would produce different
-    bytes on different platforms, which is exactly what AK-2 asserts cannot
-    happen.
+    Under the default newline translation Windows emits ``\\r\\n``, so the same
+    seed would produce different bytes on different platforms and the logs
+    would no longer satisfy the byte-identity AK-2 asserts.
     """
     for line in iter_lines(header, events):
         stream.write(line)
@@ -92,10 +92,9 @@ def log_bytes(header: LogHeader, events: Iterable[Event]) -> bytes:
 class SummaryRow(NamedTuple):
     """One row of ``summary.jsonl`` (LG-2).
 
-    The key set is fixed per schema version and does **not** vary by arm
-    (D-22): arm-specific counters are always present and zero when
-    inapplicable, so a campaign's rows are a rectangle no matter which flags
-    the cell had.
+    The key set is fixed per schema version and does not vary by arm (D-22):
+    arm-specific counters are always present and zero when inapplicable, so a
+    campaign's rows form a rectangle whatever flags a cell sets.
     """
 
     cell_key: str
@@ -107,8 +106,8 @@ class SummaryRow(NamedTuple):
     players: int
     seat_pattern: str
     starting_seat: int
-    #: §7.3 counterbalancing, recorded per row so a seat effect can never
-    #: be averaged away without the arrangement it came from (D-39).
+    #: §7.3 counterbalancing, recorded per row so a seat effect is never
+    #: averaged away from the arrangement it came from (D-39).
     n_requested: int
     n_effective: int
     balance_block: int
@@ -152,5 +151,6 @@ class SummaryRow(NamedTuple):
 
 
 def summary_line(row: SummaryRow) -> str:
+    """One canonical JSON line for a summary row, in declaration order."""
     payload = {field: _plain(getattr(row, field)) for field in row._fields}
     return canonical_dumps(payload)

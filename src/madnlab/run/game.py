@@ -1,10 +1,8 @@
 """One game, end to end: config in, header + events + summary row out.
 
-This is the seam AK-3 needs. The replay validator re-runs
-:func:`play_indexed_game` from a header alone and compares event streams, so
-everything that shapes a game has to come out of the header — which is why the
-resolved starting seat is a header field rather than something the runner
-keeps to itself.
+The replay validator re-runs :func:`play_indexed_game` from a header alone and compares
+event streams (AK-3), so everything that shapes a game has to come out of the header,
+including the resolved starting seat.
 """
 
 from __future__ import annotations
@@ -22,10 +20,8 @@ from madnlab.eventlog.events import SCHEMA_VERSION, Event, LogHeader
 from madnlab.eventlog.writer import SummaryRow
 from madnlab.run import counterbalance, seeds
 
-#: The pre-registration tag a run was executed under (§14). Recorded in every
-#: header and every summary row. The placeholder this held before the freeze
-#: was ``unfrozen``; the data generated under it was discarded rather than
-#: relabelled, so no published row carries it (D-73).
+#: The pre-registration tag a run was executed under (§14). Recorded in every header and
+#: every summary row.
 PREREG_VERSION = "prereg-v1"
 
 
@@ -37,19 +33,18 @@ class GameSpec(NamedTuple):
     players: int
     seat_pattern: SeatPattern
     rules: RuleSet
-    #: Agent id per occupied seat, in seat order. Under counterbalancing this
-    #: is the *canonical* assignment; the arrangement actually played is
-    #: derived per game index (§7.3) and recorded in the header.
+    #: Agent id per occupied seat, in seat order. Under counterbalancing this is the
+    #: *canonical* assignment; the arrangement actually played is derived per game index
+    #: (§7.3) and recorded in the header.
     agent_ids: tuple[str, ...]
     master_seed: int
-    #: §7.3 counterbalancing. Off only for one-off games and for replay, which
-    #: takes the resolved assignment from the header instead.
+    #: §7.3 counterbalancing. Off for one-off games and for replay, which takes the
+    #: resolved assignment from the header instead.
     counterbalanced: bool = True
     #: Override D-39's permutation trigger. ``None`` uses the rule.
     force_full_permutations: bool | None = None
-    #: The pre-registration this cell runs under (§14). Carried on the spec so
-    #: a second study can be frozen separately without restamping the first
-    #: study's rows (D-78).
+    #: The pre-registration this cell runs under (§14). Carried on the spec so a second
+    #: study can be frozen separately without restamping the first study's rows (D-78).
     prereg_version: str = PREREG_VERSION
 
     def occupied(self) -> tuple[int, ...]:
@@ -110,8 +105,8 @@ def play_indexed_game(
 ) -> GameRun:
     """Play game ``game_index`` of ``spec``.
 
-    ``starting_seat`` overrides the seeded draw, which is what §7.3's
-    counterbalancing does and what replay does when reading a header back.
+    ``starting_seat`` overrides both the counterbalanced value and the seeded draw; replay
+    passes the resolved seat it read back out of the header.
     """
     spec.rules.validate()
     board = board_for(spec.seats)
@@ -119,11 +114,9 @@ def play_indexed_game(
     seed = seeds.game_seed(spec.master_seed, spec.cell_key, game_index)
     streams = seeds.derive(seed, seats)
 
-    # §7.3: the arrangement and the starting seat come from the game index, so
-    # a complete block covers every combination exactly once. The seeded draw
-    # (D-6) is the uncounterbalanced fallback, and an explicit override is what
-    # replay uses — it reads the resolved value back out of the header rather
-    # than re-deriving it.
+    # §7.3: the arrangement and the starting seat come from the game index, so a complete
+    # block covers every combination exactly once. The seeded draw (D-6) is the
+    # uncounterbalanced fallback.
     if spec.counterbalanced:
         balance = spec.balance()
         balance_block = balance.block

@@ -1,10 +1,9 @@
 """AK-4's trichotomy and the scope of the gate (D-29, D-72, D-74).
 
-AK-4 had no tests. Both defects D-74 records survived a full campaign because
-of it: the report line printed ``FAIL`` under an ``INCONCLUSIVE`` verdict, and
-the gate applied to every cell rather than to the calibration cells §11 scopes
-it to. Neither is visible to ruff or mypy, and neither changes any interval —
-they only change what a reader and an exit code are told.
+AK-4 resolves to ``PASS``, ``FAIL`` or ``INCONCLUSIVE``, and gates the run only
+on the calibration cells §11 scopes it to; every other cell is still reported in
+full but sets no exit code. Neither property changes an interval; they decide
+what the report's reader and the exit code are told.
 """
 
 from __future__ import annotations
@@ -63,10 +62,10 @@ def even_wins(games: int, players: int) -> dict[int, int]:
 
 
 def test_underpowered_cell_is_inconclusive_not_failed() -> None:
-    """n = 20,000 cannot resolve delta = 0.5 pp, whatever the data.
+    """n = 20,000 cannot resolve delta = 0.5 pp, the equivalence margin (D-29).
 
-    This is the D-29 error pointed the other way: reporting it as FAIL would
-    say "the seats are asymmetric" when the data says "n is too small".
+    FAIL asserts that the seats are asymmetric; at this n the data supports only
+    the weaker claim that n is too small, so the verdict is INCONCLUSIVE (D-72).
     """
     result = ak4(cell(games=20_000, players=4, wins=even_wins(20_000, 4)))
     assert not result.conclusive
@@ -75,12 +74,7 @@ def test_underpowered_cell_is_inconclusive_not_failed() -> None:
 
 
 def test_report_last_line_agrees_with_the_verdict() -> None:
-    """The regression D-74 records.
-
-    The report explained the cell was underpowered and that this is not
-    evidence of asymmetry, then printed FAIL three lines below it. A reader
-    trusts the last line.
-    """
+    """The last line of the report is the verdict a reader acts on."""
     result = ak4(cell(games=20_000, players=4, wins=even_wins(20_000, 4)))
     report = result.report()
     assert "UNDERPOWERED" in report
@@ -96,7 +90,7 @@ def test_symmetric_cell_at_adequate_n_passes() -> None:
 
 
 def test_asymmetric_cell_at_adequate_n_fails() -> None:
-    """One seat pushed well outside the margin must still be caught."""
+    """One seat well outside the margin resolves to FAIL at adequate n."""
     wins = {0: 104_000, 1: 100_000, 2: 98_000, 3: 98_000}
     result = ak4(cell(games=400_000, players=4, wins=wins))
     assert result.conclusive
@@ -105,7 +99,7 @@ def test_asymmetric_cell_at_adequate_n_fails() -> None:
 
 
 def test_conclusiveness_is_about_n_not_about_the_wins() -> None:
-    """A wildly skewed small cell is still inconclusive, not failed."""
+    """Skew in an underpowered cell yields INCONCLUSIVE, not FAIL."""
     wins = {0: 12_000, 1: 4_000, 2: 2_000, 3: 2_000}
     result = ak4(cell(games=20_000, players=4, wins=wins))
     assert not result.conclusive
@@ -113,7 +107,7 @@ def test_conclusiveness_is_about_n_not_about_the_wins() -> None:
 
 
 def test_half_width_shrinks_below_delta_between_the_two_n() -> None:
-    """The boundary the trichotomy turns on, stated as a fact about n."""
+    """The half-width crosses AK4_DELTA_PP between the two n; that is the boundary."""
     small = ak4(cell(games=20_000, players=4, wins=even_wins(20_000, 4)))
     large = ak4(cell(games=400_000, players=4, wins=even_wins(400_000, 4)))
     assert small.half_width_pp > AK4_DELTA_PP > large.half_width_pp
@@ -130,7 +124,7 @@ def test_half_width_shrinks_below_delta_between_the_two_n() -> None:
         ((0, 1, 2, 3, 4, 5), 6, ("RANDOM",) * 6, True),
         # EX-5's spread arm: three players evenly spaced on the six-ring.
         ((0, 2, 4), 6, ("RANDOM",) * 3, True),
-        # EX-5's adjacent arms: the gap breaks the symmetry, and that is the
+        # EX-5's adjacent arms: the gap breaks the symmetry, which is the
         # research question rather than an engine fault (D-27).
         ((0, 1, 2), 4, ("RANDOM",) * 3, False),
         ((0, 1, 2), 6, ("RANDOM",) * 3, False),
@@ -139,7 +133,7 @@ def test_half_width_shrinks_below_delta_between_the_two_n() -> None:
         ((0, 1), 4, ("RANDOM",) * 2, False),
         # A deviant policy: 1/k is the wrong reference, not a broken engine.
         ((0, 1, 2, 3), 4, ("SPREAD", "RANDOM", "RANDOM", "RANDOM"), False),
-        # Both defects at once.
+        # Both symmetry breakers at once.
         ((0, 1, 2), 6, ("SPREAD", "RANDOM", "RANDOM"), False),
     ],
 )
@@ -150,7 +144,7 @@ def test_seats_exchangeable(
 
 
 def test_the_calibration_cells_are_exchangeable() -> None:
-    """EX-1 and EX-1b, the two cells §11 names, must be inside the gate."""
+    """EX-1 and EX-1b, the two cells §11 names, lie inside the gate."""
     assert seats_exchangeable((0, 1, 2, 3), 4, ("RANDOM",) * 4)
     assert seats_exchangeable((0, 1, 2, 3, 4, 5), 6, ("RANDOM",) * 6)
 
@@ -158,8 +152,8 @@ def test_the_calibration_cells_are_exchangeable() -> None:
 def test_missing_agents_does_not_silently_widen_the_gate() -> None:
     """An empty agent list means the config was unreadable.
 
-    It has to resolve one way or the other; it resolves to "exchangeable" so
-    a cell is never dropped from the gate by a missing file. A dropped cell
-    is the failure mode that matters — it turns a real asymmetry into silence.
+    The predicate resolves it to "exchangeable" so that an unreadable file never
+    drops a cell from the gate: a dropped cell turns a real asymmetry into
+    silence.
     """
     assert seats_exchangeable((0, 1, 2, 3), 4, ())

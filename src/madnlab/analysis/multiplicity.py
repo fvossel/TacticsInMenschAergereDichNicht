@@ -1,15 +1,15 @@
-"""Holm correction and the §6.4 confirmatory families.
+"""Holm correction and the pre-registered confirmatory families.
 
-Holm runs **within each research question's family, over metrics × contrasts
-jointly** (D-14). The family sizes are not a runtime detail: they are the
-pre-registration, so they live here as data and a test asserts they still add
-up to the 40 hypotheses §6.4 declares.
+Holm runs within each research question's family, over metrics × contrasts
+jointly (D-14). The family sizes are not a runtime detail: they are the
+pre-registration, so they live here as data and a test asserts they still
+match what §6.4 (40 tests in four families), §15 (RQ-5) and §16 (RQ-6)
+declare.
 
-The whole point of D-59 was that these numbers are small. An earlier draft
-treated every pairwise cell contrast as confirmatory, which put EX-4's family
-at 334 tests and drove n to 325k per cell for an estimand nobody had asked
-for. Keeping the families here, next to the correction that consumes them,
-makes the cost of widening one visible.
+D-59 keeps the confirmatory set deliberately narrow, and the per-cell sample
+sizes follow from it: a family's size sets its most stringent Holm threshold,
+so widening one costs n in every cell it covers. Keeping the families here,
+next to the correction that consumes them, makes that cost visible.
 """
 
 from __future__ import annotations
@@ -34,8 +34,8 @@ class HolmResult(NamedTuple):
     adjusted_alpha: float
     rejected: bool
     #: Position in the ascending-p ordering, 1-based. Recorded because the
-    #: step-down structure is what makes Holm's thresholds non-constant, and a
-    #: reader checking a published number needs to see which step it took.
+    #: step-down structure makes Holm's thresholds non-constant: the step a
+    #: hypothesis took is what determines the threshold it faced.
     step: int
 
 
@@ -118,8 +118,8 @@ FAMILIES: dict[str, tuple[tuple[str, ...], tuple[str, ...]]] = {
 }
 
 #: §17's interaction matrix. Sizes rather than contrast lists: the contrasts
-#: are the product of an axis list and a variant list and enumerating them
-#: twice is how the two copies drift apart.
+#: are the product of an axis list and a variant list, and Holm needs only
+#: their count.
 INTERACTION_FAMILIES: dict[str, int] = {
     "RQ-7": 21 * 5,   # 7 EX-4 axes, pairwise, x 5 metrics
     "RQ-8": 9 * 4 * 5,
@@ -130,7 +130,6 @@ INTERACTION_FAMILIES: dict[str, int] = {
 
 #: The total §6.4, §15, §16 and §17 declare together.
 CONFIRMATORY_TOTAL = 57 + sum(INTERACTION_FAMILIES.values())
-
 
 
 def family_hypotheses(family: str) -> tuple[Hypothesis, ...]:
@@ -155,10 +154,10 @@ def holm(
 ) -> list[HolmResult]:
     """Holm-Bonferroni step-down over one family.
 
-    Sorted ascending by p; hypothesis at step ``i`` (1-based) is compared
+    Sorted ascending by p; the hypothesis at step ``i`` (1-based) is compared
     against ``alpha / (m - i + 1)``; the first failure stops rejection for it
-    and everything after it, whatever their own thresholds would allow. That
-    monotonicity is the part a naive per-test comparison gets wrong.
+    and everything after it, whatever their own thresholds would allow. The
+    rejected set is therefore a prefix of the ascending-p ordering.
     """
     if len(p_values) != len(hypotheses):
         raise ValueError(

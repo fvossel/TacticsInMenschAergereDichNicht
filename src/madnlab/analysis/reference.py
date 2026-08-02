@@ -1,17 +1,13 @@
 """AK-9 — an independent re-derivation of the summary row from the event log.
 
-§4.1 forbids analyses from re-deriving a number the summary row already
-carries, and that rule removes the only redundant path: a wrong
-``lead_changes`` or ``winner_rank_at_50`` would pass AK-1 through AK-7
-unchanged and go straight into ``docs/results.md``. AK-9 is the one place the
-rule is violated **on purpose**, so the absent cross-check stops being
-load-bearing.
+§4.1 forbids analyses from re-deriving a number the summary row already carries. AK-9 is the
+one place that rule is violated on purpose: without a second route, a wrong ``lead_changes`` or
+``winner_rank_at_50`` passes AK-1 through AK-7 unchanged and reaches ``docs/results.md``.
 
-The point is that this is a *different* route, not the same code twice. The
-game loop accumulates counters as it plays. This walks the finished event
-stream, reconstructs the board from the moves, and recomputes everything from
-positions. Two implementations agreeing is evidence; one implementation called
-twice is not.
+The route is deliberately unlike the engine's. The game loop accumulates counters as it plays;
+this module walks the finished event stream, reconstructs the board from the moves, and
+recomputes every field from positions. Two implementations agreeing is evidence; one
+implementation called twice is not.
 """
 
 from __future__ import annotations
@@ -37,11 +33,10 @@ from madnlab.eventlog.replay import rules_from_header
 def derive_from_events(header: LogHeader, events: Sequence[Event]) -> dict[str, Any]:
     """Recompute the §6.2 fields by walking ``events``.
 
-    Returns a mapping keyed the way :class:`~madnlab.eventlog.writer.SummaryRow`
-    is, restricted to the fields an event stream can support. Fields the log
-    cannot see — the seeds, the config echo — are not returned rather than
-    guessed, so a caller comparing dictionaries compares only what was actually
-    re-derived.
+    Returns a mapping keyed the way :class:`~madnlab.eventlog.writer.SummaryRow` is, restricted
+    to the fields an event stream can support. Fields the log cannot see — the seeds, the config
+    echo — are omitted rather than guessed, so a caller comparing dictionaries compares only
+    what was re-derived.
     """
     board = board_for(header.seats)
     rules = rules_from_header(header)
@@ -90,9 +85,8 @@ def derive_from_events(header: LogHeader, events: Sequence[Event]) -> dict[str, 
     def _entry_waiting(seat: int) -> bool:
         """D-1: no piece on the ring, and no goal piece movable by any value.
 
-        Reimplemented here rather than imported. Two implementations agreeing
-        is the whole point of AK-9 — calling the engine's predicate would make
-        this one implementation invoked twice.
+        Reimplemented here rather than imported: calling the engine's predicate would reduce
+        AK-9 to one implementation invoked twice.
         """
         base = seat * PIECES_PER_SEAT
         pieces = [positions[base + offset] for offset in range(PIECES_PER_SEAT)]
@@ -143,17 +137,15 @@ def derive_from_events(header: LogHeader, events: Sequence[Event]) -> dict[str, 
     def _end_turn() -> None:
         """Close the open turn, counting it as a pass if nothing moved.
 
-        ``passes_by_seat`` counts **turns** with no legal move (§6.2), while
-        the log emits one ``pass`` event per unusable **roll** (§4.1) — a turn
-        of three attempts that never moves is one pass and three events. AK-9
-        found the two being conflated here; counting pass events would have
-        over-reported passes by the number of extra rolls (D-71).
+        ``passes_by_seat`` counts turns with no legal move (§6.2), while the log emits one
+        ``pass`` event per unusable roll (§4.1): a turn of three attempts that never moves is
+        one pass and three events (D-71).
         """
         nonlocal turn_moved, trace_open, final_margin
         if not turn_moved and turn_seat >= 0:
             passes_by_seat[turn_seat] += 1
-        # The first-win segment's progress trace, closed by the turn in which
-        # the first seat finished — that turn is part of the segment.
+        # The first-win segment's progress trace, closed by the turn in which the first seat
+        # finished — that turn belongs to the segment.
         if trace_open:
             progress_trace.append(tuple(_seat_total(seat) for seat in seats))
             if finished:
@@ -175,8 +167,8 @@ def derive_from_events(header: LogHeader, events: Sequence[Event]) -> dict[str, 
                 turns += 1
                 open_turn = True
                 turn_seat = event.seat
-                # Turn-start quantities, evaluated before this turn's moves
-                # land — which is where §6.2 defines them.
+                # Turn-start quantities, evaluated before this turn's moves land, which is
+                # where §6.2 defines them.
                 if rules.barriers:
                     for seat in seats:
                         if _holds_barrier(seat):
@@ -186,9 +178,9 @@ def derive_from_events(header: LogHeader, events: Sequence[Event]) -> dict[str, 
             dice_rolls += 1
         elif isinstance(event, MoveEvent):
             turn_moved = True
-            # The offered set is on the event, so the extended-capture
-            # obligation is visible without replaying legality: it applied
-            # when a capture was forced and every option cost a lap.
+            # The offered set is on the event, so the extended-capture obligation is visible
+            # without replaying legality: it applied when a capture was forced and every
+            # option cost a lap.
             if (
                 event.restriction == "capture"
                 and event.legal
@@ -199,9 +191,8 @@ def derive_from_events(header: LogHeader, events: Sequence[Event]) -> dict[str, 
             ):
                 extra_lap_offered += 1
             positions[event.piece] = event.to_pos
-            # An extra lap is the one move kind whose target is *behind* its
-            # origin on the ring, which is visible in the stream without any
-            # engine state.
+            # An extra lap is the one move kind whose target lies behind its origin on the
+            # ring, which is visible in the stream without any engine state.
             if (
                 event.kind == "ring"
                 and event.to_pos < event.from_pos

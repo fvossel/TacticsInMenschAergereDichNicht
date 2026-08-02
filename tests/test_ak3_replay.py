@@ -1,14 +1,12 @@
 """AK-3 — the replay validator.
 
-At least 1,000 seed-random games across mixed configs, re-simulated from their
-headers with exact event-stream equality.
+At least 1,000 seed-random games across mixed configurations, re-simulated from their headers
+with exact event-stream equality.
 
-"From the header" is the load-bearing part. If reproduction needed anything
-the runner kept to itself, §4.3's claim would be false — so the validator is
-given the header and nothing else, and the corpus deliberately includes the
-arms where the runner resolves something rather than deriving it (the drawn
-starting seat) and where the engine has state the header does not name (the
-extra laps of ``mandatory_extended``).
+The validator is given the header and nothing else, which is what §4.3 claims. The corpus covers
+the arms where the runner resolves a value rather than deriving it (the drawn starting seat) and
+where the engine carries state the header does not name (the extra laps of
+``mandatory_extended``).
 """
 
 from __future__ import annotations
@@ -26,7 +24,7 @@ from madnlab.run.game import GameSpec, play_indexed_game
 
 AGENT_IDS = ("RANDOM", "SPREAD", "FOCUS_FRONT", "FOCUS_REAR", "GREEDY_CAPTURE")
 
-#: The corpus size AK-3 requires. Split across the configurations below.
+#: Corpus size AK-3 requires, split across the configurations below.
 AK3_GAMES = 1000
 
 
@@ -78,7 +76,7 @@ def test_replay_reproduces_a_thousand_games_across_mixed_configs():
 
 
 def test_replay_needs_only_the_header():
-    """§4.3: the header alone, with no side channel from the runner."""
+    """§4.3: the header alone reproduces the event stream, with no side channel from the runner."""
     spec = GameSpec(
         cell_key="ak3/header-only",
         seats=6,
@@ -112,12 +110,11 @@ def test_the_drawn_starting_seat_is_reproduced_not_redrawn():
 
 
 def test_mismatch_reporting_actually_reports_the_position():
-    """The failure path has to work, or AK-3 fails with a useless message.
+    """A mismatch names the position at which the two streams diverge.
 
-    ``ReplayMismatch`` is a NamedTuple, so a field named ``index`` would be
-    shadowed by ``tuple.index`` and ``describe()`` would silently format a
-    bound method instead of the position. That is valid Python, so neither
-    ruff nor mypy flags it — only exercising the path does.
+    ``describe()`` renders the text a failing AK-3 run prints, so the assertions read that text
+    rather than the fields: the position has to appear as a number, not as a bound-method repr,
+    and the stream that has already ended has to render as ``<end>``.
     """
     spec = GameSpec(
         cell_key="ak3/mismatch", seats=4, players=2, seat_pattern=SeatPattern.OPPOSITE,
@@ -135,7 +132,7 @@ def test_mismatch_reporting_actually_reports_the_position():
 
 
 def test_version_skew_is_refused_rather_than_reported_as_a_mismatch():
-    """D-33: a cross-version replay is not a bug in the game."""
+    """D-33: a cross-version replay raises rather than being reported as an event mismatch."""
     spec = GameSpec(
         cell_key="ak3/skew", seats=4, players=2, seat_pattern=SeatPattern.OPPOSITE,
         rules=RuleSet(), agent_ids=("RANDOM", "SPREAD"), master_seed=1,
@@ -149,7 +146,7 @@ def test_version_skew_is_refused_rather_than_reported_as_a_mismatch():
 
 
 def test_the_offered_legal_set_and_chosen_index_agree(request):
-    """§4.1: the log must let AK-5 be audited without re-simulating."""
+    """§4.1: the log lets AK-5 be audited without re-simulating."""
     spec = GameSpec(
         cell_key="ak3/offered", seats=4, players=4, seat_pattern=SeatPattern.ADJACENT,
         rules=RuleSet(capture_mode=CaptureMode.MANDATORY, barriers=True),

@@ -1,8 +1,7 @@
 """AK-1 — rule conformance from hand-crafted scenarios.
 
-One test per clause of requirements §11's AK-1 list, plus the nine scenarios
-the M1 engine review showed were needed and §11 does not name. Each test cites
-the clause or ledger row it pins.
+One test per clause of requirements §11's AK-1 list, plus nine scenarios §11 does not name.
+Each test cites the clause or ledger row it pins.
 """
 
 from __future__ import annotations
@@ -92,7 +91,7 @@ def test_bonus_roll_requires_the_three_attempts_variant():
 
 
 def test_clearing_is_forced_from_turn_one_under_the_baseline(b4):
-    """GM-3.4 + D-55: the corrected setup puts clearing in force immediately."""
+    """GM-3.4 + D-55: with a piece already on the entry field, clearing binds from turn one."""
     seats = occupied_seats(4, 4, SeatPattern.ADJACENT)
     state = initial_state(b4, seats, BASELINE)
     for roll in range(1, 7):
@@ -104,17 +103,15 @@ def test_clearing_is_forced_from_turn_one_under_the_baseline(b4):
 def test_forced_entry_outranks_mandatory_capture(b4):
     """D-9: clearing > forced entry > mandatory capture.
 
-    A 6 is rolled, a yard piece is available, and a capture is available
-    elsewhere. Under the chosen lattice the 6 is used for entry and the
-    capture is not forced.
+    A 6 is rolled, a yard piece is available, and a capture is available elsewhere. The 6 goes
+    to entry and the capture is not forced.
     """
     # seat 0 piece 1 on pos 5; seat 1 piece 0 where seat 0's pos 5+6=11 lands.
     victim = pos_on_field(b4, 1, b4.ring_field(0, 11))
 
-    # Precondition, so the test cannot pass vacuously: the capture is genuinely
-    # on the table for this piece and roll. It has to be checked on a state
-    # *without* a yard piece — with one, GM-3.5's forced entry already narrows
-    # the set even at capture_mode=optional, which is the very interaction
+    # Precondition against a vacuous pass: the capture really is on the table for this piece and
+    # roll. It has to be checked on a state *without* a yard piece — with one, GM-3.5's forced
+    # entry already narrows the set even at capture_mode=optional, which is the interaction
     # under test.
     no_yard = state_for(b4, s0=(20, 5, 21, 22), s1=(victim,))
     assert any(m.captures == 4 for m in legal_moves(b4, no_yard, 0, 6, STRICT))
@@ -160,7 +157,7 @@ def test_goal_entry_requires_a_fitting_roll(b4, roll, expected):
 
 
 def test_no_overshoot_inside_the_goal_column(b4):
-    """D-54, project choice: no bounce-back, the move is simply not generated."""
+    """D-54, project choice: no bounce-back — an overshooting move is not generated."""
     state = state_for(b4, s0=(43, 44))
     assert targets(legal_moves(b4, state, 0, 1, STRICT), piece=0) == []
     assert targets(legal_moves(b4, state, 0, 2, STRICT), piece=0) == []
@@ -176,8 +173,8 @@ def test_goal_jumping_is_allowed_by_default_and_forbidden_by_the_flag(b4):
 def test_goal_no_jump_last_piece_enters_on_the_first_field(b4):
     """D-53: the variant's second sentence follows from the no-jump rule.
 
-    With three pieces home on indices 1, 2 and 3, the last one can only enter
-    on index 0 — every deeper field is occupied and every path crosses one.
+    With three pieces home on the deeper indices, the last one can only enter on the first goal
+    field — every deeper field is occupied and every longer path crosses one.
     """
     state = state_for(b4, s0=(40, 42, 43, 44))
     assert targets(legal_moves(b4, state, 0, 1, NO_JUMP), piece=0) == [41]
@@ -216,10 +213,9 @@ def test_barrier_blocks_landing_and_passing(b4):
 def test_barrier_pieces_cannot_be_captured(b4):
     """GM-6.3, which falls out of the two-occupant landing rule.
 
-    Stated as a differential against the single-piece case: with one opponent
-    piece on the field the move is a capture, with two it does not exist at
-    all. Asserting only "no capturing move" would pass vacuously whenever the
-    mover has no move either.
+    Stated as a differential against the single-piece case: with one opponent piece on the field
+    the move is a capture, with two it does not exist at all. A bare "no capturing move"
+    assertion passes vacuously whenever the mover has no move either.
     """
     target = pos_on_field(b4, 1, b4.ring_field(0, 5))
     single = state_for(b4, s0=(2,), s1=(target,))
@@ -265,7 +261,7 @@ def test_extended_lap_is_not_generated_without_a_capture(b4):
 
 
 def test_extended_lap_path_scan_crosses_the_ring_wrap(b4):
-    """Review scenario: the barrier check must follow the move across pos == R."""
+    """GM-6.2 on the extended lap: the barrier scan follows the move across pos == R."""
     extended_barriers = RuleSet(
         cold_start=ColdStart.STRICT,
         capture_mode=CaptureMode.MANDATORY_EXTENDED,
@@ -286,7 +282,7 @@ def test_extended_lap_path_scan_crosses_the_ring_wrap(b4):
 
 @pytest.mark.parametrize("yard_pieces", [1, 2, 3, 4])
 def test_exactly_one_entry_move_regardless_of_yard_count(b4, yard_pieces):
-    """D-60 regression."""
+    """D-60: yard pieces are interchangeable, so entry contributes one move, not one per piece."""
     on_ring = [20 + i for i in range(4 - yard_pieces)]
     state = state_for(b4, s0=tuple(on_ring) + (0,) * yard_pieces)
     moves = legal_moves(b4, state, 0, 6, RuleSet(cold_start=ColdStart.STRICT))
@@ -294,7 +290,7 @@ def test_exactly_one_entry_move_regardless_of_yard_count(b4, yard_pieces):
 
 
 def test_barrier_does_not_duplicate_ring_moves(b4):
-    """D-61 blocker regression: the bias measured at -15% on barrier_turns."""
+    """D-61: the two pieces of a barrier are interchangeable and yield a single ring move."""
     state = state_for(b4, s0=(5, 5, 20, 30))
     moves = legal_moves(b4, state, 0, 3, BARRIERS)
     assert len(moves) == 3
@@ -317,7 +313,7 @@ def test_barrier_does_not_duplicate_goal_entry_or_extra_lap(b4):
 
 
 def test_forced_sets_inherit_the_deduplication(b4):
-    """D-61: the clearing and capture filters must not resurrect duplicates."""
+    """D-61: the clearing and capture filters preserve the deduplication of the full set."""
     clearing, restriction = legal_moves_with_restriction(
         b4, state_for(b4, s0=(1, 1, 0, 20)), 0, 3, BARRIERS
     )
@@ -349,7 +345,7 @@ def test_seat_outside_the_board_is_rejected(b4, seat):
 
 
 def test_no_goal_move_can_land_back_on_the_ring(b4):
-    """D-62: the invalid-Move class cannot be constructed even in principle."""
+    """D-62: a goal move always ends past the ring, never back on it."""
     state = state_for(b4, s0=(41, 0, 0, 0))
     for roll in range(1, 7):
         for move in legal_moves(b4, state, 0, roll, STRICT):

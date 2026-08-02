@@ -117,13 +117,17 @@ class GameOutcome(NamedTuple):
     stalemate: bool
     #: True when the game hit :data:`MAX_TURNS_PER_GAME` with more than one
     #: seat still unfinished (D-70). Also a measured outcome; the analysis
-    #: layer reports the rate per cell and no estimand may be published from a
-    #: cell whose rate is non-negligible without saying so.
+    #: layer reports the rate per cell, and an estimand from a cell with a
+    #: non-negligible rate is conditional on the game having played out.
     abandoned: bool
 
 
 class GameTerminationError(RuntimeError):
-    """A game or turn exceeded its safety bound — a legality defect."""
+    """A turn exceeded :data:`MAX_ROLLS_PER_TURN`.
+
+    The per-game bound does not raise: hitting :data:`MAX_TURNS_PER_GAME`
+    sets ``abandoned`` and returns an outcome (D-70).
+    """
 
 
 def _is_deadlocked(
@@ -135,9 +139,9 @@ def _is_deadlocked(
 ) -> bool:
     """Whether no unfinished seat has a legal move on **any** die value.
 
-    Expensive — 6 legality calls per unfinished seat — so it is only consulted
-    after a full round has passed without a single move, which is cheap to
-    detect and which a live game essentially never triggers.
+    Six legality calls per unfinished seat, so it is consulted only after a
+    full round has passed without a single move — the cheap trigger for the
+    expensive test.
 
     A round with no moves is not by itself a deadlock: under ``strict`` a round
     in which nobody rolls a 6 has no legal move anywhere and is perfectly
@@ -300,11 +304,10 @@ def play_game(
         ) -> tuple[bool, Move | None]:
             """Roll, choose and apply. Returns ``(moved, move)``.
 
-            ``seat``, ``agent`` and ``rng`` are bound as defaults rather
-            than captured: a closure over the loop variables would read
-            whatever the *last* iteration left behind if it ever outlived
-            its turn, and the counters it mutates are exactly the ones
-            AK-5 is checked against.
+            ``seat``, ``agent`` and ``rng`` are bound as defaults, not
+            captured, so a call uses the values of the turn that defined the
+            closure. The counters it mutates are AK-5's, so that attribution
+            has to be exact.
             """
             nonlocal state, captures_total, forcing_offered, barriers_formed
             nonlocal extra_lap_offered
@@ -494,10 +497,10 @@ def play_game(
     def _checkpoint(num: int, den: int) -> tuple[int, bool]:
         """The winner's competition rank at ``ceil(num/den * turns_to_first_win)``.
 
-        Integer arithmetic throughout: the checkpoint is a turn index, and
-        ``int(0.75 * 4)`` is 2 on some floats and 3 on others. Returns ``-1``
-        when there was no first win, so a caller cannot mistake "no checkpoint"
-        for "the winner led".
+        Integer arithmetic throughout: the checkpoint is a turn index, so the
+        ceiling is taken over ``num`` and ``den`` directly and never through a
+        float ratio. Returns ``-1`` when there was no first win, so a caller
+        cannot read "no checkpoint" as "the winner led".
         """
         if turns_to_first_win <= 0 or not progress_trace:
             return -1, False

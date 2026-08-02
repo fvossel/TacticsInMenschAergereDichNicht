@@ -1,11 +1,9 @@
 """The §6.4 contrast estimators, against the numbers §6.3 works out by hand.
 
-§6.3 states three quantities explicitly — the multinomial SE at p = 0.25 and
-n = 100k, the independent SE for the same counts, and the variance ratio a
-pure location shift produces. A specification that carries its own worked
-values is a specification that can be tested against, and these are the cases
-where using the wrong estimator is invisible in the output but wrong by
-about 15%.
+§6.3 states three quantities explicitly: the multinomial SE at p = 0.25 and n = 100k, the
+independent SE for the same counts, and the variance ratio a pure location shift produces. Each
+of the wrong estimators here still returns a plausible number, so the tests pin the values and
+not just the shape of the output.
 """
 
 from __future__ import annotations
@@ -32,6 +30,7 @@ from madnlab.analysis.intervals import z_for
 
 
 def half_width_pp(estimate: Estimate, level: float = 0.95) -> float:
+    """Standard error implied by the interval, in percentage points."""
     width: float = estimate.interval.high - estimate.interval.low
     return width / (2 * z_for(level)) * 100
 
@@ -43,28 +42,27 @@ def test_multinomial_se_matches_the_specification() -> None:
 
 
 def test_independent_se_is_the_smaller_wrong_one() -> None:
-    """§6.3: 0.194 pp — what two independent Wilson intervals would imply.
+    """§6.3: 0.194 pp — what two independent Wilson intervals imply for the same counts.
 
-    Kept as a test because the failure mode is silent: the wrong estimator
-    produces a plausible number about 15% too narrow, and every interval
-    built on it is overconfident in the same direction.
+    Two seat shares from the same games are negatively correlated, so the independent form is
+    about 15% too narrow and every interval built on it is overconfident in that direction.
     """
     estimate = proportion_difference(25_000, 100_000, 25_000, 100_000, label="x")
     assert half_width_pp(estimate) == pytest.approx(0.194, abs=0.001)
 
 
 def test_the_multinomial_se_is_wider_than_the_independent_one() -> None:
-    """The direction of the error, stated so a refactor cannot flip it."""
+    """The multinomial contrast is the wider of the two estimators at these counts."""
     within = seat_difference(25_000, 25_000, 100_000, label="within")
     between = proportion_difference(25_000, 100_000, 25_000, 100_000, label="between")
     assert half_width_pp(within) > half_width_pp(between)
 
 
 def test_pure_location_shift_moves_variance_but_not_cv() -> None:
-    """§6.3's worked case for why the CV ratio is the primary estimand.
+    """§6.3's worked case for why the CV ratio is the primary dispersion estimand.
 
-    A +10% location shift at constant CV gives a variance ratio of 1.21 —
-    which would read as a dispersion effect. The CV ratio stays at 1.
+    A +10% location shift at constant CV gives a variance ratio of 1.21, which reads as a
+    dispersion effect. The CV ratio stays at 1.
     """
     rng = random.Random(7)
     base = [rng.gauss(100, 20) for _ in range(4_000)]
@@ -78,7 +76,7 @@ def test_pure_location_shift_moves_variance_but_not_cv() -> None:
 
 
 def test_cv_ratio_detects_a_real_dispersion_change() -> None:
-    """The complement: widen the spread at constant mean and it must show."""
+    """The complement: widen the spread at constant mean and the CV ratio moves with it."""
     rng = random.Random(11)
     base = [rng.gauss(100, 10) for _ in range(4_000)]
     wide = [100 + (value - 100) * 1.5 for value in base]
@@ -129,13 +127,11 @@ def test_empty_arms_are_reported_not_guessed() -> None:
 
 @pytest.mark.parametrize("shift", [0.0, 2.0, -3.5])
 def test_the_estimate_lies_inside_its_own_interval(shift: float) -> None:
-    """The invariant that catches a one-sample bootstrap used on two samples.
+    """The point estimate lies inside its own interval, at zero shift and at either sign.
 
-    Concatenating the arms and resampling the result mixes them in every
-    draw, so the replicates trace the permutation null instead of the
-    sampling distribution. The point estimate then sits *outside* its own
-    interval — a mean difference of 2.0 with a CI of [-0.21, 0.22] — while
-    every individual number still looks plausible.
+    The bootstrap resamples each arm separately. Resampling the concatenated arms instead traces
+    the permutation null, which is centred on zero whatever the true shift, and so can place the
+    estimate outside its own interval while every individual number still looks plausible.
     """
     rng = random.Random(23)
     base = [rng.gauss(20, 3) for _ in range(1_500)]
@@ -156,15 +152,13 @@ def test_mean_difference_recovers_a_known_shift() -> None:
     assert estimate.excludes_zero
 
 
-# -- the two estimators D-77 corrects ---------------------------------------
+# -- fixed-reference and interaction estimands ------------------------------
 
 
 def test_a_fixed_reference_carries_no_sampling_variance() -> None:
-    """SQ-1's case, and the factor the wrong estimator gets wrong.
+    """SQ-1's case: the reference 1/k is arithmetic and carries no sampling variance.
 
-    1/k is arithmetic. Passing it as a second sample of the same size makes
-    the interval sqrt(2) times too wide — a plausible-looking number, and
-    every RQ-3 interval built on it is conservative by 41%.
+    Treating it as a second sample of the same size makes the interval sqrt(2) times too wide.
     """
     fixed = proportion_vs_reference(50_000, 200_000, 0.25, label="fixed")
     two_sample = proportion_difference(
@@ -182,11 +176,7 @@ def test_reference_test_recovers_a_known_deviation() -> None:
 
 
 def test_interaction_is_zero_when_both_differences_agree() -> None:
-    """What makes a difference-in-differences an interaction.
-
-    The binding D-77 replaced compared two player counts at one rule level,
-    which measures 1/2 against 1/6 — arithmetic, reported as a finding.
-    """
+    """An interaction is zero when both simple differences agree, whatever their levels."""
     equal = difference_in_differences(
         (5_200, 10_000), (5_000, 10_000), (2_600, 10_000), (2_400, 10_000), label="x"
     )

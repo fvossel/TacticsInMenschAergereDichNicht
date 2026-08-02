@@ -19,9 +19,9 @@ Structure of the implementation
 
 3. The survivors are sorted canonically.
 
-Keeping generation and forcing apart is what makes the lattice auditable:
-every restriction is one filter over one list, and the restriction that fired
-is reported so the event log can record it (§4.1) and AK-5 can count it.
+Keeping generation and forcing apart makes the lattice auditable: every
+restriction is one filter over one list, and the restriction that fired is
+reported so the event log can record it (§4.1) and AK-5 can count it.
 """
 
 from __future__ import annotations
@@ -94,8 +94,8 @@ def _ring_occupancy(board: Board, state: GameState) -> dict[int, list[int]]:
     piece per field (D-34) and are not represented here.
 
     Values are lists appended to in ascending piece index, not rebuilt tuples:
-    this runs once per :func:`legal_moves` call over at most ``seats * 4``
-    pieces, and it is on the hot path NF-2's target has to clear.
+    this runs once per :func:`legal_moves` call, on the hot path NF-2's target
+    has to clear.
     """
     occupancy: dict[int, list[int]] = {}
     ring_length = board.ring_length
@@ -206,10 +206,9 @@ def _candidate_moves(
 ) -> list[Move]:
     """Every move legal on its own terms, before the GM-5.1 lattice.
 
-    ``occupancy`` is read-only here; the annotation says so rather than a
-    comment, because an in-place update inside the per-piece loop would make
-    legality depend on piece iteration order and NF-1's determinism claims are
-    made in this module.
+    ``occupancy`` is typed read-only: an in-place update inside the per-piece
+    loop would make legality depend on piece iteration order, and NF-1's
+    determinism claims are made in this module.
     """
     moves: list[Move] = []
     ring_length = board.ring_length
@@ -219,15 +218,10 @@ def _candidate_moves(
     # exactly two ways: any number of them in the yard, and — under
     # ``barriers`` — two of them on one ring field. Move generation reads only
     # ``(pos, seat, roll, rules, occupancy)``, never the piece index, so
-    # co-located pieces produce identical moves and the second is a
-    # behavioural duplicate.
+    # co-located pieces produce identical moves.
     #
-    # The duplicates are not cosmetic. ``RANDOM`` chooses uniformly over
-    # ``legal``, so a duplicated option carries twice the weight of every
-    # other: uniform agents would break barriers at roughly twice the intended
-    # rate, which measures as a 15-16% depression of ``barrier_turns`` — an
-    # order of magnitude past D-40's 0.5 pp relevance threshold, landing
-    # directly in RQ-2's barriers main effect and RQ-4's EX-6c/6d.
+    # The skip is not cosmetic: ``RANDOM`` selects uniformly over ``legal``, so
+    # a duplicated option would carry twice the weight of every other one.
     #
     # Skipping is unconditional rather than emit-conditional: two pieces at
     # the same position either both produce a move or both produce none, so
@@ -256,15 +250,12 @@ def _candidate_moves(
         if location is PieceLocation.GOAL:
             current = board.goal_index(pos)
             target = current + roll
-            # D-54: a roll that would carry the piece past the last goal field
-            # generates no move. The rulebook is silent; this is the project
-            # choice, and it is deliberately not a bounce-back.
+            # D-54: a roll that carries the piece past the last goal field
+            # generates no move, and is deliberately not a bounce-back.
             #
-            # The lower bound is not reachable from a d6 — ``legal_moves``
-            # rejects rolls outside 1..6 (D-62) — but it is checked anyway so
-            # that a ``GOAL`` record whose ``to_pos`` falls back onto the ring,
-            # violating the encoding every consumer relies on, cannot be
-            # constructed at all.
+            # The lower bound is unreachable from a d6 (D-62), but is checked
+            # so that a ``GOAL`` record whose ``to_pos`` falls back onto the
+            # ring cannot be constructed at all.
             if not 0 <= target < GOAL_FIELDS:
                 continue
             if _goal_path_clear(board, state, seat, current + 1, target, rules):
@@ -290,8 +281,8 @@ def _candidate_moves(
         ring_steps = ring_length - pos
         goal_target = destination - ring_length - 1
 
-        # Exact fit on entry (GM-3.8, verified): a roll that overshoots the
-        # column does not produce a move for this piece.
+        # Exact fit on entry (GM-3.8): a roll that overshoots the column does
+        # not produce a move for this piece.
         if (
             goal_target < GOAL_FIELDS
             and _ring_path_clear(board, occupancy, seat, pos, ring_steps, rules)
@@ -375,9 +366,8 @@ def legal_moves_with_restriction(
     Domain (D-62, D-63): ``roll`` is a d6 value and ``seat`` is a seat index on
     ``board``. Both are checked, because an out-of-domain ``seat`` would
     otherwise read another seat's pieces through Python's negative indexing and
-    return a plausible-looking move — a silent wrong answer rather than a loud
-    failure. ``legal_moves`` is deliberately blind to *which* seats are in
-    play: the game loop skips seats outside ``seats_in_play``.
+    return a plausible-looking move. ``legal_moves`` is blind to *which* seats
+    are in play: the game loop skips seats outside ``seats_in_play``.
     """
     if not 1 <= roll <= 6:
         raise ValueError(
@@ -392,9 +382,9 @@ def legal_moves_with_restriction(
     if not candidates:
         return (), Restriction.NONE
 
-    # 1. Entry-field clearing (GM-3.4). Verified official, and stated by the
-    #    rulebook as an express exception *inside* the 6-rule, so the priority
-    #    is textual rather than an artefact of clause ordering (D-2).
+    # 1. Entry-field clearing (GM-3.4). The rulebook states this as an express
+    #    exception *inside* the 6-rule, so the priority is textual rather than
+    #    an artefact of clause ordering (D-2).
     if _has_yard_piece(state, seat):
         occupants = _entry_field_occupants(state, seat)
         if occupants:
@@ -404,9 +394,9 @@ def legal_moves_with_restriction(
 
     # 2. Forced entry on a 6 (GM-3.5). Never fires under ``free_entry``, where
     #    entering is an ordinary legal move (D-7). Reaching this point means
-    #    clearing was either not in force or not legal — which is exactly
-    #    D-52's second clause: an entry-field occupant that cannot move gives
-    #    way to the ordinary forced entry.
+    #    clearing was either not in force or not legal, so D-52's second clause
+    #    applies: an entry-field occupant that cannot move gives way to the
+    #    ordinary forced entry.
     if (
         rules.cold_start.requires_six_to_enter
         and roll == 6
@@ -416,8 +406,7 @@ def legal_moves_with_restriction(
         if entries:
             return _canonical(entries), Restriction.FORCED_ENTRY
 
-    # 3. Mandatory capture (GM-5). Subordinate to both clauses above, by the
-    #    project owner's decision recorded in D-9.
+    # 3. Mandatory capture (GM-5). Subordinate to both clauses above (D-9).
     if rules.capture_mode.is_forcing:
         capturing = [m for m in candidates if m.captures is not None]
         if capturing:

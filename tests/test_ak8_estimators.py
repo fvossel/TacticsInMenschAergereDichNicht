@@ -1,12 +1,11 @@
 """AK-8 — estimator calibration.
 
-Wilson and BCa must achieve nominal coverage on synthetic data with known
-truth, and Holm must reproduce a hand-worked example.
+Wilson and BCa must achieve nominal coverage on synthetic data with known truth, and Holm
+must reproduce a hand-worked example (§11).
 
-This is the gate §11 originally lacked entirely: every AK-1..AK-7 criterion
-tested the simulated games, and §1 says the games are the by-product. A
-mis-implemented interval would have passed all of them and gone straight into
-``docs/results.md``.
+AK-1..AK-7 constrain the simulated games, which §1 calls the by-product. None of them
+constrains the estimators: a mis-implemented interval passes every one and lands in
+``docs/results.md``. That is what this criterion covers.
 """
 
 from __future__ import annotations
@@ -41,7 +40,7 @@ from madnlab.analysis.multiplicity import (
 
 
 def test_wilson_matches_a_hand_worked_value():
-    """A textbook case, so the formula is pinned and not merely self-consistent."""
+    """A textbook case, so the formula is pinned against a published value, not against itself."""
     interval = wilson(successes=25, trials=100, level=0.95)
     assert interval.estimate == 0.25
     # z = 1.959964, denominator = 1 + z²/n = 1.038415,
@@ -57,7 +56,7 @@ def test_wilson_matches_a_hand_worked_value():
 
 
 def test_wilson_achieves_nominal_coverage():
-    """The property the gate is actually about."""
+    """The 95% interval must cover the true p at that rate across several (p, n) regimes."""
     rng = random.Random(20260801)
     for true_p, trials in ((0.25, 200), (0.05, 400), (0.5, 100)):
         covered = 0
@@ -67,8 +66,8 @@ def test_wilson_achieves_nominal_coverage():
             if not wilson(successes, trials, level=0.95).excludes(true_p):
                 covered += 1
         rate = covered / replications
-        # Monte-Carlo error at 4000 replications is ~0.35 pp; Wilson is known
-        # to be slightly conservative, so the band is asymmetric on purpose.
+        # Monte-Carlo error at 4000 replications is ~0.35 pp, and Wilson is slightly
+        # conservative, so the accepted band is asymmetric around 0.95.
         assert 0.93 <= rate <= 0.98, f"p={true_p} n={trials} coverage {rate:.3f}"
 
 
@@ -84,11 +83,10 @@ def test_z_for_matches_tabulated_critical_values():
 
 
 def test_multinomial_difference_is_wider_than_two_independent_wilsons():
-    """§6.3's stated arithmetic: 0.224 pp against 0.194 pp at p=0.25, n=100k.
+    """§6.3's arithmetic: 0.224 pp against 0.194 pp at p=0.25, n=100k.
 
-    Two independent Wilson intervals drop the covariance term, which makes the
-    difference interval too narrow — the direction that manufactures false
-    positives.
+    Two independent Wilson intervals drop the covariance between the two proportions, which
+    narrows the difference interval in the direction that produces false positives.
     """
     games = 100_000
     wins = games // 4
@@ -129,7 +127,7 @@ def test_bca_achieves_nominal_coverage_on_a_known_mean():
 
 
 def test_bca_is_reproducible_from_its_seed_and_only_from_it():
-    """NF-7: a published interval is reproducible, and its seed is required."""
+    """NF-7: a published interval is reproducible, and the seed is required, not defaulted."""
     sample = [float(value) for value in range(1, 60)]
     mean = lambda values: sum(values) / len(values)  # noqa: E731
     first = bca_bootstrap(sample, mean, resamples=200, seed=7)
@@ -150,11 +148,10 @@ def test_bca_rejects_a_sample_it_cannot_accelerate():
 
 
 def test_cv_ratio_is_blind_to_a_pure_location_shift():
-    """The reason D-16 made it primary over the raw variance ratio.
+    """Why D-16 makes the CV ratio primary over the raw variance ratio.
 
-    A +10% shift at constant relative dispersion leaves the CV ratio at 1 while
-    the raw variance ratio reads 1.21 — which at the pre-registered n would
-    publish a length effect as a dynamics effect.
+    A +10% shift at constant relative dispersion leaves the CV ratio at 1 while the raw
+    variance ratio reads 1.21, which reports a length effect as a dynamics effect.
     """
     rng = random.Random(11)
     control = [rng.gauss(100, 20) for _ in range(4000)]
@@ -189,9 +186,8 @@ def test_holm_reproduces_a_hand_worked_example():
     4     0.700    0.05/1 = 0.05000           stop
     ====  =======  =========================  =======
 
-    Note that 0.013 and 0.020 would both fail a plain Bonferroni comparison
-    against 0.0125; Holm's widening thresholds are what admits them, and that
-    is the behaviour worth pinning.
+    Both 0.013 and 0.020 fail a plain Bonferroni comparison against 0.0125; Holm's widening
+    thresholds are what admit them, and that is the behaviour pinned here.
     """
     hypotheses = [Hypothesis("RQ-X", "m", f"c{i}") for i in range(4)]
     results = holm([0.003, 0.013, 0.020, 0.700], hypotheses, alpha=0.05)
@@ -203,7 +199,7 @@ def test_holm_reproduces_a_hand_worked_example():
 
 
 def test_holm_is_monotone_a_failure_stops_everything_after_it():
-    """The part a naive per-test comparison gets wrong."""
+    """The first failure ends the procedure, whatever the later p-values are."""
     hypotheses = [Hypothesis("RQ-X", "m", f"c{i}") for i in range(3)]
     # 0.030 fails at step 1 (0.05/3 = 0.0167), so 0.040 must not be rejected
     # even though it is below its own step-3 threshold of 0.05.
@@ -212,12 +208,11 @@ def test_holm_is_monotone_a_failure_stops_everything_after_it():
 
 
 def test_the_confirmatory_families_still_add_up():
-    """The declared total is the pre-registration; drift here is drift in the claim.
+    """The declared total is the pre-registration, so the family sizes must sum to it exactly.
 
-    The core families are enumerated contrast by contrast; the interaction
-    families of §17 are declared as sizes, because their contrasts are the
-    product of an axis list and a variant list and writing that product out
-    twice is how two copies of it drift apart.
+    Core families are enumerated contrast by contrast. The interaction families of §17 are
+    declared as sizes instead, because their contrasts are the product of an axis list and a
+    variant list, and that product is written out in exactly one place.
     """
     core = sum(family_size(name) for name in FAMILIES)
     assert core + sum(INTERACTION_FAMILIES.values()) == CONFIRMATORY_TOTAL, {
@@ -236,7 +231,7 @@ def test_the_confirmatory_families_still_add_up():
 
 
 def test_first_thresholds_match_the_ledger():
-    """D-59's table, which is what the sample sizes were derived from."""
+    """D-59's table: the first Holm threshold each family's sample size is derived from."""
     assert first_threshold("RQ-1") == pytest.approx(0.00625)
     assert first_threshold("RQ-2") == pytest.approx(0.05 / 18)
     assert first_threshold("RQ-3") == pytest.approx(0.0125)
@@ -247,7 +242,11 @@ def test_first_thresholds_match_the_ledger():
 
 
 def test_chi2_sf_matches_tabulated_critical_values():
-    """The implementation is verified, not trusted (no SciPy by design)."""
+    """Tabulated values pin the in-house ``chi2_sf``.
+
+    NF-7 keeps the analysis layer off BLAS-backed dependencies rather than calling SciPy, so a
+    borderline threshold verdict reads the same on every machine.
+    """
     assert chi2_sf(3.841459, 1) == pytest.approx(0.05, abs=1e-6)
     assert chi2_sf(16.918978, 9) == pytest.approx(0.05, abs=1e-6)
     assert chi2_sf(27.877165, 9) == pytest.approx(0.001, abs=1e-6)

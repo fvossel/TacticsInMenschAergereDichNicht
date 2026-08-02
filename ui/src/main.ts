@@ -204,9 +204,8 @@ function renderSeats(log: GameLog, frame: Frame, geometry: ReturnType<typeof geo
 }
 
 function renderMetrics(log: GameLog, frame: Frame): void {
-  // The dynamics metrics stop at the first finisher (§6.2's segment
-  // convention), so the panel says so rather than showing a number that
-  // quietly stopped moving.
+  // Dynamics metrics are counted over the segment that ends at the first finisher (§6.2), so
+  // the lead-change row is labelled closed once a seat has finished.
   const segmentClosed = frame.firstWinAt !== null;
   const rows: [string, string][] = [
     ["turns", String(frame.turns)],
