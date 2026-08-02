@@ -12,7 +12,6 @@ license = { file = "LICENSE" }
 dependencies = []
 
 [project.optional-dependencies]
-analysis = ["numpy>=1.26", "scipy>=1.11"]
 dev = ["pytest>=8.0", "ruff>=0.5", "mypy>=1.11"]
 
 [project.scripts]
@@ -29,9 +28,9 @@ addopts = "-q"
 line-length = 100
 src = ["src", "tests"]
 
-# The engine review found one signature that drifted out of sync with its
-# callers during a refactor, in the module where NF-1's determinism claims are
-# made. A type checker removes that error class for free.
+# A type checker removes the class of error where a signature and its callers
+# drift apart, which matters most in the modules that carry the determinism
+# claims.
 [tool.mypy]
 python_version = "3.13"
 files = ["src", "tests", "benchmarks"]

@@ -5,10 +5,10 @@ that actually gets published: §6.4's decision rules are threshold rules — "CI
 "CI excludes zero" — so recording the bootstrap seed and the resample count is what fixes a
 borderline verdict to one value across every run on byte-identical input.
 
-The manifest records the environment alongside the seed, because BLAS reduction order
-differs across CPU architectures and library builds. Simulation may fan out across HPC
-nodes; analysis runs single-node under a pinned environment, and re-running it elsewhere is
-a new analysis rather than a reproduction.
+The manifest records the environment alongside the seed, because floating-point summation
+order and library builds differ across interpreters and architectures. Simulation may fan
+out across any number of processes or machines; analysis runs in one process under a pinned
+environment, and re-running it elsewhere is a new analysis rather than a reproduction.
 """
 
 from __future__ import annotations
